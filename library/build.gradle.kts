@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "delta.codecharacter"
-version = "2023.0.1"
+version = "2024.0.1"
 
 repositories {
     mavenCentral()

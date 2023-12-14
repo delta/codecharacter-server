@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 services:
 
   db:
@@ -9,9 +9,9 @@ services:
     volumes:
       - ./data/mongo_dev:/data/db
     networks:
-      - common
+      - codecharacter_common
     environment:
-      MONGO_INITDB_DATABASE: codecharacter_2022
+      MONGO_INITDB_DATABASE: codecharacter_2024
     restart: always
 
 
@@ -26,7 +26,7 @@ services:
       - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - ./data/rabbitmq_dev:/var/lib/rabbitmq/mnesia/
     networks:
-      - common
+      - codecharacter_common
     restart: always
 
   core:
@@ -42,10 +42,10 @@ services:
     volumes:
       - ./:/server
     networks:
-      - common
+      - codecharacter_common
 
 
 networks:
-  common:
+  codecharacter_common:
     name: codecharacter_common
     driver: bridge

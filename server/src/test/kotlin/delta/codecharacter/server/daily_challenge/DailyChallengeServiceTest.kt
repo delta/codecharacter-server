@@ -32,7 +32,7 @@ internal class DailyChallengeServiceTest {
                 dailyChallengeRepository, publicUserService, dailyChallengeScoreAlgorithm
             )
 
-        ReflectionTestUtils.setField(dailyChallengeService, "startDate", "2023-02-15T23:00:00Z")
+        ReflectionTestUtils.setField(dailyChallengeService, "startDate", "2024-02-15T23:00:00Z")
         every { publicUserService.getPublicUser(any()) } returns
             TestAttributes.publicUser.copy(dailyChallengeHistory = HashMap())
         every { dailyChallengeRepository.findByDay(any()) } returns

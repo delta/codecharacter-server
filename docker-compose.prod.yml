@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 services:
 
   db:
@@ -7,7 +7,7 @@ services:
     volumes:
       - ./data/mongo_prod:/data/db
     networks:
-      - common
+      - codecharacter_common
     environment:
       MONGO_INITDB_DATABASE: codecharacter_2022
     restart: always
@@ -24,7 +24,7 @@ services:
       - "5672:5672"
       - "15672:15672"
     networks:
-      - common
+      - codecharacter_common
     restart: always
 
   core:
@@ -38,10 +38,10 @@ services:
       - db
       - rabbitmq
     networks:
-      - common
+      - codecharacter_common
     restart: always
 
 networks:
-  common:
+  codecharacter_common:
     name: codecharacter_common
     driver: bridge

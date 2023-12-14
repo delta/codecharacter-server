@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: CodeCharacter API
-  version: 2023.0.1
+  version: 2024.0.1
   contact:
     name: CodeCharacter Authors
     url: 'https://delta.nitt.edu'
