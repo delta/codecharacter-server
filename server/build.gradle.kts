@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.asciidoctor.convert") version "1.5.8"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
     jacoco
     kotlin("jvm")
     kotlin("plugin.spring")
@@ -29,7 +29,7 @@ repositories {
 val snippetsDir by extra { file("build/generated-snippets") }
 
 dependencies {
-    runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
+    implementation("org.springframework.boot:spring-boot-properties-migrator")
     implementation("org.springframework.boot:spring-boot-starter-amqp:3.0.0")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.0.0")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.0.0")
