@@ -1,4 +1,10 @@
+.openapi-generator-ignore
+README.md
+build.gradle.kts
+pom.xml
+settings.gradle
 src/main/kotlin/delta/codecharacter/SpringDocConfiguration.kt
+src/main/kotlin/delta/codecharacter/core/ApiUtil.kt
 src/main/kotlin/delta/codecharacter/core/AuthApi.kt
 src/main/kotlin/delta/codecharacter/core/CodeApi.kt
 src/main/kotlin/delta/codecharacter/core/CurrentUserApi.kt
