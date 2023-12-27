@@ -10,7 +10,7 @@ import io.swagger.v3.oas.models.info.License
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.security.SecurityScheme
 
-@jakarta.annotation.Generated(value = ["org.openapitools.codegen.languages.KotlinSpringServerCodegen"])
+// @jakarta.annotation.Generated(value = ["org.openapitools.codegen.languages.KotlinSpringServerCodegen"])
 @Configuration
 class SpringDocConfiguration {
 
@@ -35,15 +35,15 @@ class SpringDocConfiguration {
             )
             .components(
                 Components()
-                    .addSecuritySchemes("http-bearer", SecurityScheme()
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
+                    .addSecuritySchemes("oauth2-google", SecurityScheme()
+                        .type(SecurityScheme.Type.OAUTH2)
                     )
                     .addSecuritySchemes("oauth2-github", SecurityScheme()
                         .type(SecurityScheme.Type.OAUTH2)
                     )
-                    .addSecuritySchemes("oauth2-google", SecurityScheme()
-                        .type(SecurityScheme.Type.OAUTH2)
+                    .addSecuritySchemes("http-bearer", SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
                     )
             )
     }

@@ -2,14 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    id("org.springframework.boot") version "3.0.0"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.asciidoctor.convert") version "1.5.8"
+    id("org.springframework.boot") version "3.2.0"
+    id("io.spring.dependency-management") version "1.1.4"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
     jacoco
     kotlin("jvm")
     kotlin("plugin.spring")
     kotlin("plugin.allopen")
-    id("com.diffplug.spotless") version "6.2.1"
+    id("com.diffplug.spotless") version "6.23.3"
 }
 
 group = "delta.codecharacter"
@@ -48,12 +48,12 @@ dependencies {
     implementation(project(":library"))
     implementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("com.ninja-squad:springmockk:4.0.0")
-    developmentOnly("org.springframework.boot:spring-boot-devtools:3.0.0")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:3.0.0")
+    developmentOnly("org.springframework.boot:spring-boot-devtools:3.2.0")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:3.2.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.0.0") {
         exclude(module = "mockito-core")
     }
-    testRuntimeOnly("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.5.2")
+    testRuntimeOnly("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.11.0")
     testImplementation("org.springframework.amqp:spring-rabbit-test:2.4.7")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE")
     testImplementation("org.springframework.security:spring-security-test:6.0.0")
@@ -115,6 +115,8 @@ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {
         target("**/*.kt")
         ktfmt()
+        targetExclude("**/build/**/*")
+        targetExclude("**/bin/**/*")
         ktlint()
     }
     kotlinGradle {
