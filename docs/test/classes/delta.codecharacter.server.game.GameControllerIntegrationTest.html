@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - GameControllerIntegrationTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>GameControllerIntegrationTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/delta.codecharacter.server.game.html">delta.codecharacter.server.game</a> &gt; GameControllerIntegrationTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.173s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">should get game log()</td>
+<td class="success">0.128s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">should return empty string when game not found()</td>
+<td class="success">0.045s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2023-12-27T07:51:21.687Z  INFO 2599 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [delta.codecharacter.server.game.GameControllerIntegrationTest]: GameControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2023-12-27T07:51:21.728Z  INFO 2599 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration delta.codecharacter.server.ServerApplication for test class delta.codecharacter.server.game.GameControllerIntegrationTest
+2023-12-27T07:51:21.753Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.752+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20320,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;createCollection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;,&quot;uuidDisposition&quot;:&quot;generated&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;cba0f7b0-ca13-4fdb-aedf-092e6ac11a21&quot;}},&quot;options&quot;:{}}}
+2023-12-27T07:51:21.760Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.760+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;INDEX&quot;,    &quot;id&quot;:20345,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Index build: done building&quot;,&quot;attr&quot;:{&quot;buildUUID&quot;:null,&quot;collectionUUID&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;cba0f7b0-ca13-4fdb-aedf-092e6ac11a21&quot;}},&quot;namespace&quot;:&quot;test.user&quot;,&quot;index&quot;:&quot;_id_&quot;,&quot;ident&quot;:&quot;index-38-4487454402241633657&quot;,&quot;collectionIdent&quot;:&quot;collection-37-4487454402241633657&quot;,&quot;commitTimestamp&quot;:null}}
+2023-12-27T07:51:21.782Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.782+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20320,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;createCollection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game&quot;,&quot;uuidDisposition&quot;:&quot;generated&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;4174f270-aca4-43f4-bc81-76508114e5ed&quot;}},&quot;options&quot;:{}}}
+2023-12-27T07:51:21.791Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.790+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;INDEX&quot;,    &quot;id&quot;:20345,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Index build: done building&quot;,&quot;attr&quot;:{&quot;buildUUID&quot;:null,&quot;collectionUUID&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;4174f270-aca4-43f4-bc81-76508114e5ed&quot;}},&quot;namespace&quot;:&quot;test.game&quot;,&quot;index&quot;:&quot;_id_&quot;,&quot;ident&quot;:&quot;index-40-4487454402241633657&quot;,&quot;collectionIdent&quot;:&quot;collection-39-4487454402241633657&quot;,&quot;commitTimestamp&quot;:null}}
+2023-12-27T07:51:21.819Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.819+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20320,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;createCollection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game_log&quot;,&quot;uuidDisposition&quot;:&quot;generated&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;ce2362d4-0f4f-4bf7-9443-9575547af624&quot;}},&quot;options&quot;:{}}}
+2023-12-27T07:51:21.827Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.827+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;INDEX&quot;,    &quot;id&quot;:20345,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Index build: done building&quot;,&quot;attr&quot;:{&quot;buildUUID&quot;:null,&quot;collectionUUID&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;ce2362d4-0f4f-4bf7-9443-9575547af624&quot;}},&quot;namespace&quot;:&quot;test.game_log&quot;,&quot;index&quot;:&quot;_id_&quot;,&quot;ident&quot;:&quot;index-42-4487454402241633657&quot;,&quot;collectionIdent&quot;:&quot;collection-41-4487454402241633657&quot;,&quot;commitTimestamp&quot;:null}}
+2023-12-27T07:51:21.863Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.862+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;COMMAND&quot;,  &quot;id&quot;:518070,  &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;CMD: drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;}}
+2023-12-27T07:51:21.863Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.863+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20318,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Finishing collection drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;cba0f7b0-ca13-4fdb-aedf-092e6ac11a21&quot;}}}}
+2023-12-27T07:51:21.863Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.863+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22206,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Deferring table drop for index&quot;,&quot;attr&quot;:{&quot;index&quot;:&quot;_id_&quot;,&quot;namespace&quot;:&quot;test.user&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;cba0f7b0-ca13-4fdb-aedf-092e6ac11a21&quot;}},&quot;ident&quot;:&quot;index-38-4487454402241633657&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2023-12-27T07:51:21.864Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.863+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22214,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Deferring table drop for collection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;,&quot;ident&quot;:&quot;collection-37-4487454402241633657&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2023-12-27T07:51:21.864Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.864+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;COMMAND&quot;,  &quot;id&quot;:518070,  &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;CMD: drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game&quot;}}
+2023-12-27T07:51:21.864Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.864+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20318,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Finishing collection drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;4174f270-aca4-43f4-bc81-76508114e5ed&quot;}}}}
+2023-12-27T07:51:21.865Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.864+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22206,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Deferring table drop for index&quot;,&quot;attr&quot;:{&quot;index&quot;:&quot;_id_&quot;,&quot;namespace&quot;:&quot;test.game&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;4174f270-aca4-43f4-bc81-76508114e5ed&quot;}},&quot;ident&quot;:&quot;index-40-4487454402241633657&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2023-12-27T07:51:21.865Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.864+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22214,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Deferring table drop for collection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game&quot;,&quot;ident&quot;:&quot;collection-39-4487454402241633657&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2023-12-27T07:51:21.865Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.865+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;COMMAND&quot;,  &quot;id&quot;:518070,  &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;CMD: drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game_log&quot;}}
+2023-12-27T07:51:21.866Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.865+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20318,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Finishing collection drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game_log&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;ce2362d4-0f4f-4bf7-9443-9575547af624&quot;}}}}
+2023-12-27T07:51:21.866Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.865+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22206,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Deferring table drop for index&quot;,&quot;attr&quot;:{&quot;index&quot;:&quot;_id_&quot;,&quot;namespace&quot;:&quot;test.game_log&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;ce2362d4-0f4f-4bf7-9443-9575547af624&quot;}},&quot;ident&quot;:&quot;index-42-4487454402241633657&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2023-12-27T07:51:21.866Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.865+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22214,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Deferring table drop for collection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game_log&quot;,&quot;ident&quot;:&quot;collection-41-4487454402241633657&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2023-12-27T07:51:21.884Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.883+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20320,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;createCollection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;,&quot;uuidDisposition&quot;:&quot;generated&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;ba078654-72f7-49dc-bc22-b38d8ac0f961&quot;}},&quot;options&quot;:{}}}
+2023-12-27T07:51:21.892Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.892+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;INDEX&quot;,    &quot;id&quot;:20345,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Index build: done building&quot;,&quot;attr&quot;:{&quot;buildUUID&quot;:null,&quot;collectionUUID&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;ba078654-72f7-49dc-bc22-b38d8ac0f961&quot;}},&quot;namespace&quot;:&quot;test.user&quot;,&quot;index&quot;:&quot;_id_&quot;,&quot;ident&quot;:&quot;index-44-4487454402241633657&quot;,&quot;collectionIdent&quot;:&quot;collection-43-4487454402241633657&quot;,&quot;commitTimestamp&quot;:null}}
+2023-12-27T07:51:21.909Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.909+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;COMMAND&quot;,  &quot;id&quot;:518070,  &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;CMD: drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;}}
+2023-12-27T07:51:21.909Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.909+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20318,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Finishing collection drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;ba078654-72f7-49dc-bc22-b38d8ac0f961&quot;}}}}
+2023-12-27T07:51:21.910Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.909+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22206,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Deferring table drop for index&quot;,&quot;attr&quot;:{&quot;index&quot;:&quot;_id_&quot;,&quot;namespace&quot;:&quot;test.user&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;ba078654-72f7-49dc-bc22-b38d8ac0f961&quot;}},&quot;ident&quot;:&quot;index-44-4487454402241633657&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2023-12-27T07:51:21.910Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.909+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22214,   &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;Deferring table drop for collection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;,&quot;ident&quot;:&quot;collection-43-4487454402241633657&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2023-12-27T07:51:21.910Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.910+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;COMMAND&quot;,  &quot;id&quot;:518070,  &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;CMD: drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game&quot;}}
+2023-12-27T07:51:21.912Z  INFO 2599 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2023-12-27T07:51:21.911+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;COMMAND&quot;,  &quot;id&quot;:518070,  &quot;ctx&quot;:&quot;conn4&quot;,&quot;msg&quot;:&quot;CMD: drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.game_log&quot;}}
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.5</a> at Dec 27, 2023, 7:51:36 AM</p>
+</div>
+</div>
+</body>
+</html>
