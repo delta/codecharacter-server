@@ -5,8 +5,7 @@
 */
 package delta.codecharacter.core
 
-import delta.codecharacter.dtos.LeaderboardEntryDto
-import delta.codecharacter.dtos.TierTypeDto
+import delta.codecharacter.dtos.TutorialsGetRequestDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
 import io.swagger.v3.oas.annotations.media.*
@@ -36,24 +35,26 @@ import kotlin.collections.Map
 
 @Validated
 @RequestMapping("\${api.base-path:}")
-interface LeaderboardApi {
+interface TutorialsApi {
 
     @Operation(
-        summary = "Get leaderboard",
-        operationId = "getLeaderboard",
-        description = """Get leaderboard""",
+        summary = "Get Tutorial",
+        operationId = "getTutorials",
+        description = """Get a single tutorial""",
         responses = [
-            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = LeaderboardEntryDto::class)))]),
-            ApiResponse(responseCode = "401", description = "Unauthorized")
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = TutorialsGetRequestDto::class))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "403", description = "Forbidden"),
+            ApiResponse(responseCode = "404", description = "Not found")
         ],
         security = [ SecurityRequirement(name = "http-bearer") ]
     )
     @RequestMapping(
             method = [RequestMethod.GET],
-            value = ["/leaderboard"],
+            value = ["/tutorial/get"],
             produces = ["application/json"]
     )
-    fun getLeaderboard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?,@Parameter(description = "Leaderboard Tier", schema = Schema(allowableValues = ["TIER_PRACTICE", "TIER1", "TIER2", "TIER3", "TIER4"])) @Valid @RequestParam(value = "tier", required = false) tier: TierTypeDto?): ResponseEntity<List<LeaderboardEntryDto>> {
+    fun getTutorials(): ResponseEntity<TutorialsGetRequestDto> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }

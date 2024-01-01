@@ -1294,6 +1294,30 @@ paths:
         - Daily Challenges
 
 
+
+  '/tutorial/get':
+    get:
+      summary: Get Tutorial
+      description: Get a single tutorial
+      operationId: getTutorials
+      tags:
+        - Tutorials
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TutorialsGetRequest'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not found
+
+
+
 components:
   schemas:
     PasswordLoginRequest:
@@ -1939,6 +1963,45 @@ components:
         - user
         - stats
       description: Leaderboard entry model
+    TutorialsGetRequest:
+      title: Get tutorials
+      description: Get the game tutorials
+      type: object
+      properties:
+        tutorialId:
+          type: integer
+          example: 1
+        tutorialName:
+          type: string
+          example: Tutorial for Spawning attacker
+        tutorialType:
+          $ref: '#/components/schemas/ChallengeType'
+        description:
+          type: string
+          example: Brief description of how the code works
+        tutorialCodes:
+          $ref: '#/components/schemas/TutorialCodeObject'
+      required:
+        - tutorialName
+        - tutorialCodes
+
+    TutorialCodeObject:
+      title: Tutorial Code Object
+      description: The object containing the code for the tutorial
+      type: object
+      properties:
+        cpp:
+          type: string
+          example: This would have the cpp code for the tutorial
+        java:
+          type: string
+          example: This would have the java code for the tutorial
+        python:
+          type: string
+          example: This would have the python code for the tutorial
+        image:
+          type: string
+
 
     DailyChallengeGetRequest:
       title: Get daily challenge
