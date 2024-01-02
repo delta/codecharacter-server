@@ -2,7 +2,6 @@ package delta.codecharacter.server.tutorial
 
 import delta.codecharacter.dtos.TutorialsGetRequestDto
 import delta.codecharacter.server.exception.CustomException
-import delta.codecharacter.server.user.public_user.PublicUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -11,7 +10,6 @@ import java.util.UUID
 @Service
 class TutorialService(
         @Autowired private val tutorialRepository: TutorialRepository,
-        @Autowired private val publicUserService: PublicUserService
 ) {
 
     fun getTutorialByNumber(tutorialNumber: Int): TutorialEntity {
@@ -23,7 +21,6 @@ class TutorialService(
     }
 
     fun getTutorialByNumberForUser(userId: UUID, tutorialNumber: Int): TutorialsGetRequestDto {
-        val user = publicUserService.getPublicUser(userId)
         val currentTutorial = getTutorialByNumber(tutorialNumber)
         return TutorialsGetRequestDto(
             tutorialName = currentTutorial.tutName,
