@@ -14,17 +14,17 @@ class TutorialService(
         @Autowired private val publicUserService: PublicUserService
 ) {
 
-    fun getTutorialByNumber(): TutorialEntity {
+    fun getTutorialByNumber(tutorialNumber: Int): TutorialEntity {
         val currentTutorial =
-            tutorialRepository.findByNumber(1).orElseThrow {
+            tutorialRepository.findByNumber(tutorialNumber).orElseThrow {
                 throw CustomException(HttpStatus.BAD_REQUEST, "Invalid Request")
             }
         return currentTutorial
     }
 
-    fun getTutorialByNumberForUser(userId: UUID): TutorialsGetRequestDto {
+    fun getTutorialByNumberForUser(userId: UUID, tutorialNumber: Int): TutorialsGetRequestDto {
         val user = publicUserService.getPublicUser(userId)
-        val currentTutorial = getTutorialByNumber()
+        val currentTutorial = getTutorialByNumber(tutorialNumber)
         return TutorialsGetRequestDto(
             tutorialName = currentTutorial.tutName,
             tutorialCodes = currentTutorial.tutorial,

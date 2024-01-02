@@ -1295,13 +1295,17 @@ paths:
 
 
 
-  '/tutorial/get':
+  '/codetutorial/get/{tutorialNumber}':
     get:
-      summary: Get Tutorial
+      summary: Get tutorial by number
       description: Get a single tutorial
-      operationId: getTutorials
-      tags:
-        - Tutorials
+      operationId: getTutorialByNumber
+      parameters:
+      - name: tutorialNumber
+        in: path
+        required: true
+        schema:
+          type: integer
       responses:
         200:
           description: OK
@@ -1315,6 +1319,8 @@ paths:
           description: Forbidden
         404:
           description: Not found
+      tags:
+        - Tutorials
 
 
 

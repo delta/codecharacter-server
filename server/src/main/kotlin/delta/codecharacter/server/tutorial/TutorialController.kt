@@ -14,8 +14,8 @@ class TutorialController(
         @Autowired private val tutorialService: TutorialService,
 ) : TutorialsApi {
     @Secured(value = ["ROLE_USER"])
-    override fun getTutorials(): ResponseEntity<TutorialsGetRequestDto> {
+    override fun getTutorialByNumber(tutorialNumber: Int): ResponseEntity<TutorialsGetRequestDto> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        return ResponseEntity.ok(tutorialService.getTutorialByNumberForUser(user.id))
+        return ResponseEntity.ok(tutorialService.getTutorialByNumberForUser(user.id,tutorialNumber))
     }
 }

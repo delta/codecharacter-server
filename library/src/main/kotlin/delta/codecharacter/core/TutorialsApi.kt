@@ -38,8 +38,8 @@ import kotlin.collections.Map
 interface TutorialsApi {
 
     @Operation(
-        summary = "Get Tutorial",
-        operationId = "getTutorials",
+        summary = "Get tutorial by number",
+        operationId = "getTutorialByNumber",
         description = """Get a single tutorial""",
         responses = [
             ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = TutorialsGetRequestDto::class))]),
@@ -51,10 +51,10 @@ interface TutorialsApi {
     )
     @RequestMapping(
             method = [RequestMethod.GET],
-            value = ["/tutorial/get"],
+            value = ["/codetutorial/get/{tutorialNumber}"],
             produces = ["application/json"]
     )
-    fun getTutorials(): ResponseEntity<TutorialsGetRequestDto> {
+    fun getTutorialByNumber(@Parameter(description = "", required = true) @PathVariable("tutorialNumber") tutorialNumber: kotlin.Int): ResponseEntity<TutorialsGetRequestDto> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }
