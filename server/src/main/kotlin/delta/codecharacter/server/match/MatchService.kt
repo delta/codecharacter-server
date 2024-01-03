@@ -28,6 +28,7 @@ import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
+import delta.codecharacter.server.stats.StatsService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.slf4j.Logger
@@ -62,7 +63,8 @@ class MatchService(
     @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
     @Autowired private val mapValidator: MapValidator,
-    @Autowired private val autoMatchRepository: AutoMatchRepository
+    @Autowired private val autoMatchRepository: AutoMatchRepository,
+    @Autowired private val statsService : StatsService
 ) {
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
     private val logger: Logger = LoggerFactory.getLogger(MatchService::class.java)
@@ -389,6 +391,20 @@ class MatchService(
                             verdict = verdict,
                             newRating = newOpponentRating
                         )
+                        statsService.updateStats(
+                            userId = match.player1.userId,
+                            verdict = null,
+                            atkDmg = player1Game.destruction,
+                            dcAttempts = 0,
+                            coins = player1Game.coinsUsed,
+                        )
+                        statsService.updateStats(
+                            userId = match.player2.userId,
+                            verdict = null,
+                            atkDmg = player2Game.destruction,
+                            dcAttempts = 0,
+                            coins = player2Game.coinsUsed,
+                        )
                     }
                     notificationService.sendNotification(
                         match.player1.userId,
@@ -461,11 +477,18 @@ class MatchService(
                 )
             )
             if (updatedGame.status != GameStatusEnum.EXECUTING) {
+               val verdict = dailyChallengeService.completeDailyChallenge(updatedGame, match.user.userId)
                 val updatedMatch =
                     match.copy(
-                        verdict =
-                        dailyChallengeService.completeDailyChallenge(updatedGame, match.user.userId)
+                        verdict = verdict
                     )
+                statsService.updateStats(
+                    userId = match.user.userId,
+                    verdict = verdict,
+                    atkDmg = updatedGame.destruction,
+                    dcAttempts = 1,
+                    coins = updatedGame.coinsUsed
+                )
                 notificationService.sendNotification(
                     match.user.userId,
                     title = "Daily Challenge Results",
