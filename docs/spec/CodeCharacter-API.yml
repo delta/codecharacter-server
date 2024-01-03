@@ -1292,8 +1292,23 @@ paths:
                   value: "[[0,0,0]]"
       tags:
         - Daily Challenges
-
-
+  '/stats/':
+    get:
+      summary: Get all General Stats for current user and top user
+      tags:
+        - stats
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserMatchStats'
+      operationId: getStats
+      description: Gets all statistics for the current user
+    parameters: []
 components:
   schemas:
     PasswordLoginRequest:
@@ -1940,6 +1955,55 @@ components:
         - stats
       description: Leaderboard entry model
 
+    UserMatchStats:
+      title: UserMatchStat
+      type: array
+      description: User Match Stats array model
+      items:
+        anyOf:
+          - $ref: '#/components/schemas/UserMatchStat'
+      required:
+        - stat
+
+    UserMatchStat:
+      title: UserMatchStat
+      type: object
+      description: User Match Stat model
+      properties:
+        maxAtk:
+          type: number
+          default: 0
+        minAtk:
+          type: number
+          default: 0
+        avgAtk:
+          type: number
+          default: 0
+        dc_wins:
+          type: number
+          default: 0
+        dc_losses:
+          type: number
+          default: 0
+        dc_completions:
+          type: number
+          default: 0
+        dc_destruction:
+          type: number
+          default: 0
+        coins:
+          type: number
+          default: 0
+      required:
+        - maxAtk
+        - minAtk
+        - avgAtk
+        - dc_wins
+        - dc_losses
+        - dc_completions
+        - dc_destruction
+        - coins
+
     DailyChallengeGetRequest:
       title: Get daily challenge
       description: Get current-user daily challenge
@@ -2098,6 +2162,10 @@ components:
         - TIER2
         - TIER3
         - TIER4
+
+
+
+
   securitySchemes:
     oauth2-google:
       type: oauth2
@@ -2166,3 +2234,4 @@ tags:
   - name: match
   - name: notification
   - name: user
+  - name: stats
