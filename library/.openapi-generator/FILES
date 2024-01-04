@@ -15,6 +15,7 @@ src/main/kotlin/delta/codecharacter/dtos/AuthStatusResponseDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ChallengeTypeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CodeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CodeRevisionDto.kt
+src/main/kotlin/delta/codecharacter/dtos/CodeTutorialMatchRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CodeTypeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CompleteProfileRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CreateCodeRevisionRequestDto.kt

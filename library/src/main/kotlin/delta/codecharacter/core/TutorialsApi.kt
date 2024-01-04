@@ -5,6 +5,8 @@
 */
 package delta.codecharacter.core
 
+import delta.codecharacter.dtos.CodeTutorialMatchRequestDto
+import delta.codecharacter.dtos.GenericErrorDto
 import delta.codecharacter.dtos.TutorialsGetRequestDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
@@ -38,8 +40,29 @@ import kotlin.collections.Map
 interface TutorialsApi {
 
     @Operation(
+        summary = "Match Execution for Tutorials",
+        operationId = "createCodeTutorialMatch",
+        description = """Match making for Tutorials""",
+        responses = [
+            ApiResponse(responseCode = "201", description = "Created"),
+            ApiResponse(responseCode = "400", description = "Bad Request", content = [Content(schema = Schema(implementation = GenericErrorDto::class))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized")
+        ],
+        security = [ SecurityRequirement(name = "http-bearer") ]
+    )
+    @RequestMapping(
+            method = [RequestMethod.POST],
+            value = ["/codetutorial/submit"],
+            produces = ["application/json"],
+            consumes = ["application/json"]
+    )
+    fun createCodeTutorialMatch(@Parameter(description = "", required = true) @Valid @RequestBody codeTutorialMatchRequestDto: CodeTutorialMatchRequestDto): ResponseEntity<Unit> {
+        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    }
+
+    @Operation(
         summary = "Get tutorial by number",
-        operationId = "getTutorialByNumber",
+        operationId = "getCodeTutorialByNumber",
         description = """Get a single tutorial""",
         responses = [
             ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = TutorialsGetRequestDto::class))]),
@@ -51,10 +74,10 @@ interface TutorialsApi {
     )
     @RequestMapping(
             method = [RequestMethod.GET],
-            value = ["/codetutorial/get/{tutorialNumber}"],
+            value = ["/codetutorial/get/{codeTutorialNumber}"],
             produces = ["application/json"]
     )
-    fun getTutorialByNumber(@Parameter(description = "", required = true) @PathVariable("tutorialNumber") tutorialNumber: kotlin.Int): ResponseEntity<TutorialsGetRequestDto> {
+    fun getCodeTutorialByNumber(@Parameter(description = "", required = true) @PathVariable("codeTutorialNumber") codeTutorialNumber: kotlin.Int): ResponseEntity<TutorialsGetRequestDto> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }

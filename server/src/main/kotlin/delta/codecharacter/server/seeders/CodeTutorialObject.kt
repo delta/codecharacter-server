@@ -2,10 +2,9 @@ package delta.codecharacter.server.seeders
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import delta.codecharacter.dtos.ChallengeTypeDto
-import delta.codecharacter.dtos.DailyChallengeObjectDto
 import delta.codecharacter.dtos.TutorialCodeObjectDto
 
-data class TutorialObject(
+data class CodeTutorialObject(
         @field:JsonProperty("number") val number: Int,
         @field:JsonProperty("tutName") val tutName: String,
         @field:JsonProperty("tutType") val tutType: ChallengeTypeDto,

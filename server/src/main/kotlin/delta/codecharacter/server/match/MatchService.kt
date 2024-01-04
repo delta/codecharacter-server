@@ -1,20 +1,15 @@
 package delta.codecharacter.server.match
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import delta.codecharacter.dtos.ChallengeTypeDto
-import delta.codecharacter.dtos.CreateMatchRequestDto
-import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
-import delta.codecharacter.dtos.GameDto
-import delta.codecharacter.dtos.GameStatusDto
-import delta.codecharacter.dtos.MatchDto
-import delta.codecharacter.dtos.MatchModeDto
-import delta.codecharacter.dtos.PublicUserDto
-import delta.codecharacter.dtos.TierTypeDto
-import delta.codecharacter.dtos.VerdictDto
+import delta.codecharacter.dtos.*
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
+import delta.codecharacter.server.code_tutorial.CodeTutorialService
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchEntity
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchRepository
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchVerdictEnum
 import delta.codecharacter.server.daily_challenge.DailyChallengeService
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchEntity
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchRepository
@@ -45,24 +40,26 @@ import java.util.UUID
 
 @Service
 class MatchService(
-    @Autowired private val matchRepository: MatchRepository,
-    @Autowired private val gameService: GameService,
-    @Autowired private val latestCodeService: LatestCodeService,
-    @Autowired private val codeRevisionService: CodeRevisionService,
-    @Autowired private val lockedCodeService: LockedCodeService,
-    @Autowired private val latestMapService: LatestMapService,
-    @Autowired private val mapRevisionService: MapRevisionService,
-    @Autowired private val lockedMapService: LockedMapService,
-    @Autowired private val publicUserService: PublicUserService,
-    @Autowired private val verdictAlgorithm: VerdictAlgorithm,
-    @Autowired private val ratingHistoryService: RatingHistoryService,
-    @Autowired private val notificationService: NotificationService,
-    @Autowired private val dailyChallengeService: DailyChallengeService,
-    @Autowired private val dailyChallengeMatchRepository: DailyChallengeMatchRepository,
-    @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,
-    @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
-    @Autowired private val mapValidator: MapValidator,
-    @Autowired private val autoMatchRepository: AutoMatchRepository
+        @Autowired private val matchRepository: MatchRepository,
+        @Autowired private val gameService: GameService,
+        @Autowired private val latestCodeService: LatestCodeService,
+        @Autowired private val codeRevisionService: CodeRevisionService,
+        @Autowired private val lockedCodeService: LockedCodeService,
+        @Autowired private val latestMapService: LatestMapService,
+        @Autowired private val mapRevisionService: MapRevisionService,
+        @Autowired private val lockedMapService: LockedMapService,
+        @Autowired private val publicUserService: PublicUserService,
+        @Autowired private val verdictAlgorithm: VerdictAlgorithm,
+        @Autowired private val ratingHistoryService: RatingHistoryService,
+        @Autowired private val notificationService: NotificationService,
+        @Autowired private val dailyChallengeService: DailyChallengeService,
+        @Autowired private val codeTutorialService: CodeTutorialService,
+        @Autowired private val dailyChallengeMatchRepository: DailyChallengeMatchRepository,
+        @Autowired private val codeTutorialMatchRepository: CodeTutorialMatchRepository,
+        @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,
+        @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
+        @Autowired private val mapValidator: MapValidator,
+        @Autowired private val autoMatchRepository: AutoMatchRepository
 ) {
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
     private val logger: Logger = LoggerFactory.getLogger(MatchService::class.java)
@@ -190,6 +187,45 @@ class MatchService(
                 game = game
             )
         dailyChallengeMatchRepository.save(match)
+        gameService.sendGameRequest(game, code, language, map)
+    }
+    fun createTutorialMatch(userId: UUID, codeTutorialMatchRequestDto: CodeTutorialMatchRequestDto) {
+        val tutorial = codeTutorialService.getTutorialByNumberForUser(userId, codeTutorialMatchRequestDto.codeTutorialNumber ?: 0).tutorialCodes
+        val tutType = codeTutorialService.getTutorialByNumberForUser(userId, codeTutorialMatchRequestDto.codeTutorialNumber ?: 0).tutorialType
+        val ct = codeTutorialService.getTutorialByNumber(codeTutorialMatchRequestDto.codeTutorialNumber ?: 0)
+        val value = codeTutorialMatchRequestDto.value
+        val language: LanguageEnum
+        val map: String
+        val code: String
+        when (tutType) {
+            ChallengeTypeDto.MAP -> {
+                mapValidator.validateMap(value)
+                code = tutorial.cpp.toString()
+                language = LanguageEnum.CPP
+                map = value
+            }
+            ChallengeTypeDto.CODE -> {
+                map = ct.map
+                language = LanguageEnum.valueOf(codeTutorialMatchRequestDto.language.toString())
+                code = value
+            }
+
+            null -> {
+                throw CustomException(HttpStatus.BAD_REQUEST, "Invalid tutorial type")
+            }
+        }
+        val matchId = UUID.randomUUID()
+        val game = gameService.createGame(matchId)
+        val user = publicUserService.getPublicUser(userId)
+        val match =
+                CodeTutorialMatchEntity(
+                        id = matchId,
+                        createdAt = Instant.now(),
+                        user = user,
+                        game = game,
+                        verdict = CodeTutorialMatchVerdictEnum.STARTED
+                )
+        codeTutorialMatchRepository.save(match)
         gameService.sendGameRequest(game, code, language, map)
     }
     fun createMatch(userId: UUID, createMatchRequestDto: CreateMatchRequestDto) {
@@ -479,6 +515,40 @@ class MatchService(
                     }
                 )
                 dailyChallengeMatchRepository.save(updatedMatch)
+            }
+        }
+        else if(codeTutorialMatchRepository.findById(matchId).isPresent) {
+            val match = codeTutorialMatchRepository.findById(matchId).get()
+            simpMessagingTemplate.convertAndSend(
+                    "/updates/${match.user.userId}",
+                    mapper.writeValueAsString(
+                            GameDto(
+                                    id = updatedGame.id,
+                                    destruction = BigDecimal(updatedGame.destruction),
+                                    coinsUsed = updatedGame.coinsUsed,
+                                    status = GameStatusDto.valueOf(updatedGame.status.name),
+                            )
+                    )
+            )
+            if (updatedGame.status != GameStatusEnum.EXECUTING) {
+                val updatedMatch =
+                        match.copy(
+                                verdict =
+                                codeTutorialService.completeCodeTutorial(updatedGame, match.user.userId)
+                        )
+                notificationService.sendNotification(
+                        match.user.userId,
+                        title = "Tutorial Results",
+                        content =
+                        when (updatedMatch.verdict) {
+                            CodeTutorialMatchVerdictEnum.SUCCESS -> "Successfully completed tutorial"
+                            CodeTutorialMatchVerdictEnum.FAILURE -> "Failed to complete tutorial"
+                            else -> {
+                                "Some error occurred. Try again!"
+                            }
+                        }
+                )
+                codeTutorialMatchRepository.save(updatedMatch)
             }
         }
     }

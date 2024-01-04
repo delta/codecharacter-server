@@ -2,8 +2,8 @@ package delta.codecharacter.server.seeders
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import delta.codecharacter.server.tutorial.TutorialEntity
-import delta.codecharacter.server.tutorial.TutorialRepository
+import delta.codecharacter.server.code_tutorial.CodeTutorialEntity
+import delta.codecharacter.server.code_tutorial.CodeTutorialRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,27 +13,27 @@ import org.springframework.stereotype.Component
 import java.util.UUID
 
 @Component
-class TutorialSeeder {
+class CodeTutorialSeeder {
 
-    @Autowired private lateinit var tutorialRepository: TutorialRepository
+    @Autowired private lateinit var codeTutorialRepository: CodeTutorialRepository
 
-    private val logger: Logger = LoggerFactory.getLogger(TutorialSeeder::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(CodeTutorialSeeder::class.java)
     @EventListener(ApplicationReadyEvent::class)
     fun seedTutorials() {
 
-        if (tutorialRepository.findAll().isEmpty()) {
+        if (codeTutorialRepository.findAll().isEmpty()) {
             logger.info("Seeding tutorials")
 
             val jsonString = this::class.java.classLoader.getResource("tutorialConstants.json")?.readText()
             if (!jsonString.isNullOrEmpty()) {
                 val objectMapper = jacksonObjectMapper()
-                val tuts: List<TutorialObject> = objectMapper.readValue(jsonString)
-                var tutEntities: List<TutorialEntity> = listOf()
+                val tuts: List<CodeTutorialObject> = objectMapper.readValue(jsonString)
+                var tutEntities: List<CodeTutorialEntity> = listOf()
                 tuts.forEach {
                     val id = UUID.randomUUID()
                     tutEntities =
                             tutEntities.plus(
-                                    TutorialEntity(
+                                    CodeTutorialEntity(
                                             id = id,
                                             number = it.number,
                                             tutName = it.tutName,
@@ -44,7 +44,7 @@ class TutorialSeeder {
                                     )
                             )
                 }
-                tutorialRepository.saveAll(tutEntities)
+                codeTutorialRepository.saveAll(tutEntities)
                 logger.info("Seeding Tutorials Completed")
             } else {
                 logger.error("tutorialConstants.json is empty or doesn't exist")
