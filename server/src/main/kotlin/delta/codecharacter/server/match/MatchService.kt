@@ -190,9 +190,9 @@ class MatchService(
         gameService.sendGameRequest(game, code, language, map)
     }
     fun createTutorialMatch(userId: UUID, codeTutorialMatchRequestDto: CodeTutorialMatchRequestDto) {
-        val tutorial = codeTutorialService.getTutorialByNumberForUser(userId, codeTutorialMatchRequestDto.codeTutorialNumber ?: 0).tutorialCodes
-        val tutType = codeTutorialService.getTutorialByNumberForUser(userId, codeTutorialMatchRequestDto.codeTutorialNumber ?: 0).tutorialType
-        val ct = codeTutorialService.getTutorialByNumber(codeTutorialMatchRequestDto.codeTutorialNumber ?: 0)
+        val tutorial = codeTutorialService.getTutorialByNumberForUser(userId, codeTutorialMatchRequestDto.codeTutorialNumber).tutorialCodes
+        val tutType = codeTutorialService.getTutorialByNumberForUser(userId, codeTutorialMatchRequestDto.codeTutorialNumber).tutorialType
+        val ct = codeTutorialService.getTutorialByNumber(codeTutorialMatchRequestDto.codeTutorialNumber)
         val value = codeTutorialMatchRequestDto.value
         val language: LanguageEnum
         val map: String
