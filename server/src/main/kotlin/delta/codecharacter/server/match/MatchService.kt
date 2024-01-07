@@ -198,13 +198,13 @@ class MatchService(
         val map: String
         val code: String
         when (tutType) {
-            ChallengeTypeDto.MAP -> {
+            ChallengeTypeDto.CODE -> {
                 mapValidator.validateMap(value)
                 code = tutorial.cpp.toString()
                 language = LanguageEnum.CPP
                 map = value
             }
-            ChallengeTypeDto.CODE -> {
+            ChallengeTypeDto.MAP -> {
                 map = ct.map
                 language = LanguageEnum.valueOf(codeTutorialMatchRequestDto.language.toString())
                 code = value
