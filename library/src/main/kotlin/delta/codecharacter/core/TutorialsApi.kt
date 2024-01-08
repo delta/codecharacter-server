@@ -5,10 +5,9 @@
 */
 package delta.codecharacter.core
 
-import delta.codecharacter.dtos.DailyChallengeGetRequestDto
-import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
-import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
+import delta.codecharacter.dtos.CodeTutorialMatchRequestDto
 import delta.codecharacter.dtos.GenericErrorDto
+import delta.codecharacter.dtos.TutorialsGetRequestDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
 import io.swagger.v3.oas.annotations.media.*
@@ -38,12 +37,12 @@ import kotlin.collections.Map
 
 @Validated
 @RequestMapping("\${api.base-path:}")
-interface DailyChallengesApi {
+interface TutorialsApi {
 
     @Operation(
-        summary = "Match Execution for Daily Challenges",
-        operationId = "createDailyChallengeMatch",
-        description = """Match making for Daily Challenges""",
+        summary = "Match Execution for Tutorials",
+        operationId = "createCodeTutorialMatch",
+        description = """Match making for Tutorials""",
         responses = [
             ApiResponse(responseCode = "201", description = "Created"),
             ApiResponse(responseCode = "400", description = "Bad Request", content = [Content(schema = Schema(implementation = GenericErrorDto::class))]),
@@ -53,20 +52,20 @@ interface DailyChallengesApi {
     )
     @RequestMapping(
             method = [RequestMethod.POST],
-            value = ["/dc/submit"],
+            value = ["/codetutorial/submit"],
             produces = ["application/json"],
             consumes = ["application/json"]
     )
-    fun createDailyChallengeMatch(@Parameter(description = "", required = true) @Valid @RequestBody dailyChallengeMatchRequestDto: DailyChallengeMatchRequestDto): ResponseEntity<Unit> {
+    fun createCodeTutorialMatch(@Parameter(description = "", required = true) @Valid @RequestBody codeTutorialMatchRequestDto: CodeTutorialMatchRequestDto): ResponseEntity<Unit> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 
     @Operation(
-        summary = "Get Daily Challenge for the day",
-        operationId = "getDailyChallenge",
-        description = """Get current user challenge for that day""",
+        summary = "Get tutorial by number",
+        operationId = "getCodeTutorialByNumber",
+        description = """Get a single tutorial""",
         responses = [
-            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = DailyChallengeGetRequestDto::class))]),
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = TutorialsGetRequestDto::class))]),
             ApiResponse(responseCode = "401", description = "Unauthorized"),
             ApiResponse(responseCode = "403", description = "Forbidden"),
             ApiResponse(responseCode = "404", description = "Not found")
@@ -75,31 +74,10 @@ interface DailyChallengesApi {
     )
     @RequestMapping(
             method = [RequestMethod.GET],
-            value = ["/dc/get"],
+            value = ["/codetutorial/get/{codeTutorialNumber}"],
             produces = ["application/json"]
     )
-    fun getDailyChallenge(): ResponseEntity<DailyChallengeGetRequestDto> {
-        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
-    }
-
-    @Operation(
-        summary = "Get Daily Challenges Leaderboard",
-        operationId = "getDailyChallengeLeaderBoard",
-        description = """Get Leaderboard for daily challenges""",
-        responses = [
-            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = DailyChallengeLeaderBoardResponseDto::class)))]),
-            ApiResponse(responseCode = "401", description = "Unauthorized"),
-            ApiResponse(responseCode = "403", description = "Forbidden"),
-            ApiResponse(responseCode = "404", description = "Not Found")
-        ],
-        security = [ SecurityRequirement(name = "http-bearer") ]
-    )
-    @RequestMapping(
-            method = [RequestMethod.GET],
-            value = ["/dc/leaderboard"],
-            produces = ["application/json"]
-    )
-    fun getDailyChallengeLeaderBoard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<DailyChallengeLeaderBoardResponseDto>> {
+    fun getCodeTutorialByNumber(@Parameter(description = "", required = true) @PathVariable("codeTutorialNumber") codeTutorialNumber: kotlin.Int): ResponseEntity<TutorialsGetRequestDto> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }
