@@ -8,6 +8,7 @@ import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchVerdi
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.GameEntity
 import delta.codecharacter.server.game.GameStatusEnum
+import delta.codecharacter.server.notifications.NotificationService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -18,12 +19,14 @@ import kotlin.properties.Delegates
 
 @Service
 class CodeTutorialService(
-        @Autowired private val codeTutorialRepository: CodeTutorialRepository,
-        @Autowired private val publicUserService: PublicUserService,
+    @Autowired private val codeTutorialRepository: CodeTutorialRepository,
+    @Autowired private val notificationService: NotificationService,
+    @Autowired private val publicUserService: PublicUserService,
 ) {
 
     @Value("\${environment.event-start-date}") private lateinit var startDate: String
     private var currentTutorialNumber = 1
+    private val totalCodeTutorials = 6
     fun getTutorialByNumber(tutorialNumber: Int): CodeTutorialEntity {
         val currentTutorial =
             codeTutorialRepository.findByNumber(tutorialNumber).orElseThrow {
@@ -40,9 +43,13 @@ class CodeTutorialService(
         {
             currentTutorial = getTutorialByNumber(codeTutorialNumber)
         }
-        else
+        else if(codeTutorialNumber <= totalCodeTutorials)
         {
             throw CustomException(HttpStatus.BAD_REQUEST, "Complete the current tutorial first")
+        }
+        else
+        {
+            throw CustomException(HttpStatus.SERVICE_UNAVAILABLE, "No more tutorials!")
         }
         return TutorialsGetRequestDto(
                 tutorialName = currentTutorial.tutName,
@@ -65,7 +72,18 @@ class CodeTutorialService(
                                 destruction < 75.0
                         )
         ) {
-            publicUserService.updateUserCodeTutorialLevel(userId, true)
+            if(currentTutorialNumber == publicUserService.getPublicUser(userId).codeTutorialLevel)
+            {
+                publicUserService.updateUserCodeTutorialLevel(userId, true)
+            }
+            if(currentTutorialNumber == totalCodeTutorials)
+            {
+                notificationService.sendNotification(
+                    userId,
+                    title = "Completed all tutorials!",
+                    content = ""
+                )
+            }
             return CodeTutorialMatchVerdictEnum.SUCCESS
         }
         return CodeTutorialMatchVerdictEnum.FAILURE

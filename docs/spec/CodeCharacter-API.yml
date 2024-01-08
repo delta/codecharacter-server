@@ -2017,9 +2017,6 @@ components:
       description: Get the game tutorials
       type: object
       properties:
-        tutorialId:
-          type: integer
-          example: 1
         tutorialName:
           type: string
           example: Tutorial for Spawning attacker

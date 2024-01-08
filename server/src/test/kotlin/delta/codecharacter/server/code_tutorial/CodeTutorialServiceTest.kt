@@ -6,6 +6,7 @@ import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchVerdictEn
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchVerdictEnum
 import delta.codecharacter.server.game.GameEntity
 import delta.codecharacter.server.game.GameStatusEnum
+import delta.codecharacter.server.notifications.NotificationService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import io.mockk.every
 import io.mockk.mockk
@@ -21,14 +22,16 @@ internal class CodeTutorialServiceTest {
     private lateinit var codeTutorialRepository: CodeTutorialRepository
     private lateinit var publicUserService: PublicUserService
     private lateinit var codeTutorialService: CodeTutorialService
+    private lateinit var notificationService: NotificationService
 
     @BeforeEach
     fun setUp() {
         codeTutorialRepository = mockk(relaxed = true)
         publicUserService = mockk(relaxed = true)
+        notificationService = mockk(relaxed = true)
         codeTutorialService =
             CodeTutorialService(
-                codeTutorialRepository, publicUserService
+                codeTutorialRepository, notificationService, publicUserService
             )
 
         ReflectionTestUtils.setField(codeTutorialService, "startDate", "2024-02-15T23:00:00Z")

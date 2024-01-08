@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.media.Schema
  * Get the game tutorials
  * @param tutorialName 
  * @param tutorialCodes 
- * @param tutorialId 
  * @param tutorialType 
  * @param description 
  */
@@ -32,9 +31,6 @@ data class TutorialsGetRequestDto(
     @field:Valid
     @Schema(example = "null", required = true, description = "")
     @get:JsonProperty("tutorialCodes", required = true) val tutorialCodes: TutorialCodeObjectDto,
-
-    @Schema(example = "1", description = "")
-    @get:JsonProperty("tutorialId") val tutorialId: kotlin.Int? = null,
 
     @field:Valid
     @Schema(example = "null", description = "")
