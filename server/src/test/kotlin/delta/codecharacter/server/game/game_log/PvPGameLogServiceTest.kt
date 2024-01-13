@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 import java.util.Optional
 import java.util.UUID
 
-internal class GameLogServiceTest {
+internal class PvPGameLogServiceTest {
     private lateinit var gameLogRepository: GameLogRepository
     private lateinit var gameLogService: GameLogService
 

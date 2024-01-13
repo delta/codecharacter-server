@@ -514,6 +514,25 @@ paths:
                   value: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
       operationId: getGameLogsByGameId
       description: Get game logs by game ID
+  '/pvpgames/{gameId}/logs':
+    parameters:
+      - $ref: '#/components/parameters/gameId'
+    get:
+      summary: Get pvp game logs by game ID
+      tags:
+        - pvp-game
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PvPGameLog'
+              examples:
+                Example:
+                  value: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
+      operationId: getPvpGameLogsByGameId
+      description: Get pvp game logs by game ID
   /user:
     parameters: []
     get:
@@ -1927,6 +1946,41 @@ components:
       type: string
       description: Game log model
       example: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
+
+    PvPGame:
+      title: PvPGame
+      type: object
+      description: PvP Game model
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        destructionPlayer1:
+          type: number
+          example: 100
+        destructionPlayer2:
+          type: number
+          example: 100
+        coinsUsedPlayer1:
+          type: integer
+          example: 69
+        coinsUsedPlayer2:
+          type: integer
+          example: 69
+        status:
+          $ref: '#/components/schemas/PvPGameStatus'
+      required:
+        - id
+        - destructionPlayer1
+        - destructionPlayer2
+        - coinsUsedPlayer1
+        - coinsUsedPlayer2
+        - status
+    PvPGameLog:
+        type: string
+        description: PvP Game log model
+        example: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
     LeaderboardEntry:
       title: LeaderboardEntry
       type: object
@@ -1936,6 +1990,7 @@ components:
         stats:
           $ref: '#/components/schemas/UserStats'
       required:
+        - user
         - user
         - stats
       description: Leaderboard entry model
@@ -2032,6 +2087,7 @@ components:
         - MANUAL
         - AUTO
         - DAILYCHALLENGE
+        - PVP
       description: Match Mode
     Verdict:
       type: string
@@ -2045,6 +2101,14 @@ components:
       description: Match/Game verdict
     GameStatus:
       title: GameStatus
+      type: string
+      enum:
+        - IDLE
+        - EXECUTING
+        - EXECUTED
+        - EXECUTE_ERROR
+    PvPGameStatus:
+      title: PvPGameStatus
       type: string
       enum:
         - IDLE
@@ -2161,6 +2225,7 @@ tags:
   - name: code
   - name: current-user
   - name: game
+  - name: pvp-game
   - name: leaderboard
   - name: map
   - name: match

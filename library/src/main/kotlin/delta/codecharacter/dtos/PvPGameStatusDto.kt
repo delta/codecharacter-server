@@ -15,15 +15,14 @@ import jakarta.validation.Valid
 import io.swagger.v3.oas.annotations.media.Schema
 
 /**
-* Match Mode
-* Values: SELF,MANUAL,AUTO,DAILYCHALLENGE,PVP
+* 
+* Values: IDLE,EXECUTING,EXECUTED,EXECUTE_ERROR
 */
-enum class MatchModeDto(val value: kotlin.String) {
+enum class PvPGameStatusDto(val value: kotlin.String) {
 
-    @JsonProperty("SELF") SELF("SELF"),
-    @JsonProperty("MANUAL") MANUAL("MANUAL"),
-    @JsonProperty("AUTO") AUTO("AUTO"),
-    @JsonProperty("DAILYCHALLENGE") DAILYCHALLENGE("DAILYCHALLENGE"),
-    @JsonProperty("PVP") PVP("PVP")
+    @JsonProperty("IDLE") IDLE("IDLE"),
+    @JsonProperty("EXECUTING") EXECUTING("EXECUTING"),
+    @JsonProperty("EXECUTED") EXECUTED("EXECUTED"),
+    @JsonProperty("EXECUTE_ERROR") EXECUTE_ERROR("EXECUTE_ERROR")
 }
 

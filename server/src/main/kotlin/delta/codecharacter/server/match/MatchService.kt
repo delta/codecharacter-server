@@ -28,6 +28,8 @@ import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
+import delta.codecharacter.server.pvp_game.PvPGameService
+import delta.codecharacter.server.user.public_user.PublicUserEntity
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.slf4j.Logger
@@ -47,6 +49,7 @@ import java.util.UUID
 class MatchService(
     @Autowired private val matchRepository: MatchRepository,
     @Autowired private val gameService: GameService,
+    @Autowired private val pvPGameService: PvPGameService,
     @Autowired private val latestCodeService: LatestCodeService,
     @Autowired private val codeRevisionService: CodeRevisionService,
     @Autowired private val lockedCodeService: LockedCodeService,
@@ -62,7 +65,8 @@ class MatchService(
     @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
     @Autowired private val mapValidator: MapValidator,
-    @Autowired private val autoMatchRepository: AutoMatchRepository
+    @Autowired private val autoMatchRepository: AutoMatchRepository,
+    @Autowired private val pvPMatchRepository: PvPMatchRepository
 ) {
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
     private val logger: Logger = LoggerFactory.getLogger(MatchService::class.java)
@@ -111,13 +115,13 @@ class MatchService(
         gameService.sendGameRequest(game, code, LanguageEnum.valueOf(language.name), map)
     }
 
-    fun createDualMatch(userId: UUID, opponentUsername: String, mode: MatchModeEnum): UUID {
-        val publicUser = publicUserService.getPublicUser(userId)
-        val publicOpponent = publicUserService.getPublicUserByUsername(opponentUsername)
+    fun createNormalMatch(
+        publicUser: PublicUserEntity,
+        publicOpponent: PublicUserEntity,
+        mode: MatchModeEnum
+    ) : UUID {
+        val userId = publicUser.userId
         val opponentId = publicOpponent.userId
-        if (userId == opponentId) {
-            throw CustomException(HttpStatus.BAD_REQUEST, "You cannot play against yourself")
-        }
         val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId)
         val userMap = lockedMapService.getLockedMap(userId)
 
@@ -150,6 +154,33 @@ class MatchService(
             )
         }
         return matchId
+    }
+
+    fun createPvPMatch(publicUser: PublicUserEntity, publicOpponent: PublicUserEntity) : UUID {
+
+        // TODO : Logic for creating PvPMatch
+
+        return UUID.randomUUID() // TODO : replace with return matchId
+    }
+
+    fun createDualMatch(userId: UUID, opponentUsername: String, mode: MatchModeEnum): UUID {
+        val publicUser = publicUserService.getPublicUser(userId)
+        val publicOpponent = publicUserService.getPublicUserByUsername(opponentUsername)
+        val opponentId = publicOpponent.userId
+        if (userId == opponentId) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "You cannot play against yourself")
+        }
+        return when(mode) {
+            MatchModeEnum.MANUAL, MatchModeEnum.AUTO -> {
+                createNormalMatch(publicUser, publicOpponent, mode)
+            }
+            MatchModeEnum.PVP -> {
+                createPvPMatch(publicUser, publicOpponent)
+            }
+            else -> {
+                throw CustomException(HttpStatus.BAD_REQUEST, "MatchMode does not exist")
+            }
+        }
     }
 
     fun createDCMatch(userId: UUID, dailyChallengeMatchRequestDto: DailyChallengeMatchRequestDto) {
@@ -301,6 +332,7 @@ class MatchService(
 
     fun getTopMatches(): List<MatchDto> {
         val matches = matchRepository.findTop10ByOrderByTotalPointsDesc()
+        // TODO : Add PvP Matches
         return mapMatchEntitiesToDtos(matches)
     }
 
@@ -312,6 +344,7 @@ class MatchService(
                 Duration.between(it.createdAt, Instant.now()).toHours() < 24 &&
                     it.verdict != DailyChallengeMatchVerdictEnum.STARTED
             }
+        // TODO : Add PvP Matches
         return mapDailyChallengeMatchEntitiesToDtos(dcMatches) + mapMatchEntitiesToDtos(matches)
     }
 
@@ -447,6 +480,8 @@ class MatchService(
                     )
                 }
             }
+        } else if (pvPMatchRepository.findById(matchId).isPresent) {
+            // TODO : Logic for sending PvP Match Result
         } else if (dailyChallengeMatchRepository.findById(matchId).isPresent) {
             val match = dailyChallengeMatchRepository.findById(matchId).get()
             simpMessagingTemplate.convertAndSend(

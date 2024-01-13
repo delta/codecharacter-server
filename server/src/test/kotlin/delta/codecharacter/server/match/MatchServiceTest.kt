@@ -24,6 +24,7 @@ import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
+import delta.codecharacter.server.pvp_game.PvPGameService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import io.mockk.confirmVerified
@@ -44,6 +45,7 @@ internal class MatchServiceTest {
 
     private lateinit var matchRepository: MatchRepository
     private lateinit var gameService: GameService
+    private lateinit var pvPGameService: PvPGameService
     private lateinit var latestCodeService: LatestCodeService
     private lateinit var codeRevisionService: CodeRevisionService
     private lateinit var lockedCodeService: LockedCodeService
@@ -61,11 +63,13 @@ internal class MatchServiceTest {
     private lateinit var mapValidator: MapValidator
     private lateinit var matchService: MatchService
     private lateinit var autoMatchRepository: AutoMatchRepository
+    private lateinit var pvPMatchRepository: PvPMatchRepository
 
     @BeforeEach
     fun setUp() {
         matchRepository = mockk(relaxed = true)
         gameService = mockk(relaxed = true)
+        pvPGameService = mockk(relaxed = true)
         latestCodeService = mockk(relaxed = true)
         codeRevisionService = mockk(relaxed = true)
         lockedCodeService = mockk(relaxed = true)
@@ -82,11 +86,13 @@ internal class MatchServiceTest {
         simpMessagingTemplate = mockk(relaxed = true)
         mapValidator = mockk(relaxed = true)
         autoMatchRepository = mockk(relaxed = true)
+        pvPMatchRepository = mockk(relaxed = true)
 
         matchService =
             MatchService(
                 matchRepository,
                 gameService,
+                pvPGameService,
                 latestCodeService,
                 codeRevisionService,
                 lockedCodeService,
@@ -102,7 +108,8 @@ internal class MatchServiceTest {
                 jackson2ObjectMapperBuilder,
                 simpMessagingTemplate,
                 mapValidator,
-                autoMatchRepository
+                autoMatchRepository,
+                pvPMatchRepository,
             )
     }
 
