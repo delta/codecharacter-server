@@ -11,7 +11,7 @@ import java.util.UUID
 @Document(collection = "pvp_match")
 data class PvPMatchEntity (
     @Id val id: UUID,
-    @DocumentReference(lazy = true) val games: PvPGameEntity,
+    @DocumentReference(lazy = true) val game: PvPGameEntity,
     val mode: MatchModeEnum,
     val verdict: MatchVerdictEnum,
     val createdAt: Instant,

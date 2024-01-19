@@ -7,6 +7,7 @@ import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.game_log.GameLogService
 import delta.codecharacter.server.game.queue.entities.GameRequestEntity
 import delta.codecharacter.server.game.queue.entities.GameStatusUpdateEntity
+import delta.codecharacter.server.params.GameCode
 import delta.codecharacter.server.params.GameParameters
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,8 +46,7 @@ class GameService(
         val gameRequest =
             GameRequestEntity(
                 gameId = game.id,
-                sourceCode = sourceCode,
-                language = language,
+                playerCode = GameCode(sourceCode, language),
                 parameters = parameters,
                 map = map
             )

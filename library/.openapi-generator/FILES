@@ -43,6 +43,7 @@ src/main/kotlin/delta/codecharacter/dtos/PasswordLoginResponseDto.kt
 src/main/kotlin/delta/codecharacter/dtos/PublicUserDto.kt
 src/main/kotlin/delta/codecharacter/dtos/PvPGameDto.kt
 src/main/kotlin/delta/codecharacter/dtos/PvPGameStatusDto.kt
+src/main/kotlin/delta/codecharacter/dtos/PvPMatchDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RatingHistoryDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RegisterUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ResetPasswordRequestDto.kt

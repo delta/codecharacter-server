@@ -1,9 +1,11 @@
 package delta.codecharacter.server.pvp_game.queue.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import delta.codecharacter.server.pvp_game.PvPGameStatusEnum
 import java.util.UUID
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class PvPGameStatusUpdateEntity(
     @field:JsonProperty("game_id", required = true) val gameId: UUID,
     @field:JsonProperty("game_status", required = true) val gameStatus: PvPGameStatusEnum,

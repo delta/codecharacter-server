@@ -1891,6 +1891,36 @@ components:
         - matchVerdict
         - createdAt
         - user1
+    PvPMatch:
+      description: PvP Match model
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        game:
+          $ref: '#/components/schemas/PvPGame'
+        matchMode:
+          $ref: '#/components/schemas/MatchMode'
+        matchVerdict:
+          $ref: '#/components/schemas/Verdict'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+        user1:
+          $ref: '#/components/schemas/PublicUser'
+        user2:
+          $ref: '#/components/schemas/PublicUser'
+      required:
+        - id
+        - game
+        - matchMode
+        - matchVerdict
+        - createdAt
+        - user1
+        - user2
     CreateMatchRequest:
       title: CreateMatchRequest
       type: object

@@ -1,16 +1,7 @@
 package delta.codecharacter.server.match
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import delta.codecharacter.dtos.ChallengeTypeDto
-import delta.codecharacter.dtos.CreateMatchRequestDto
-import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
-import delta.codecharacter.dtos.GameDto
-import delta.codecharacter.dtos.GameStatusDto
-import delta.codecharacter.dtos.MatchDto
-import delta.codecharacter.dtos.MatchModeDto
-import delta.codecharacter.dtos.PublicUserDto
-import delta.codecharacter.dtos.TierTypeDto
-import delta.codecharacter.dtos.VerdictDto
+import delta.codecharacter.dtos.*
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
@@ -28,7 +19,9 @@ import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
+import delta.codecharacter.server.params.GameCode
 import delta.codecharacter.server.pvp_game.PvPGameService
+import delta.codecharacter.server.pvp_game.PvPGameStatusEnum
 import delta.codecharacter.server.user.public_user.PublicUserEntity
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
@@ -40,6 +33,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
+import springfox.documentation.spring.web.json.Json
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
@@ -157,10 +151,32 @@ class MatchService(
     }
 
     fun createPvPMatch(publicUser: PublicUserEntity, publicOpponent: PublicUserEntity) : UUID {
+        val userId = publicUser.userId
+        val opponentId = publicOpponent.userId
 
-        // TODO : Logic for creating PvPMatch
+        val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId)
+        val (opponentLanguage, opponentCode) = lockedCodeService.getLockedCode(opponentId)
 
-        return UUID.randomUUID() // TODO : replace with return matchId
+        val matchId = UUID.randomUUID()
+
+        val game = pvPGameService.createPvPGame(matchId)
+
+        val match =
+            PvPMatchEntity(
+                id = matchId,
+                game = game,
+                mode = MatchModeEnum.PVP,
+                verdict = MatchVerdictEnum.TIE,
+                createdAt = Instant.now(),
+                totalPoints = 0,
+                player1 = publicUser,
+                player2 = publicOpponent,
+            )
+        pvPMatchRepository.save(match)
+
+        pvPGameService.sendPvPGameRequest(game, GameCode(userCode, userLanguage), GameCode(opponentCode, opponentLanguage))
+
+        return matchId
     }
 
     fun createDualMatch(userId: UUID, opponentUsername: String, mode: MatchModeEnum): UUID {
@@ -299,6 +315,50 @@ class MatchService(
         }
     }
 
+    private fun mapPvPMatchEntitiesToDtos(pvPMatchEntities: List<PvPMatchEntity>): List<MatchDto> {
+        return pvPMatchEntities.map { pvPMatchEntity ->
+            MatchDto(
+                id = pvPMatchEntity.id,
+                matchMode = MatchModeDto.valueOf(pvPMatchEntity.mode.name),
+                matchVerdict = VerdictDto.valueOf(pvPMatchEntity.verdict.name),
+                createdAt = pvPMatchEntity.createdAt,
+                games =
+                setOf(
+                    GameDto (
+                        id = pvPMatchEntity.game.matchId,
+                        destruction = BigDecimal(pvPMatchEntity.game.destructionPlayer1),
+                        coinsUsed = pvPMatchEntity.game.coinsUsedPlayer1,
+                        status = GameStatusDto.valueOf(pvPMatchEntity.game.status.name)
+                    ),
+                    GameDto (
+                        id = pvPMatchEntity.game.matchId,
+                        destruction = BigDecimal(pvPMatchEntity.game.destructionPlayer2),
+                        coinsUsed = pvPMatchEntity.game.coinsUsedPlayer2,
+                        status = GameStatusDto.valueOf(pvPMatchEntity.game.status.name)
+                    )
+                ),
+                user1 =
+                PublicUserDto(
+                    username = pvPMatchEntity.player1.username,
+                    name = pvPMatchEntity.player1.name,
+                    tier = TierTypeDto.valueOf(pvPMatchEntity.player1.tier.name),
+                    country = pvPMatchEntity.player1.country,
+                    college = pvPMatchEntity.player1.college,
+                    avatarId = pvPMatchEntity.player1.avatarId,
+                ),
+                user2 =
+                PublicUserDto(
+                    username = pvPMatchEntity.player2.username,
+                    name = pvPMatchEntity.player2.name,
+                    tier = TierTypeDto.valueOf(pvPMatchEntity.player2.tier.name),
+                    country = pvPMatchEntity.player2.country,
+                    college = pvPMatchEntity.player2.college,
+                    avatarId = pvPMatchEntity.player2.avatarId,
+                ),
+            )
+        }
+    }
+
     private fun mapDailyChallengeMatchEntitiesToDtos(
         dailyChallengeMatchEntities: List<DailyChallengeMatchEntity>
     ): List<MatchDto> {
@@ -332,20 +392,20 @@ class MatchService(
 
     fun getTopMatches(): List<MatchDto> {
         val matches = matchRepository.findTop10ByOrderByTotalPointsDesc()
-        // TODO : Add PvP Matches
-        return mapMatchEntitiesToDtos(matches)
+        val pvPMatches = pvPMatchRepository.findTop10ByOrderByTotalPointsDesc()
+        return mapMatchEntitiesToDtos(matches) + mapPvPMatchEntitiesToDtos(pvPMatches)
     }
 
     fun getUserMatches(userId: UUID): List<MatchDto> {
         val publicUser = publicUserService.getPublicUser(userId)
         val matches = matchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser)
+        val pvPMatches = pvPMatchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser)
         val dcMatches =
             dailyChallengeMatchRepository.findByUserOrderByCreatedAtDesc(publicUser).takeWhile {
                 Duration.between(it.createdAt, Instant.now()).toHours() < 24 &&
                     it.verdict != DailyChallengeMatchVerdictEnum.STARTED
             }
-        // TODO : Add PvP Matches
-        return mapDailyChallengeMatchEntitiesToDtos(dcMatches) + mapMatchEntitiesToDtos(matches)
+        return mapDailyChallengeMatchEntitiesToDtos(dcMatches) + mapMatchEntitiesToDtos(matches) + mapPvPMatchEntitiesToDtos(pvPMatches)
     }
 
     @RabbitListener(queues = ["gameStatusUpdateQueue"], ackMode = "AUTO")
@@ -480,8 +540,6 @@ class MatchService(
                     )
                 }
             }
-        } else if (pvPMatchRepository.findById(matchId).isPresent) {
-            // TODO : Logic for sending PvP Match Result
         } else if (dailyChallengeMatchRepository.findById(matchId).isPresent) {
             val match = dailyChallengeMatchRepository.findById(matchId).get()
             simpMessagingTemplate.convertAndSend(
@@ -515,6 +573,71 @@ class MatchService(
                 )
                 dailyChallengeMatchRepository.save(updatedMatch)
             }
+        }
+    }
+
+    @RabbitListener(queues = ["gamePvPStatusUpdateQueue"], ackMode = "AUTO")
+    fun receivePvPGameResult(gameStatusUpdateJson: String) {
+        val updatedGame = pvPGameService.updateGameStatus(gameStatusUpdateJson)
+        val matchId = updatedGame.matchId
+        if (pvPMatchRepository.findById(matchId).isPresent) {
+            val match = pvPMatchRepository.findById(updatedGame.matchId).get()
+            if (match.game.matchId == updatedGame.matchId) {
+                simpMessagingTemplate.convertAndSend(
+                    "/updates/${match.player1.userId}",
+                    mapper.writeValueAsString(
+                        GameDto(
+                            id = updatedGame.matchId,
+                            destruction = BigDecimal(updatedGame.destructionPlayer1),
+                            coinsUsed = updatedGame.coinsUsedPlayer1,
+                            status = GameStatusDto.valueOf(updatedGame.status.name),
+                        )
+                    )
+                )
+            }
+            if (match.game.status == PvPGameStatusEnum.EXECUTED) {
+                val verdict =
+                    verdictAlgorithm.getVerdict(
+                        match.game.status == PvPGameStatusEnum.EXECUTE_ERROR,
+                        match.game.coinsUsedPlayer1,
+                        match.game.destructionPlayer1,
+                        match.game.status == PvPGameStatusEnum.EXECUTE_ERROR,
+                        match.game.coinsUsedPlayer2,
+                        match.game.destructionPlayer2
+                    )
+                val finishedMatch = match.copy(verdict = verdict)
+                val (newUserRating, newOpponentRating) =
+                    ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
+
+                publicUserService.updatePublicRating(
+                    userId = match.player1.userId,
+                    isInitiator = true,
+                    verdict = verdict,
+                    newRating = newUserRating
+                )
+
+                publicUserService.updatePublicRating(
+                    userId = match.player2.userId,
+                    isInitiator = false,
+                    verdict = verdict,
+                    newRating = newOpponentRating
+                )
+
+                pvPMatchRepository.save(finishedMatch)
+                notificationService.sendNotification(
+                    match.player1.userId,
+                    "Match Result",
+                    "${
+                        when (verdict) {
+                            MatchVerdictEnum.PLAYER1 -> "Won"
+                            MatchVerdictEnum.PLAYER2 -> "Lost"
+                            MatchVerdictEnum.TIE -> "Tied"
+                        }
+                    } against ${match.player2.username}",
+                )
+            }
+        } else {
+            logger.error("PvP Match not found")
         }
     }
 }
