@@ -17,6 +17,7 @@ import delta.codecharacter.server.daily_challenge.DailyChallengeService
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchRepository
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.GameEntity
+import delta.codecharacter.server.game.GameRepository
 import delta.codecharacter.server.game.GameService
 import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
@@ -24,6 +25,7 @@ import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
+import delta.codecharacter.server.pvp_game.PvPGameRepository
 import delta.codecharacter.server.pvp_game.PvPGameService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
@@ -64,6 +66,8 @@ internal class MatchServiceTest {
     private lateinit var matchService: MatchService
     private lateinit var autoMatchRepository: AutoMatchRepository
     private lateinit var pvPMatchRepository: PvPMatchRepository
+    private lateinit var gameRepository: GameRepository
+    private lateinit var pvPGameRepository: PvPGameRepository
 
     @BeforeEach
     fun setUp() {
@@ -87,6 +91,8 @@ internal class MatchServiceTest {
         mapValidator = mockk(relaxed = true)
         autoMatchRepository = mockk(relaxed = true)
         pvPMatchRepository = mockk(relaxed = true)
+        gameRepository = mockk(relaxed = true)
+        pvPGameRepository = mockk(relaxed = true)
 
         matchService =
             MatchService(
@@ -110,6 +116,8 @@ internal class MatchServiceTest {
                 mapValidator,
                 autoMatchRepository,
                 pvPMatchRepository,
+                gameRepository,
+                pvPGameRepository,
             )
     }
 
@@ -246,6 +254,7 @@ internal class MatchServiceTest {
         val opponentId = UUID.randomUUID()
         val opponentPublicUser =
             TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
+        val publicUser = TestAttributes.publicUser.copy(userId = userId, username = "public user")
 
         val userCode = Pair(LanguageEnum.CPP, "user-code")
         val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
@@ -258,8 +267,8 @@ internal class MatchServiceTest {
                 opponentUsername = opponentPublicUser.username,
             )
 
-        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
-            opponentPublicUser
+        every { publicUserService.getPublicUser(userId) } returns publicUser
+        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns opponentPublicUser
         every { lockedCodeService.getLockedCode(userId) } returns userCode
         every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
         every { lockedMapService.getLockedMap(userId) } returns userMap
@@ -294,6 +303,8 @@ internal class MatchServiceTest {
     fun `should create auto match`() {
         val userId = UUID.randomUUID()
         val opponentId = UUID.randomUUID()
+        val publicUser =
+            TestAttributes.publicUser.copy(userId = userId, username = "public user")
         val opponentPublicUser =
             TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
 
@@ -308,6 +319,7 @@ internal class MatchServiceTest {
                 opponentUsername = opponentPublicUser.username,
             )
 
+        every { publicUserService.getPublicUser(userId) } returns publicUser
         every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
             opponentPublicUser
         every { lockedCodeService.getLockedCode(userId) } returns userCode

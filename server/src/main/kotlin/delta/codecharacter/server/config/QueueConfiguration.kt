@@ -11,5 +11,4 @@ class QueueConfiguration {
     @Bean fun gameRequestQueue() = Queue("gameRequestQueue")
     @Bean fun gameStatusUpdateQueue() = Queue("gameStatusUpdateQueue")
     @Bean fun pvPGameRequestQueue() = Queue("gamePvPRequestQueue")
-    @Bean fun pvPGameStatusUpdateQueue() = Queue("gamePvPStatusUpdateQueue")
 }

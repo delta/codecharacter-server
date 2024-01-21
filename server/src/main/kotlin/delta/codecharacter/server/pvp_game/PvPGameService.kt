@@ -50,7 +50,7 @@ class PvPGameService(
                 player1 = player1Code,
                 player2 = player2Code
             )
-        rabbitTemplate.convertAndSend("pvPGameRequestQueue", mapper.writeValueAsString(pvPGameRequest))
+        rabbitTemplate.convertAndSend("gamePvPRequestQueue", mapper.writeValueAsString(pvPGameRequest))
     }
 
     fun updateGameStatus(gameStatusUpdateJson: String): PvPGameEntity {

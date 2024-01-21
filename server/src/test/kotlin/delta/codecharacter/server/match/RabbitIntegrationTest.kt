@@ -69,8 +69,6 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
         try {
             rabbitAdmin.purgeQueue("gameRequestQueue", true)
             rabbitAdmin.purgeQueue("gameStatusUpdateQueue", true)
-            rabbitAdmin.purgeQueue("pvPGameRequestQueue", true)
-            rabbitAdmin.purgeQueue("pvPGameStatusUpdateQueue", true)
         } catch (e: Exception) {
             println("RabbitMQ queues are not available")
         }
@@ -373,8 +371,6 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
         try {
             rabbitAdmin.purgeQueue("gameRequestQueue", true)
             rabbitAdmin.purgeQueue("gameStatusUpdateQueue", true)
-            rabbitAdmin.purgeQueue("pvPGameRequestQueue", true)
-            rabbitAdmin.purgeQueue("pvPGameStatusUpdateQueue", true)
         } catch (e: Exception) {
             println("RabbitMQ queues are not available")
         }

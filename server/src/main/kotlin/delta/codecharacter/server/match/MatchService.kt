@@ -11,8 +11,10 @@ import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchEntit
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchRepository
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchVerdictEnum
 import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.game.GameRepository
 import delta.codecharacter.server.game.GameService
 import delta.codecharacter.server.game.GameStatusEnum
+import delta.codecharacter.server.game.queue.entities.GameStatusUpdateEntity
 import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
@@ -20,6 +22,7 @@ import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
 import delta.codecharacter.server.params.GameCode
+import delta.codecharacter.server.pvp_game.PvPGameRepository
 import delta.codecharacter.server.pvp_game.PvPGameService
 import delta.codecharacter.server.pvp_game.PvPGameStatusEnum
 import delta.codecharacter.server.user.public_user.PublicUserEntity
@@ -33,7 +36,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
-import springfox.documentation.spring.web.json.Json
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.Instant
@@ -60,7 +62,9 @@ class MatchService(
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
     @Autowired private val mapValidator: MapValidator,
     @Autowired private val autoMatchRepository: AutoMatchRepository,
-    @Autowired private val pvPMatchRepository: PvPMatchRepository
+    @Autowired private val pvPMatchRepository: PvPMatchRepository,
+    @Autowired private val gameRepository: GameRepository,
+    @Autowired private val pvPGameRepository: PvPGameRepository,
 ) {
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
     private val logger: Logger = LoggerFactory.getLogger(MatchService::class.java)
@@ -245,7 +249,7 @@ class MatchService(
                 val (_, _, mapRevisionId, codeRevisionId) = createMatchRequestDto
                 createSelfMatch(userId, codeRevisionId, mapRevisionId)
             }
-            MatchModeDto.MANUAL, MatchModeDto.AUTO -> {
+            MatchModeDto.MANUAL, MatchModeDto.AUTO , MatchModeDto.PVP -> {
                 if (createMatchRequestDto.opponentUsername == null) {
                     throw CustomException(HttpStatus.BAD_REQUEST, "Opponent ID is required")
                 }
@@ -410,9 +414,24 @@ class MatchService(
 
     @RabbitListener(queues = ["gameStatusUpdateQueue"], ackMode = "AUTO")
     fun receiveGameResult(gameStatusUpdateJson: String) {
-        val updatedGame = gameService.updateGameStatus(gameStatusUpdateJson)
-        val matchId = updatedGame.matchId
+        val gameStatusUpdateEntity =
+            mapper.readValue(gameStatusUpdateJson, GameStatusUpdateEntity::class.java)
+        val gameId = gameStatusUpdateEntity.gameId
+
+        var matchId: UUID
+        if(gameRepository.findById(gameId).isPresent) {
+            val game = gameRepository.findById(gameId).get()
+            matchId = game.matchId // for normal matches, each match has 2 games
+        }
+        else if(pvPGameRepository.findById(gameId).isPresent) {
+            matchId = gameId // for pvp matches, matchId is same as gameId
+        }
+        else {
+            throw CustomException(HttpStatus.NOT_FOUND, "Game not found")
+        }
+
         if (matchRepository.findById(matchId).isPresent) {
+            val updatedGame = gameService.updateGameStatus(gameStatusUpdateJson)
             val match = matchRepository.findById(updatedGame.matchId).get()
             if (match.mode != MatchModeEnum.AUTO && match.games.first().id == updatedGame.id) {
                 simpMessagingTemplate.convertAndSend(
@@ -541,6 +560,7 @@ class MatchService(
                 }
             }
         } else if (dailyChallengeMatchRepository.findById(matchId).isPresent) {
+            val updatedGame = gameService.updateGameStatus(gameStatusUpdateJson)
             val match = dailyChallengeMatchRepository.findById(matchId).get()
             simpMessagingTemplate.convertAndSend(
                 "/updates/${match.user.userId}",
@@ -573,14 +593,8 @@ class MatchService(
                 )
                 dailyChallengeMatchRepository.save(updatedMatch)
             }
-        }
-    }
-
-    @RabbitListener(queues = ["gamePvPStatusUpdateQueue"], ackMode = "AUTO")
-    fun receivePvPGameResult(gameStatusUpdateJson: String) {
-        val updatedGame = pvPGameService.updateGameStatus(gameStatusUpdateJson)
-        val matchId = updatedGame.matchId
-        if (pvPMatchRepository.findById(matchId).isPresent) {
+        } else if(pvPMatchRepository.findById(matchId).isPresent) {
+            val updatedGame = pvPGameService.updateGameStatus(gameStatusUpdateJson)
             val match = pvPMatchRepository.findById(updatedGame.matchId).get()
             if (match.game.matchId == updatedGame.matchId) {
                 simpMessagingTemplate.convertAndSend(
@@ -636,8 +650,6 @@ class MatchService(
                     } against ${match.player2.username}",
                 )
             }
-        } else {
-            logger.error("PvP Match not found")
         }
     }
 }
