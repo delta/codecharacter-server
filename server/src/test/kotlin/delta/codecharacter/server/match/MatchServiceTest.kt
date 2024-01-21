@@ -25,6 +25,7 @@ import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
+import delta.codecharacter.server.params.GameCode
 import delta.codecharacter.server.pvp_game.PvPGameRepository
 import delta.codecharacter.server.pvp_game.PvPGameService
 import delta.codecharacter.server.user.public_user.PublicUserService
@@ -249,12 +250,30 @@ internal class MatchServiceTest {
     }
 
     @Test
+    @Throws(CustomException::class)
+    fun `should throw bad request if opponent id is empty in pvp match`() {
+        val createMatchRequestDto =
+            CreateMatchRequestDto(
+                mode = MatchModeDto.PVP,
+                codeRevisionId = UUID.randomUUID(),
+                mapRevisionId = UUID.randomUUID(),
+                opponentUsername = null
+            )
+
+        val exception =
+            assertThrows<CustomException> { matchService.createMatch(mockk(), createMatchRequestDto) }
+
+        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(exception.message).isEqualTo("Opponent ID is required")
+    }
+
+    @Test
     fun `should create manual match`() {
         val userId = UUID.randomUUID()
         val opponentId = UUID.randomUUID()
         val opponentPublicUser =
             TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
-        val publicUser = TestAttributes.publicUser.copy(userId = userId, username = "public user")
+        val publicUser = TestAttributes.publicUser.copy(userId = userId, username = "public-user")
 
         val userCode = Pair(LanguageEnum.CPP, "user-code")
         val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
@@ -296,6 +315,52 @@ internal class MatchServiceTest {
         }
         confirmVerified(
             codeRevisionService, mapRevisionService, gameService, matchRepository, gameService
+        )
+    }
+
+    @Test
+    fun `should create a pvp match`() {
+        val userId = UUID.randomUUID()
+        val opponentId = UUID.randomUUID()
+        val opponentPublicUser =
+            TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
+        val publicUser = TestAttributes.publicUser.copy(userId = userId, username = "public-user")
+
+        val userCode = Pair(LanguageEnum.CPP, "user-code")
+        val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
+
+        val createMatchRequestDto =
+            CreateMatchRequestDto(
+                mode = MatchModeDto.PVP,
+                opponentUsername = opponentPublicUser.username,
+            )
+
+        every { publicUserService.getPublicUser(userId) } returns publicUser
+        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns opponentPublicUser
+        every { lockedCodeService.getLockedCode(userId) } returns userCode
+        every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
+        every { pvPGameService.createPvPGame(any()) } returns mockk()
+        every { pvPMatchRepository.save(any()) } returns mockk()
+        every {
+            pvPGameService.sendPvPGameRequest(any(),
+                GameCode(userCode.second, userCode.first),
+                GameCode(opponentCode.second, opponentCode.first))
+        } returns Unit
+
+        matchService.createMatch(userId, createMatchRequestDto)
+
+        verify {
+            publicUserService.getPublicUserByUsername(opponentPublicUser.username)
+            lockedCodeService.getLockedCode(userId)
+            lockedCodeService.getLockedCode(opponentId)
+            pvPGameService.createPvPGame(any())
+            pvPMatchRepository.save(any())
+            pvPGameService.sendPvPGameRequest(any(),
+                GameCode(userCode.second, userCode.first),
+                GameCode(opponentCode.second, opponentCode.first))
+        }
+        confirmVerified(
+            codeRevisionService, mapRevisionService, pvPGameService, pvPMatchRepository, pvPGameService
         )
     }
 

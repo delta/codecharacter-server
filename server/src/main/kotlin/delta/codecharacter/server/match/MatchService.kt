@@ -253,7 +253,7 @@ class MatchService(
                 if (createMatchRequestDto.opponentUsername == null) {
                     throw CustomException(HttpStatus.BAD_REQUEST, "Opponent ID is required")
                 }
-                createDualMatch(userId, createMatchRequestDto.opponentUsername!!, MatchModeEnum.MANUAL)
+                createDualMatch(userId, createMatchRequestDto.opponentUsername!!, MatchModeEnum.valueOf(createMatchRequestDto.mode.name))
             }
             else -> {
                 throw CustomException(HttpStatus.BAD_REQUEST, "MatchMode Is Not Correct")
