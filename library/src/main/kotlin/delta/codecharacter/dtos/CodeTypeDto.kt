@@ -16,11 +16,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 /**
 * 
-* Values: NORMAL,DAILY_CHALLENGE
+* Values: NORMAL,DAILY_CHALLENGE,PVP
 */
 enum class CodeTypeDto(val value: kotlin.String) {
 
     @JsonProperty("NORMAL") NORMAL("NORMAL"),
-    @JsonProperty("DAILY_CHALLENGE") DAILY_CHALLENGE("DAILY_CHALLENGE")
+    @JsonProperty("DAILY_CHALLENGE") DAILY_CHALLENGE("DAILY_CHALLENGE"),
+    @JsonProperty("PVP") PVP("PVP")
 }
 

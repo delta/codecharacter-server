@@ -77,7 +77,7 @@ internal class CodeRevisionServiceTest {
             )
         } returns listOf(codeRevisionEntity)
 
-        val codeRevisionDtos = codeRevisionService.getCodeRevisions(userId)
+        val codeRevisionDtos = codeRevisionService.getCodeRevisions(userId, CodeTypeDto.NORMAL)
         val codeRevisionDto = codeRevisionDtos.first()
 
         verify {

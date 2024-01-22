@@ -19,7 +19,7 @@ class LatestCodeService(
     @Autowired private val defaultCodeMapConfiguration: DefaultCodeMapConfiguration
 ) {
 
-    fun getLatestCode(userId: UUID, codeType: CodeTypeDto = CodeTypeDto.NORMAL): CodeDto {
+    fun getLatestCode(userId: UUID, codeType: CodeTypeDto): CodeDto {
         val latestCode = HashMap<CodeTypeDto, Code>()
         latestCode[codeType] = defaultCodeMapConfiguration.defaultLatestCode
         val code: CodeDto =

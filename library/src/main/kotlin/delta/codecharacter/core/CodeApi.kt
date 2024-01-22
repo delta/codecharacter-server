@@ -78,7 +78,7 @@ interface CodeApi {
             value = ["/user/code/revisions"],
             produces = ["application/json"]
     )
-    fun getCodeRevisions(@Parameter(description = "code type", schema = Schema(allowableValues = ["NORMAL", "DAILY_CHALLENGE"], defaultValue = "NORMAL")) @Valid @RequestParam(value = "type", required = false, defaultValue = "NORMAL") type: CodeTypeDto): ResponseEntity<List<CodeRevisionDto>> {
+    fun getCodeRevisions(@Parameter(description = "code type", schema = Schema(allowableValues = ["NORMAL", "DAILY_CHALLENGE", "PVP"], defaultValue = "NORMAL")) @Valid @RequestParam(value = "type", required = false, defaultValue = "NORMAL") type: CodeTypeDto): ResponseEntity<List<CodeRevisionDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 
@@ -97,7 +97,7 @@ interface CodeApi {
             value = ["/user/code/latest"],
             produces = ["application/json"]
     )
-    fun getLatestCode(@Parameter(description = "code type", schema = Schema(allowableValues = ["NORMAL", "DAILY_CHALLENGE"], defaultValue = "NORMAL")) @Valid @RequestParam(value = "type", required = false, defaultValue = "NORMAL") type: CodeTypeDto): ResponseEntity<CodeDto> {
+    fun getLatestCode(@Parameter(description = "code type", schema = Schema(allowableValues = ["NORMAL", "DAILY_CHALLENGE", "PVP"], defaultValue = "NORMAL")) @Valid @RequestParam(value = "type", required = false, defaultValue = "NORMAL") type: CodeTypeDto): ResponseEntity<CodeDto> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 

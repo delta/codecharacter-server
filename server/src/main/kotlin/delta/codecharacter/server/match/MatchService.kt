@@ -73,12 +73,12 @@ class MatchService(
         val code: String
         val language: LanguageEnum
         if (codeRevisionId == null) {
-            val latestCode = latestCodeService.getLatestCode(userId)
+            val latestCode = latestCodeService.getLatestCode(userId, CodeTypeDto.NORMAL)
             code = latestCode.code
             language = LanguageEnum.valueOf(latestCode.language.name)
         } else {
             val codeRevision =
-                codeRevisionService.getCodeRevisions(userId).find { it.id == codeRevisionId }
+                codeRevisionService.getCodeRevisions(userId, CodeTypeDto.NORMAL).find { it.id == codeRevisionId }
                     ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
             code = codeRevision.code
             language = LanguageEnum.valueOf(codeRevision.language.name)
@@ -120,10 +120,10 @@ class MatchService(
     ) : UUID {
         val userId = publicUser.userId
         val opponentId = publicOpponent.userId
-        val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId)
+        val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId, CodeTypeDto.NORMAL)
         val userMap = lockedMapService.getLockedMap(userId)
 
-        val (opponentLanguage, opponentCode) = lockedCodeService.getLockedCode(opponentId)
+        val (opponentLanguage, opponentCode) = lockedCodeService.getLockedCode(opponentId, CodeTypeDto.NORMAL)
         val opponentMap = lockedMapService.getLockedMap(opponentId)
 
         val matchId = UUID.randomUUID()
@@ -158,8 +158,8 @@ class MatchService(
         val userId = publicUser.userId
         val opponentId = publicOpponent.userId
 
-        val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId)
-        val (opponentLanguage, opponentCode) = lockedCodeService.getLockedCode(opponentId)
+        val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId, CodeTypeDto.PVP)
+        val (opponentLanguage, opponentCode) = lockedCodeService.getLockedCode(opponentId, CodeTypeDto.PVP)
 
         val matchId = UUID.randomUUID()
 

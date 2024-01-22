@@ -2175,6 +2175,7 @@ components:
       enum:
         - NORMAL
         - DAILY_CHALLENGE
+        - PVP
       default: NORMAL
     GameMapType:
       title: GameMapType

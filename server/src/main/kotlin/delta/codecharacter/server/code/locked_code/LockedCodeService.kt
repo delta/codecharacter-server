@@ -18,7 +18,7 @@ class LockedCodeService(
 
     fun getLockedCode(
         userId: UUID,
-        codeType: CodeTypeDto = CodeTypeDto.NORMAL
+        codeType: CodeTypeDto
     ): Pair<LanguageEnum, String> {
         val lockedCode = HashMap<CodeTypeDto, Code>()
         lockedCode[codeType] = defaultCodeMapConfiguration.defaultLockedCode
