@@ -33,6 +33,19 @@ class TestAttributes {
                 loginType = LoginType.PASSWORD,
                 isProfileComplete = true,
             )
+
+        val opponent =
+            UserEntity(
+                id = UUID.randomUUID(),
+                password = "password",
+                email = "opponent@test.com",
+                isEnabled = true,
+                isAccountNonExpired = true,
+                isAccountNonLocked = true,
+                loginType = LoginType.PASSWORD,
+                isProfileComplete = true,
+            )
+
         val dailyChallengeCode =
             DailyChallengeEntity(
                 id = UUID.randomUUID(),
@@ -51,6 +64,24 @@ class TestAttributes {
                 userId = user.id,
                 username = "TestUser",
                 name = "Test User",
+                country = "Test Country",
+                college = "Test College",
+                avatarId = 1,
+                rating = 1000.0,
+                wins = 4,
+                losses = 2,
+                ties = 1,
+                tier = TierTypeDto.TIER_PRACTICE,
+                score = 0.0,
+                dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
+                tutorialLevel = 1
+            )
+
+        val publicOpponent =
+            PublicUserEntity(
+                userId = opponent.id,
+                username = "TestOpponentUser",
+                name = "Test Opponent User",
                 country = "Test Country",
                 college = "Test College",
                 avatarId = 1,
