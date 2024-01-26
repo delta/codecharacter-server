@@ -318,7 +318,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Match'
+                  type: object
               examples:
                 Example:
                   value:
@@ -989,7 +989,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Match'
+                   type: object
               examples:
                 Example:
                   value:
@@ -1986,26 +1986,18 @@ components:
           type: string
           format: uuid
           example: 123e4567-e89b-12d3-a456-426614174000
-        destructionPlayer1:
-          type: number
-          example: 100
-        destructionPlayer2:
-          type: number
-          example: 100
-        coinsUsedPlayer1:
+        scorePlayer1:
           type: integer
           example: 69
-        coinsUsedPlayer2:
+        scorePlayer2:
           type: integer
           example: 69
         status:
           $ref: '#/components/schemas/PvPGameStatus'
       required:
         - id
-        - destructionPlayer1
-        - destructionPlayer2
-        - coinsUsedPlayer1
-        - coinsUsedPlayer2
+        - scorePlayer1
+        - scorePlayer2
         - status
     PvPGameLog:
         type: string

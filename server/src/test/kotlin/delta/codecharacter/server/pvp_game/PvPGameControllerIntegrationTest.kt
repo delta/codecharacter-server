@@ -61,10 +61,8 @@ internal class PvPGameControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
         val pvPGameEntity =
             PvPGameEntity(
                 matchId = UUID.randomUUID(),
-                destructionPlayer1 = 100.0,
-                destructionPlayer2 = 100.0,
-                coinsUsedPlayer1 = 100,
-                coinsUsedPlayer2 = 100,
+                scorePlayer1 = 0,
+                scorePlayer2 = 0,
                 status = PvPGameStatusEnum.EXECUTED,
             )
         mongoTemplate.save<PvPGameEntity>(pvPGameEntity)

@@ -7,7 +7,6 @@ package delta.codecharacter.core
 
 import delta.codecharacter.dtos.CreateMatchRequestDto
 import delta.codecharacter.dtos.GenericErrorDto
-import delta.codecharacter.dtos.MatchDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
 import io.swagger.v3.oas.annotations.media.*
@@ -65,7 +64,7 @@ interface MatchApi {
         operationId = "getTopMatches",
         description = """Get top matches""",
         responses = [
-            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = MatchDto::class)))]),
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = kotlin.Any::class)))]),
             ApiResponse(responseCode = "401", description = "Unauthorized")
         ],
         security = [ SecurityRequirement(name = "http-bearer") ]
@@ -75,7 +74,7 @@ interface MatchApi {
             value = ["/top-matches"],
             produces = ["application/json"]
     )
-    fun getTopMatches(): ResponseEntity<List<MatchDto>> {
+    fun getTopMatches(): ResponseEntity<List<kotlin.Any>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 
@@ -84,7 +83,7 @@ interface MatchApi {
         operationId = "getUserMatches",
         description = """Get matches played by authenticated user""",
         responses = [
-            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = MatchDto::class)))]),
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = kotlin.Any::class)))]),
             ApiResponse(responseCode = "401", description = "Unauthorized")
         ],
         security = [ SecurityRequirement(name = "http-bearer") ]
@@ -94,7 +93,7 @@ interface MatchApi {
             value = ["/user/matches"],
             produces = ["application/json"]
     )
-    fun getUserMatches(): ResponseEntity<List<MatchDto>> {
+    fun getUserMatches(): ResponseEntity<List<kotlin.Any>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }

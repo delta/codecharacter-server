@@ -68,6 +68,7 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
         mongoTemplate.save<PublicUserEntity>(TestAttributes.publicUser)
         try {
             rabbitAdmin.purgeQueue("gameRequestQueue", true)
+            rabbitAdmin.purgeQueue("gamePvPRequestQueue", true)
             rabbitAdmin.purgeQueue("gameStatusUpdateQueue", true)
         } catch (e: Exception) {
             println("RabbitMQ queues are not available")
@@ -370,6 +371,7 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
 
         try {
             rabbitAdmin.purgeQueue("gameRequestQueue", true)
+            rabbitAdmin.purgeQueue("gamePvPRequestQueue", true)
             rabbitAdmin.purgeQueue("gameStatusUpdateQueue", true)
         } catch (e: Exception) {
             println("RabbitMQ queues are not available")

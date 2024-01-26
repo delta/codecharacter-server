@@ -33,10 +33,8 @@ class PvPGameService(
         val pvPGame =
             PvPGameEntity(
                 matchId = matchId,
-                destructionPlayer1 = 0.0,
-                destructionPlayer2 = 0.0,
-                coinsUsedPlayer1 = 0,
-                coinsUsedPlayer2 = 0,
+                scorePlayer1 = 0,
+                scorePlayer2 = 0,
                 status = PvPGameStatusEnum.IDLE,
             )
         return pvPGameRepository.save(pvPGame)
@@ -63,14 +61,15 @@ class PvPGameService(
         if(gameStatusUpdateEntity.gameResultPlayer1 == null || gameStatusUpdateEntity.gameResultPlayer2 == null) {
             val newPvPGameEntity = oldPvPGameEntity.copy(status = gameStatusUpdateEntity.gameStatus)
             println("newPvPGameEntity: $newPvPGameEntity")
-            return pvPGameRepository.save(newPvPGameEntity)
+            println("type of newPvPGameEntity: ${newPvPGameEntity::class.java}")
+            println("pvPGame: ${pvPGameRepository.save(newPvPGameEntity)}")
+            println("type of pvPGame: ${pvPGameRepository.save(newPvPGameEntity)::class.java}")
+            //val pvPGame = pvPGameRepository.save(newPvPGameEntity)
+            return oldPvPGameEntity
         }
 
         val gameResultPlayer1 = gameStatusUpdateEntity.gameResultPlayer1
         val gameResultPlayer2 = gameStatusUpdateEntity.gameResultPlayer2
-
-        val (destructionPercentagePlayer1, coinsUsedPlayer1) = gameResultPlayer1
-        val (destructionPercentagePlayer2, coinsUsedPlayer2) = gameResultPlayer2
 
         val gameStatus =
             if (gameResultPlayer1.hasErrors || gameResultPlayer2.hasErrors) {
@@ -81,10 +80,8 @@ class PvPGameService(
 
         val newPvPGameEntity =
             oldPvPGameEntity.copy(
-                destructionPlayer1 = destructionPercentagePlayer1,
-                coinsUsedPlayer1 = coinsUsedPlayer1,
-                destructionPlayer2 = destructionPercentagePlayer2,
-                coinsUsedPlayer2 = coinsUsedPlayer2,
+                scorePlayer1 = gameResultPlayer1.score,
+                scorePlayer2 = gameResultPlayer2.score,
                 status = gameStatus
             )
 

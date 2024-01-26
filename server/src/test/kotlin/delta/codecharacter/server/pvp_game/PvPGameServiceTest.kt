@@ -108,14 +108,59 @@ internal class PvPGameServiceTest {
     }
 
     @Test
+    fun `should receive pvp game status update`() {
+        val pvPGame =
+            PvPGameEntity(
+                matchId = UUID.randomUUID(),
+                scorePlayer1 = 0,
+                scorePlayer2 = 0,
+                status = PvPGameStatusEnum.IDLE,
+            )
+
+        val pvPGameStatusUpdate =
+            PvPGameStatusUpdateEntity(
+                gameId = pvPGame.matchId,
+                gameStatus = PvPGameStatusEnum.EXECUTING,
+                gameResultPlayer1 = null,
+                gameResultPlayer2 = null
+            )
+
+
+        every { pvPGameRepository.findById(pvPGame.matchId) } returns Optional.of(pvPGame)
+        every {
+            pvPGameRepository.save(
+                PvPGameEntity(
+                    pvPGame.matchId,
+                    pvPGame.scorePlayer1,
+                    pvPGame.scorePlayer2,
+                    PvPGameStatusEnum.EXECUTING,
+                )
+            )
+        } returns mockk()
+
+        pvPGameService.updateGameStatus(mapper.writeValueAsString(pvPGameStatusUpdate))
+
+        verify { pvPGameRepository.findById(pvPGame.matchId) }
+        verify {
+            pvPGameRepository.save(
+                PvPGameEntity(
+                    pvPGame.matchId,
+                    pvPGame.scorePlayer1,
+                    pvPGame.scorePlayer2,
+                    PvPGameStatusEnum.EXECUTING,
+                )
+            )
+        }
+        confirmVerified(pvPGameRepository)
+    }
+
+    @Test
     fun `should receive pvp game status update with result`() {
         val pvPGame =
             PvPGameEntity(
                 matchId = UUID.randomUUID(),
-                destructionPlayer1 = 100.0,
-                destructionPlayer2 = 100.0,
-                coinsUsedPlayer1 = 100,
-                coinsUsedPlayer2 = 100,
+                scorePlayer1 = 0,
+                scorePlayer2 = 0,
                 status = PvPGameStatusEnum.IDLE,
             )
         val pvPGameStatusUpdate =
@@ -124,15 +169,13 @@ internal class PvPGameServiceTest {
                 gameStatus = PvPGameStatusEnum.EXECUTED,
                 gameResultPlayer1 =
                     PvPGameResultEntity(
-                        coinsUsed = 0,
-                        destructionPercentage = 0.0,
+                        score = 100,
                         hasErrors = false,
                         log = "player1 log"
                     ),
                 gameResultPlayer2 =
                     PvPGameResultEntity(
-                        coinsUsed = 0,
-                        destructionPercentage = 0.0,
+                        score = 100,
                         hasErrors = false,
                         log = "player2 log"
                     ),
@@ -141,10 +184,8 @@ internal class PvPGameServiceTest {
         val updatedPvPGameEntity =
             PvPGameEntity(
                 matchId = pvPGame.matchId,
-                destructionPlayer1 = pvPGameStatusUpdate.gameResultPlayer1!!.destructionPercentage,
-                destructionPlayer2 = pvPGameStatusUpdate.gameResultPlayer2!!.destructionPercentage,
-                coinsUsedPlayer1 = pvPGameStatusUpdate.gameResultPlayer1!!.coinsUsed,
-                coinsUsedPlayer2 = pvPGameStatusUpdate.gameResultPlayer2!!.coinsUsed,
+                scorePlayer1 = pvPGameStatusUpdate.gameResultPlayer1!!.score,
+                scorePlayer2 = pvPGameStatusUpdate.gameResultPlayer2!!.score,
                 status = pvPGameStatusUpdate.gameStatus,
             )
 
@@ -158,10 +199,8 @@ internal class PvPGameServiceTest {
             pvPGameRepository.save(
                 PvPGameEntity (
                     matchId = pvPGame.matchId,
-                    destructionPlayer1 = pvPGameStatusUpdate.gameResultPlayer1!!.destructionPercentage,
-                    destructionPlayer2 = pvPGameStatusUpdate.gameResultPlayer2!!.destructionPercentage,
-                    coinsUsedPlayer1 = pvPGameStatusUpdate.gameResultPlayer1!!.coinsUsed,
-                    coinsUsedPlayer2 = pvPGameStatusUpdate.gameResultPlayer2!!.coinsUsed,
+                    scorePlayer1 = pvPGameStatusUpdate.gameResultPlayer1!!.score,
+                    scorePlayer2 = pvPGameStatusUpdate.gameResultPlayer2!!.score,
                     status = pvPGameStatusUpdate.gameStatus,
                 )
             )

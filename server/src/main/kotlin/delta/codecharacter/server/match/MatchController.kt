@@ -27,12 +27,12 @@ class MatchController(@Autowired private val matchService: MatchService) : Match
     }
 
     @Secured("ROLE_USER")
-    override fun getTopMatches(): ResponseEntity<List<MatchDto>> {
+    override fun getTopMatches(): ResponseEntity<List<Any>> {
         return ResponseEntity.ok(matchService.getTopMatches())
     }
 
     @Secured("ROLE_USER")
-    override fun getUserMatches(): ResponseEntity<List<MatchDto>> {
+    override fun getUserMatches(): ResponseEntity<List<Any>> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         return ResponseEntity.ok(matchService.getUserMatches(user.id))
     }

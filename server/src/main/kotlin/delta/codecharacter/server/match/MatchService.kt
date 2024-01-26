@@ -319,28 +319,20 @@ class MatchService(
         }
     }
 
-    private fun mapPvPMatchEntitiesToDtos(pvPMatchEntities: List<PvPMatchEntity>): List<MatchDto> {
+    private fun mapPvPMatchEntitiesToDtos(pvPMatchEntities: List<PvPMatchEntity>): List<PvPMatchDto> {
         return pvPMatchEntities.map { pvPMatchEntity ->
-            MatchDto(
+            PvPMatchDto(
                 id = pvPMatchEntity.id,
                 matchMode = MatchModeDto.valueOf(pvPMatchEntity.mode.name),
                 matchVerdict = VerdictDto.valueOf(pvPMatchEntity.verdict.name),
                 createdAt = pvPMatchEntity.createdAt,
-                games =
-                setOf(
-                    GameDto (
+                game =
+                   PvPGameDto (
                         id = pvPMatchEntity.game.matchId,
-                        destruction = BigDecimal(pvPMatchEntity.game.destructionPlayer1),
-                        coinsUsed = pvPMatchEntity.game.coinsUsedPlayer1,
-                        status = GameStatusDto.valueOf(pvPMatchEntity.game.status.name)
-                    ),
-                    GameDto (
-                        id = pvPMatchEntity.game.matchId,
-                        destruction = BigDecimal(pvPMatchEntity.game.destructionPlayer2),
-                        coinsUsed = pvPMatchEntity.game.coinsUsedPlayer2,
-                        status = GameStatusDto.valueOf(pvPMatchEntity.game.status.name)
-                    )
-                ),
+                        scorePlayer1 = pvPMatchEntity.game.scorePlayer1,
+                        scorePlayer2 = pvPMatchEntity.game.scorePlayer2,
+                        status = PvPGameStatusDto.valueOf(pvPMatchEntity.game.status.name),
+                   ),
                 user1 =
                 PublicUserDto(
                     username = pvPMatchEntity.player1.username,
@@ -394,13 +386,13 @@ class MatchService(
         }
     }
 
-    fun getTopMatches(): List<MatchDto> {
+    fun getTopMatches(): List<Any> {
         val matches = matchRepository.findTop10ByOrderByTotalPointsDesc()
         val pvPMatches = pvPMatchRepository.findTop10ByOrderByTotalPointsDesc()
-        return mapMatchEntitiesToDtos(matches) + mapPvPMatchEntitiesToDtos(pvPMatches)
+        return listOf(mapMatchEntitiesToDtos(matches) + mapPvPMatchEntitiesToDtos(pvPMatches))
     }
 
-    fun getUserMatches(userId: UUID): List<MatchDto> {
+    fun getUserMatches(userId: UUID): List<Any> {
         val publicUser = publicUserService.getPublicUser(userId)
         val matches = matchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser)
         val pvPMatches = pvPMatchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser)
@@ -418,7 +410,7 @@ class MatchService(
             mapper.readValue(gameStatusUpdateJson, GameStatusUpdateEntity::class.java)
         val gameId = gameStatusUpdateEntity.gameId
 
-        var matchId: UUID
+        val matchId: UUID
         if(gameRepository.findById(gameId).isPresent) {
             val game = gameRepository.findById(gameId).get()
             matchId = game.matchId // for normal matches, each match has 2 games
@@ -600,24 +592,22 @@ class MatchService(
                 simpMessagingTemplate.convertAndSend(
                     "/updates/${match.player1.userId}",
                     mapper.writeValueAsString(
-                        GameDto(
+                        PvPGameDto(
                             id = updatedGame.matchId,
-                            destruction = BigDecimal(updatedGame.destructionPlayer1),
-                            coinsUsed = updatedGame.coinsUsedPlayer1,
-                            status = GameStatusDto.valueOf(updatedGame.status.name),
+                            scorePlayer1 = updatedGame.scorePlayer1,
+                            scorePlayer2 = updatedGame.scorePlayer2,
+                            status = PvPGameStatusDto.valueOf(updatedGame.status.name),
                         )
                     )
                 )
             }
             if (match.game.status == PvPGameStatusEnum.EXECUTED) {
                 val verdict =
-                    verdictAlgorithm.getVerdict(
+                    verdictAlgorithm.getPvPVerdict(
                         match.game.status == PvPGameStatusEnum.EXECUTE_ERROR,
-                        match.game.coinsUsedPlayer1,
-                        match.game.destructionPlayer1,
+                        match.game.scorePlayer1,
                         match.game.status == PvPGameStatusEnum.EXECUTE_ERROR,
-                        match.game.coinsUsedPlayer2,
-                        match.game.destructionPlayer2
+                        match.game.scorePlayer2,
                     )
                 val finishedMatch = match.copy(verdict = verdict)
                 val (newUserRating, newOpponentRating) =
