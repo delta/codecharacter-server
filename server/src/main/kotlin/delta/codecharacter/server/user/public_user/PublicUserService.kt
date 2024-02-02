@@ -2,12 +2,14 @@ package delta.codecharacter.server.user.public_user
 
 import delta.codecharacter.dtos.CurrentUserProfileDto
 import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
+import delta.codecharacter.dtos.PvPLeaderBoardResponseDto
 import delta.codecharacter.dtos.LeaderboardEntryDto
 import delta.codecharacter.dtos.PublicUserDto
 import delta.codecharacter.dtos.TierTypeDto
 import delta.codecharacter.dtos.TutorialUpdateTypeDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UserStatsDto
+import delta.codecharacter.dtos.PvPUserStatsDto
 import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.match.MatchVerdictEnum
@@ -156,6 +158,32 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         return publicUserRepository.findAll(pageRequest).content.map {
             DailyChallengeLeaderBoardResponseDto(
                 userName = it.username, score = BigDecimal(it.score), avatarId = it.avatarId
+            )
+        }
+    }
+
+    fun getPvPLeaderboard(
+        page: Int?,
+        size: Int?
+    ): List<PvPLeaderBoardResponseDto> {
+        val pageRequest = PageRequest.of(page ?: 0, size ?: 10, Sort.by(Sort.Direction.DESC, "score"))
+        return publicUserRepository.findAll(pageRequest).content.map {
+            PvPLeaderBoardResponseDto(
+                user =
+                PublicUserDto(
+                    username = it.username,
+                    name = it.name,
+                    tier = TierTypeDto.valueOf(it.tier.name),
+                    country = it.country,
+                    college = it.college,
+                    avatarId = it.avatarId,
+                ),
+                stats =
+                PvPUserStatsDto(
+                    rating = BigDecimal(it.rating),
+                    wins = it.wins,
+                    losses = it.losses
+                ),
             )
         }
     }
