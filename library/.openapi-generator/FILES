@@ -9,7 +9,6 @@ src/main/kotlin/delta/codecharacter/core/MapApi.kt
 src/main/kotlin/delta/codecharacter/core/MatchApi.kt
 src/main/kotlin/delta/codecharacter/core/NotificationApi.kt
 src/main/kotlin/delta/codecharacter/core/PvpGameApi.kt
-src/main/kotlin/delta/codecharacter/core/PvpLeaderboardApi.kt
 src/main/kotlin/delta/codecharacter/core/UserApi.kt
 src/main/kotlin/delta/codecharacter/dtos/ActivateUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/AuthStatusResponseDto.kt

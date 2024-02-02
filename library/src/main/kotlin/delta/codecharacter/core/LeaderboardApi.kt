@@ -6,6 +6,7 @@
 package delta.codecharacter.core
 
 import delta.codecharacter.dtos.LeaderboardEntryDto
+import delta.codecharacter.dtos.PvPLeaderBoardResponseDto
 import delta.codecharacter.dtos.TierTypeDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
@@ -54,6 +55,25 @@ interface LeaderboardApi {
             produces = ["application/json"]
     )
     fun getLeaderboard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?,@Parameter(description = "Leaderboard Tier", schema = Schema(allowableValues = ["TIER_PRACTICE", "TIER1", "TIER2", "TIER3", "TIER4"])) @Valid @RequestParam(value = "tier", required = false) tier: TierTypeDto?): ResponseEntity<List<LeaderboardEntryDto>> {
+        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    }
+
+    @Operation(
+        summary = "Get PvP leaderboard",
+        operationId = "getPvPLeaderboard",
+        description = """Get PvP leaderboard""",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = PvPLeaderBoardResponseDto::class)))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized")
+        ],
+        security = [ SecurityRequirement(name = "http-bearer") ]
+    )
+    @RequestMapping(
+            method = [RequestMethod.GET],
+            value = ["/pvpleaderboard"],
+            produces = ["application/json"]
+    )
+    fun getPvPLeaderboard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<PvPLeaderBoardResponseDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }

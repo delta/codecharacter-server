@@ -434,7 +434,7 @@ paths:
             description: Unauthorized
         operationId: getPvPLeaderboard
         tags:
-          - pvpLeaderboard
+          - Leaderboard
         parameters:
           - schema:
               type: integer
@@ -447,7 +447,7 @@ paths:
             name: size
             description: Size of the page
         description: Get PvP leaderboard
-      parameters: [ ]
+      parameters: []
 
   /top-matches:
     get:
@@ -1727,10 +1727,14 @@ components:
         losses:
           type: integer
           example: 1
+        ties:
+          type: integer
+          example: 1
       required:
         - rating
         - wins
         - losses
+        - ties
     Code:
       title: Code
       type: object
