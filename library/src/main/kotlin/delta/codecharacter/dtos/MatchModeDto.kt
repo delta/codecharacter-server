@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 /**
 * Match Mode
-* Values: SELF,MANUAL,AUTO,DAILYCHALLENGE,PVP
+* Values: SELF,MANUAL,AUTO,DAILYCHALLENGE,PVP,SELFPVP
 */
 enum class MatchModeDto(val value: kotlin.String) {
 
@@ -24,6 +24,7 @@ enum class MatchModeDto(val value: kotlin.String) {
     @JsonProperty("MANUAL") MANUAL("MANUAL"),
     @JsonProperty("AUTO") AUTO("AUTO"),
     @JsonProperty("DAILYCHALLENGE") DAILYCHALLENGE("DAILYCHALLENGE"),
-    @JsonProperty("PVP") PVP("PVP")
+    @JsonProperty("PVP") PVP("PVP"),
+    @JsonProperty("SELFPVP") SELFPVP("SELFPVP")
 }
 

@@ -1949,6 +1949,11 @@ components:
           format: uuid
           description: Revision of the code
           nullable: true
+        codeRevisionId2:
+          type: string
+          format: uuid
+          description: Revision of the code (for SELF-PVP mode)
+          nullable: true
       required:
         - mode
     Game:
@@ -2110,6 +2115,7 @@ components:
         - AUTO
         - DAILYCHALLENGE
         - PVP
+        - SELFPVP
       description: Match Mode
     Verdict:
       type: string

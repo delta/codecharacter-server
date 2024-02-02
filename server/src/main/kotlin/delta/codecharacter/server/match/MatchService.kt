@@ -69,7 +69,7 @@ class MatchService(
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
     private val logger: Logger = LoggerFactory.getLogger(MatchService::class.java)
 
-    private fun createSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?) {
+    private fun createNormalSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?) {
         val code: String
         val language: LanguageEnum
         if (codeRevisionId == null) {
@@ -113,7 +113,60 @@ class MatchService(
         gameService.sendGameRequest(game, code, LanguageEnum.valueOf(language.name), map)
     }
 
-    fun createNormalMatch(
+    private fun createPvPSelfMatch(userId: UUID, codeRevisionId1: UUID?, codeRevisionId2: UUID?) {
+        val code1: String
+        val code2: String
+        val language1: LanguageEnum
+        val language2: LanguageEnum
+
+        if (codeRevisionId1 == null && codeRevisionId2 == null) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "At least one revision ID is required")
+        }
+
+        if (codeRevisionId1 == null) {
+            val latestCode = latestCodeService.getLatestCode(userId, CodeTypeDto.PVP)
+            code1 = latestCode.code
+            language1 = LanguageEnum.valueOf(latestCode.language.name)
+        } else {
+            val codeRevision =
+                codeRevisionService.getCodeRevisions(userId, CodeTypeDto.PVP).find { it.id == codeRevisionId1 }
+                    ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
+            code1 = codeRevision.code
+            language1 = LanguageEnum.valueOf(codeRevision.language.name)
+        }
+
+        if (codeRevisionId2 == null) {
+            val latestCode = latestCodeService.getLatestCode(userId, CodeTypeDto.PVP)
+            code2 = latestCode.code
+            language2 = LanguageEnum.valueOf(latestCode.language.name)
+        }
+        else {
+            val codeRevision =
+                codeRevisionService.getCodeRevisions(userId, CodeTypeDto.PVP).find { it.id == codeRevisionId2 }
+                    ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
+            code2 = codeRevision.code
+            language2 = LanguageEnum.valueOf(codeRevision.language.name)
+        }
+
+        val matchId = UUID.randomUUID()
+        val game = pvPGameService.createPvPGame(matchId)
+        val publicUser = publicUserService.getPublicUser(userId)
+        val match =
+            PvPMatchEntity(
+                id = matchId,
+                game = game,
+                mode = MatchModeEnum.PVP,
+                verdict = MatchVerdictEnum.TIE,
+                createdAt = Instant.now(),
+                totalPoints = 0,
+                player1 = publicUser,
+                player2 = publicUser,
+            )
+        pvPMatchRepository.save(match)
+        pvPGameService.sendPvPGameRequest(game, GameCode(code1, language1), GameCode(code2, language2))
+    }
+
+    private fun createNormalMatch(
         publicUser: PublicUserEntity,
         publicOpponent: PublicUserEntity,
         mode: MatchModeEnum
@@ -154,7 +207,7 @@ class MatchService(
         return matchId
     }
 
-    fun createPvPMatch(publicUser: PublicUserEntity, publicOpponent: PublicUserEntity) : UUID {
+    private fun createPvPMatch(publicUser: PublicUserEntity, publicOpponent: PublicUserEntity) : UUID {
         val userId = publicUser.userId
         val opponentId = publicOpponent.userId
 
@@ -183,7 +236,7 @@ class MatchService(
         return matchId
     }
 
-    fun createDualMatch(userId: UUID, opponentUsername: String, mode: MatchModeEnum): UUID {
+    private fun createDualMatch(userId: UUID, opponentUsername: String, mode: MatchModeEnum): UUID {
         val publicUser = publicUserService.getPublicUser(userId)
         val publicOpponent = publicUserService.getPublicUserByUsername(opponentUsername)
         val opponentId = publicOpponent.userId
@@ -246,8 +299,12 @@ class MatchService(
     fun createMatch(userId: UUID, createMatchRequestDto: CreateMatchRequestDto) {
         when (createMatchRequestDto.mode) {
             MatchModeDto.SELF -> {
-                val (_, _, mapRevisionId, codeRevisionId) = createMatchRequestDto
-                createSelfMatch(userId, codeRevisionId, mapRevisionId)
+                val (_, _, mapRevisionId, codeRevisionId, _) = createMatchRequestDto
+                createNormalSelfMatch(userId, codeRevisionId, mapRevisionId)
+            }
+            MatchModeDto.SELFPVP -> {
+                val (_, _, codeRevisionId1, _, codeRevisionId2) = createMatchRequestDto
+                createPvPSelfMatch(userId, codeRevisionId1, codeRevisionId2)
             }
             MatchModeDto.MANUAL, MatchModeDto.AUTO , MatchModeDto.PVP -> {
                 if (createMatchRequestDto.opponentUsername == null) {
