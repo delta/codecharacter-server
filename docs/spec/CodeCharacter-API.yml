@@ -989,7 +989,7 @@ paths:
               schema:
                 type: array
                 items:
-                   type: object
+                    $ref: '#/components/schemas/Match'
               examples:
                 Example:
                   value:
@@ -1016,8 +1016,19 @@ paths:
                         avatarId: 0
         '401':
           description: Unauthorized
-      operationId: getUserMatches
-      description: Get matches played by authenticated user
+      operationId: getUserNormalMatches
+      description: Get normal matches played by authenticated user
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          description: Index of the page
+        - schema:
+            type: integer
+          in: query
+          name: size
+          description: Size of the page
     parameters: []
     post:
       summary: Create match
@@ -1054,6 +1065,60 @@ paths:
                   opponentId: 0a4b34b0-6057-4b82-ae27-a59c36eab667
                   mapRevisionId: f52ddf9e-e933-471a-9250-41078cc39f80
                   codeRevisionId: d9eb9923-651b-4ec4-b6f1-b7625b2a9392
+  /user/pvpmatches:
+    get:
+      summary: Get user pvp matches
+      tags:
+        - match
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PvPMatch'
+              examples:
+                Example:
+                  value:
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                    - game:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          scorePlayer1: 100
+                          scorePlayer2: 45
+                          status: IDLE
+                    - matchMode: PVPSELF
+                    - matchVerdict: PLAYER1
+                    - createdAt: '2019-08-24T14:15:22Z'
+                    - user1:
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                    - user2:
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+        '401':
+          description: Unauthorized
+      operationId: getUserPvPMatches
+      description: Get pvp matches played by authenticated user
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          description: Index of the page
+        - schema:
+            type: integer
+          in: query
+          name: size
+          description: Size of the page
+    parameters: []
   /user/notifications:
     get:
       summary: Get all notifications
@@ -1311,7 +1376,55 @@ paths:
                   value: "[[0,0,0]]"
       tags:
         - Daily Challenges
-
+  /dc/matches:
+    get:
+      summary: Get user daily challenge matches
+      tags:
+        - Daily Challenges
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Match'
+              examples:
+                Example:
+                  value:
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                      games:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          coinsUsed: 100
+                          destruction: 45
+                          status: IDLE
+                      matchMode: SELF
+                      matchVerdict: SUCCESS
+                      createdAt: '2019-08-24T14:15:22Z'
+                      user1:
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      user2: null
+        '401':
+          description: Unauthorized
+      operationId: getUserDCMatches
+      description: Get daily-challenge matches played by authenticated user
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          description: Index of the page
+        - schema:
+            type: integer
+          in: query
+          name: size
+          description: Size of the page
+    parameters: []
 
 components:
   schemas:

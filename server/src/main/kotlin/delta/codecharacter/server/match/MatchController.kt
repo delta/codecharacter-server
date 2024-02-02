@@ -4,6 +4,7 @@ import delta.codecharacter.core.MatchApi
 import delta.codecharacter.dtos.CreateMatchRequestDto
 import delta.codecharacter.dtos.MatchDto
 import delta.codecharacter.dtos.MatchModeDto
+import delta.codecharacter.dtos.PvPMatchDto
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,8 +33,20 @@ class MatchController(@Autowired private val matchService: MatchService) : Match
     }
 
     @Secured("ROLE_USER")
-    override fun getUserMatches(): ResponseEntity<List<Any>> {
+    override fun getUserNormalMatches(
+        page: Int?,
+        size: Int?,
+    ): ResponseEntity<List<MatchDto>> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        return ResponseEntity.ok(matchService.getUserMatches(user.id))
+        return ResponseEntity.ok(matchService.getUserNormalMatches(user.id, page, size))
+    }
+
+    @Secured("ROLE_USER")
+    override fun getUserPvPMatches(
+        page: Int?,
+        size: Int?,
+    ): ResponseEntity<List<PvPMatchDto>> {
+        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
+        return ResponseEntity.ok(matchService.getUserPvPMatches(user.id, page, size))
     }
 }

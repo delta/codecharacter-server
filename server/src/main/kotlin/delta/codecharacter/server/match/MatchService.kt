@@ -2,6 +2,7 @@ package delta.codecharacter.server.match
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import delta.codecharacter.dtos.*
+import delta.codecharacter.server.code.Code
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
@@ -32,6 +33,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -69,21 +72,23 @@ class MatchService(
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
     private val logger: Logger = LoggerFactory.getLogger(MatchService::class.java)
 
-    private fun createNormalSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?) {
-        val code: String
-        val language: LanguageEnum
-        if (codeRevisionId == null) {
-            val latestCode = latestCodeService.getLatestCode(userId, CodeTypeDto.NORMAL)
-            code = latestCode.code
-            language = LanguageEnum.valueOf(latestCode.language.name)
-        } else {
-            val codeRevision =
-                codeRevisionService.getCodeRevisions(userId, CodeTypeDto.NORMAL).find { it.id == codeRevisionId }
-                    ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
-            code = codeRevision.code
-            language = LanguageEnum.valueOf(codeRevision.language.name)
+    private fun getCodeFromRevision(userId: UUID, codeRevisionId: UUID?, codeType: CodeTypeDto): Pair<String, LanguageEnum> {
+        when (codeRevisionId) {
+            null -> {
+                val latestCode = latestCodeService.getLatestCode(userId, codeType)
+                return Pair(latestCode.code, LanguageEnum.valueOf(latestCode.language.name))
+            }
+            else -> {
+                val codeRevision =
+                    codeRevisionService.getCodeRevisions(userId, codeType).find { it.id == codeRevisionId}
+                        ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
+                return Pair(codeRevision.code, LanguageEnum.valueOf(codeRevision.language.name))
+            }
         }
+    }
 
+    private fun createNormalSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?) {
+        val (code, language) = getCodeFromRevision(userId, codeRevisionId, CodeTypeDto.NORMAL)
         val map: String =
             if (mapRevisionId == null) {
                 val latestMap = latestMapService.getLatestMap(userId)
@@ -114,40 +119,11 @@ class MatchService(
     }
 
     private fun createPvPSelfMatch(userId: UUID, codeRevisionId1: UUID?, codeRevisionId2: UUID?) {
-        val code1: String
-        val code2: String
-        val language1: LanguageEnum
-        val language2: LanguageEnum
-
-        if (codeRevisionId1 == null && codeRevisionId2 == null) {
-            throw CustomException(HttpStatus.BAD_REQUEST, "At least one revision ID is required")
+        if (codeRevisionId1==codeRevisionId2) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Codes must be different")
         }
-
-        if (codeRevisionId1 == null) {
-            val latestCode = latestCodeService.getLatestCode(userId, CodeTypeDto.PVP)
-            code1 = latestCode.code
-            language1 = LanguageEnum.valueOf(latestCode.language.name)
-        } else {
-            val codeRevision =
-                codeRevisionService.getCodeRevisions(userId, CodeTypeDto.PVP).find { it.id == codeRevisionId1 }
-                    ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
-            code1 = codeRevision.code
-            language1 = LanguageEnum.valueOf(codeRevision.language.name)
-        }
-
-        if (codeRevisionId2 == null) {
-            val latestCode = latestCodeService.getLatestCode(userId, CodeTypeDto.PVP)
-            code2 = latestCode.code
-            language2 = LanguageEnum.valueOf(latestCode.language.name)
-        }
-        else {
-            val codeRevision =
-                codeRevisionService.getCodeRevisions(userId, CodeTypeDto.PVP).find { it.id == codeRevisionId2 }
-                    ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
-            code2 = codeRevision.code
-            language2 = LanguageEnum.valueOf(codeRevision.language.name)
-        }
-
+        val (code1, language1) = getCodeFromRevision(userId, codeRevisionId1, CodeTypeDto.PVP)
+        val (code2, language2) = getCodeFromRevision(userId, codeRevisionId2, CodeTypeDto.PVP)
         val matchId = UUID.randomUUID()
         val game = pvPGameService.createPvPGame(matchId)
         val publicUser = publicUserService.getPublicUser(userId)
@@ -449,16 +425,47 @@ class MatchService(
         return listOf(mapMatchEntitiesToDtos(matches) + mapPvPMatchEntitiesToDtos(pvPMatches))
     }
 
-    fun getUserMatches(userId: UUID): List<Any> {
+    fun getUserNormalMatches(userId: UUID, page: Int?, size: Int?): List<MatchDto> {
         val publicUser = publicUserService.getPublicUser(userId)
-        val matches = matchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser)
-        val pvPMatches = pvPMatchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser)
+        val pageRequest =
+            PageRequest.of(
+                page ?: 0,
+                size ?: 10,
+                Sort.by(Sort.Order.desc("createdAt")),
+            )
+
+        val matches = matchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser, pageRequest)
+
+        return mapMatchEntitiesToDtos(matches)
+    }
+
+    fun getUserDCMatches(userId: UUID, page: Int?, size: Int?): List<MatchDto> {
+        val publicUser = publicUserService.getPublicUser(userId)
+        val pageRequest =
+            PageRequest.of(
+                page ?: 0,
+                size ?: 10,
+                Sort.by(Sort.Order.desc("createdAt")),
+            )
+
         val dcMatches =
             dailyChallengeMatchRepository.findByUserOrderByCreatedAtDesc(publicUser).takeWhile {
                 Duration.between(it.createdAt, Instant.now()).toHours() < 24 &&
-                    it.verdict != DailyChallengeMatchVerdictEnum.STARTED
+                        it.verdict != DailyChallengeMatchVerdictEnum.STARTED
             }
-        return mapDailyChallengeMatchEntitiesToDtos(dcMatches) + mapMatchEntitiesToDtos(matches) + mapPvPMatchEntitiesToDtos(pvPMatches)
+        return mapDailyChallengeMatchEntitiesToDtos(dcMatches)
+    }
+
+    fun getUserPvPMatches(userId: UUID, page: Int?, size: Int?): List<PvPMatchDto> {
+        val publicUser = publicUserService.getPublicUser(userId)
+        val pageRequest =
+            PageRequest.of(
+                page ?: 0,
+                size ?: 10,
+                Sort.by(Sort.Order.desc("createdAt")),
+            )
+        val pvPMatches = pvPMatchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser, pageRequest)
+        return mapPvPMatchEntitiesToDtos(pvPMatches)
     }
 
     @RabbitListener(queues = ["gameStatusUpdateQueue"], ackMode = "AUTO")
