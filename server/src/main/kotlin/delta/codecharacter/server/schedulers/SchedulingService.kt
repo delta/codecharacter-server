@@ -27,21 +27,22 @@ class SchedulingService(
 ) {
     private val logger: Logger = LoggerFactory.getLogger(SchedulingService::class.java)
 
-    @Scheduled(cron = "\${environment.registration-time}", zone = "GMT+5:30")
-    fun updateTempLeaderboard() {
-        logger.info("Practice phase ended!!")
-        publicUserService.resetRatingsAfterPracticePhase()
-        codeRevisionService.resetCodeRevisionAfterPracticePhase()
-        latestCodeService.resetLatestCodeAfterPracticePhase()
-        lockedCodeService.resetLockedCodeAfterPracticePhase()
-        latestMapService.resetLatestMapAfterPracticePhase()
-        lockedMapService.resetLockedMapAfterPracticePhase()
-        mapRevisionService.resetMapRevisionAfterPracticePhase()
-        publicUserService.updateLeaderboardAfterPracticePhase()
-    }
+//    @Scheduled(cron = "\${environment.registration-time}", zone = "GMT+5:30")
+//    fun updateTempLeaderboard() {
+//        logger.info("Practice phase ended!!")
+//        publicUserService.resetRatingsAfterPracticePhase()
+//        codeRevisionService.resetCodeRevisionAfterPracticePhase()
+//        latestCodeService.resetLatestCodeAfterPracticePhase()
+//        lockedCodeService.resetLockedCodeAfterPracticePhase()
+//        latestMapService.resetLatestMapAfterPracticePhase()
+//        lockedMapService.resetLockedMapAfterPracticePhase()
+//        mapRevisionService.resetMapRevisionAfterPracticePhase()
+//        publicUserService.updateLeaderboardAfterPracticePhase()
+//    }
 
-    @Scheduled(cron = "\${environment.promote-demote-time}", zone = "GMT+5:30")
-    fun createAutoMatch() {
-        matchService.createAutoMatch()
-    }
+
+//    @Scheduled(cron = "\${environment.promote-demote-time}", zone = "GMT+5:30")
+//    fun createAutoMatch() {
+//        matchService.createAutoMatch()
+//    }
 }

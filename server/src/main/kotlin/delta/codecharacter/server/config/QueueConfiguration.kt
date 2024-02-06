@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Configuration
 class QueueConfiguration {
     @Bean fun gameRequestQueue() = Queue("gameRequestQueue")
     @Bean fun gameStatusUpdateQueue() = Queue("gameStatusUpdateQueue")
-    @Bean fun pvPGameRequestQueue() = Queue("gamePvPRequestQueue")
+    @Bean fun pvPGameRequestQueue() = Queue("gamePvpRequestQueue")
 }

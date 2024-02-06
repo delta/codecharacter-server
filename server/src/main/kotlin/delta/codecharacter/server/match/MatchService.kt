@@ -122,6 +122,8 @@ class MatchService(
         if (codeRevisionId1==codeRevisionId2) {
             throw CustomException(HttpStatus.BAD_REQUEST, "Codes must be different")
         }
+        println(codeRevisionId1)
+        println(codeRevisionId2)
         val (code1, language1) = getCodeFromRevision(userId, codeRevisionId1, CodeTypeDto.PVP)
         val (code2, language2) = getCodeFromRevision(userId, codeRevisionId2, CodeTypeDto.PVP)
         val matchId = UUID.randomUUID()
@@ -273,13 +275,14 @@ class MatchService(
         gameService.sendGameRequest(game, code, language, map)
     }
     fun createMatch(userId: UUID, createMatchRequestDto: CreateMatchRequestDto) {
+        println(createMatchRequestDto)
         when (createMatchRequestDto.mode) {
             MatchModeDto.SELF -> {
                 val (_, _, mapRevisionId, codeRevisionId, _) = createMatchRequestDto
                 createNormalSelfMatch(userId, codeRevisionId, mapRevisionId)
             }
             MatchModeDto.SELFPVP -> {
-                val (_, _, codeRevisionId1, _, codeRevisionId2) = createMatchRequestDto
+                val (_, _, _, codeRevisionId1, codeRevisionId2) = createMatchRequestDto
                 createPvPSelfMatch(userId, codeRevisionId1, codeRevisionId2)
             }
             MatchModeDto.MANUAL, MatchModeDto.AUTO , MatchModeDto.PVP -> {

@@ -42,7 +42,7 @@ class CodeRevisionService(@Autowired private val codeRevisionRepository: CodeRev
 
     fun getCodeRevisions(
         userId: UUID,
-        codeTypeDto: CodeTypeDto
+        codeTypeDto: CodeTypeDto = CodeTypeDto.NORMAL
     ): List<CodeRevisionDto> {
         return codeRevisionRepository.findAllByUserIdAndCodeTypeOrderByCreatedAtDesc(
             userId, codeTypeDto
