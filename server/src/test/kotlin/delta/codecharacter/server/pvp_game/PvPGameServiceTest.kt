@@ -91,7 +91,7 @@ internal class PvPGameServiceTest {
         every {pvPGame.matchId} returns matchId
         every {
             rabbitTemplate.convertAndSend(
-                "gamePvPRequestQueue",
+                "gamePvpRequestQueue",
                 mapper.writeValueAsString(expectedPvPGameRequest)
             )
         } returns Unit
@@ -100,7 +100,7 @@ internal class PvPGameServiceTest {
 
         verify {
             rabbitTemplate.convertAndSend(
-                "gamePvPRequestQueue",
+                "gamePvpRequestQueue",
                 mapper.writeValueAsString(expectedPvPGameRequest)
             )
         }
