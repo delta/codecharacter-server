@@ -60,12 +60,7 @@ class PvPGameService(
             }
         if(gameStatusUpdateEntity.gameResultPlayer1 == null || gameStatusUpdateEntity.gameResultPlayer2 == null) {
             val newPvPGameEntity = oldPvPGameEntity.copy(status = gameStatusUpdateEntity.gameStatus)
-            println("newPvPGameEntity: $newPvPGameEntity")
-            println("type of newPvPGameEntity: ${newPvPGameEntity::class.java}")
-            println("pvPGame: ${pvPGameRepository.save(newPvPGameEntity)}")
-            println("type of pvPGame: ${pvPGameRepository.save(newPvPGameEntity)::class.java}")
-            //val pvPGame = pvPGameRepository.save(newPvPGameEntity)
-            return oldPvPGameEntity
+            return pvPGameRepository.save(newPvPGameEntity)
         }
 
         val gameResultPlayer1 = gameStatusUpdateEntity.gameResultPlayer1

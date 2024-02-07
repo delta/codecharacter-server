@@ -39,6 +39,7 @@ internal class LeaderboardTest {
             score = 0.0,
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
+            pvpRating = 2000.0,
         )
     private var user2 =
         PublicUserEntity(
@@ -58,6 +59,7 @@ internal class LeaderboardTest {
             score = 0.0,
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
+            pvpRating = 1800.0,
         )
     private var user3 =
         PublicUserEntity(
@@ -77,6 +79,7 @@ internal class LeaderboardTest {
             score = 0.0,
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
+            pvpRating = 1600.0,
         )
     private var user4 =
         PublicUserEntity(
@@ -96,6 +99,7 @@ internal class LeaderboardTest {
             score = 0.0,
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
+            pvpRating = 1500.0
         )
 
     @BeforeEach
@@ -136,4 +140,6 @@ internal class LeaderboardTest {
         verify { publicUserRepository.findAllByTier(any(), any()) }
         confirmVerified(publicUserRepository)
     }
+
+    //    todo write pvp leaderboard tests
 }

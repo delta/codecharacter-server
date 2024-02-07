@@ -74,7 +74,8 @@ class TestAttributes {
                 tier = TierTypeDto.TIER_PRACTICE,
                 score = 0.0,
                 dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
-                tutorialLevel = 1
+                tutorialLevel = 1,
+                pvpRating = 1000.0
             )
 
         val publicOpponent =
@@ -92,7 +93,8 @@ class TestAttributes {
                 tier = TierTypeDto.TIER_PRACTICE,
                 score = 0.0,
                 dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
-                tutorialLevel = 1
+                tutorialLevel = 1,
+                pvpRating = 1000.0
             )
     }
 }

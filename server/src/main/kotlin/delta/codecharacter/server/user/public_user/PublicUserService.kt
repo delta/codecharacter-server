@@ -57,7 +57,8 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 // registering after practice phase
                 tier = TierTypeDto.TIER2,
                 tutorialLevel = 1,
-                dailyChallengeHistory = HashMap()
+                dailyChallengeHistory = HashMap(),
+                pvpRating = 1500.0
             )
         publicUserRepository.save(publicUser)
     }
@@ -166,7 +167,12 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         page: Int?,
         size: Int?
     ): List<PvPLeaderBoardResponseDto> {
-        val pageRequest = PageRequest.of(page ?: 0, size ?: 10, Sort.by(Sort.Direction.DESC, "score"))
+        val pageRequest =
+            PageRequest.of(
+                    page ?: 0,
+                    size ?: 10,
+                    Sort.by(Sort.Order.desc("pvpRating"), Sort.Order.desc("wins"), Sort.Order.asc("username"))
+            )
         return publicUserRepository.findAll(pageRequest).content.map {
             PvPLeaderBoardResponseDto(
                 user =
@@ -180,7 +186,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 ),
                 stats =
                 PvPUserStatsDto(
-                    rating = BigDecimal(it.rating),
+                    rating = BigDecimal(it.pvpRating),
                     wins = it.wins,
                     losses = it.losses,
                     ties = it.ties
@@ -296,6 +302,33 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 else user.losses,
                 ties = if (verdict == MatchVerdictEnum.TIE) user.ties + 1 else user.ties
             )
+        publicUserRepository.save(updatedUser)
+    }
+
+    fun updatePublicPvPRating(
+        userId: UUID,
+        isInitiator: Boolean,
+        verdict: MatchVerdictEnum,
+        newRating: Double
+    ) {
+        val publicUser = publicUserRepository.findById(userId).get()
+        val updatedUser =
+                publicUser.copy(
+                    pvpRating = newRating,
+                    wins =
+                    if ((isInitiator && verdict == MatchVerdictEnum.PLAYER1) ||
+                            (!isInitiator && verdict == MatchVerdictEnum.PLAYER2)
+                    )
+                        publicUser.wins + 1
+                    else publicUser.wins,
+                    losses =
+                    if ((isInitiator && verdict == MatchVerdictEnum.PLAYER2) ||
+                            (!isInitiator && verdict == MatchVerdictEnum.PLAYER1)
+                    )
+                        publicUser.losses + 1
+                    else publicUser.losses,
+                    ties = if (verdict == MatchVerdictEnum.TIE) publicUser.ties + 1 else publicUser.ties
+                )
         publicUserRepository.save(updatedUser)
     }
 

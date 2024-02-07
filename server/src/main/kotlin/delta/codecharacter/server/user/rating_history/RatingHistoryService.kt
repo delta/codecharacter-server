@@ -17,15 +17,20 @@ class RatingHistoryService(
     @Autowired private val ratingAlgorithm: RatingAlgorithm
 ) {
     fun create(userId: UUID) {
-        val ratingHistory =
+        val ratingHistoryNormal =
             RatingHistoryEntity(
-                userId = userId, rating = 1500.0, ratingDeviation = 350.0, validFrom = Instant.now()
+                userId = userId, rating = 1500.0, ratingDeviation = 350.0, validFrom = Instant.now(), ratingType = RatingType.NORMAL
             )
-        ratingHistoryRepository.save(ratingHistory)
+        val ratingHistoryPvP =
+            RatingHistoryEntity(
+                userId = userId, rating = 1500.0, ratingDeviation = 350.0, validFrom = Instant.now(), ratingType = RatingType.PVP
+            )
+        ratingHistoryRepository.save(ratingHistoryNormal)
+        ratingHistoryRepository.save(ratingHistoryPvP)
     }
 
-    fun getRatingHistory(userId: UUID): List<RatingHistoryDto> {
-        return ratingHistoryRepository.findAllByUserId(userId).map {
+    fun getRatingHistory(userId: UUID, ratingType:RatingType): List<RatingHistoryDto> {
+        return ratingHistoryRepository.findAllByUserIdAndRatingType(userId,ratingType).map {
             RatingHistoryDto(
                 rating = BigDecimal(it.rating),
                 ratingDeviation = BigDecimal(it.ratingDeviation),
@@ -45,12 +50,13 @@ class RatingHistoryService(
     fun updateRating(
         userId: UUID,
         opponentId: UUID,
-        verdict: MatchVerdictEnum
+        verdict: MatchVerdictEnum,
+        ratingType: RatingType
     ): Pair<Double, Double> {
         val (_, userRating, userRatingDeviation, userRatingValidFrom) =
-            ratingHistoryRepository.findFirstByUserIdOrderByValidFromDesc(userId)
+            ratingHistoryRepository.findFirstByUserIdAndRatingTypeOrderByValidFromDesc(userId,ratingType)
         val (_, opponentRating, opponentRatingDeviation, opponentRatingValidFrom) =
-            ratingHistoryRepository.findFirstByUserIdOrderByValidFromDesc(opponentId)
+            ratingHistoryRepository.findFirstByUserIdAndRatingTypeOrderByValidFromDesc(opponentId,ratingType)
 
         val userWeightedRatingDeviation =
             ratingAlgorithm.getWeightedRatingDeviationSinceLastCompetition(
@@ -80,7 +86,8 @@ class RatingHistoryService(
                 userId = userId,
                 rating = newUserRating.rating,
                 ratingDeviation = newUserRating.ratingDeviation,
-                validFrom = currentInstant
+                validFrom = currentInstant,
+                ratingType = ratingType
             )
         )
         ratingHistoryRepository.save(
@@ -88,7 +95,8 @@ class RatingHistoryService(
                 userId = opponentId,
                 rating = newOpponentRating.rating,
                 ratingDeviation = newOpponentRating.ratingDeviation,
-                validFrom = currentInstant
+                validFrom = currentInstant,
+                ratingType = ratingType
             )
         )
 
@@ -167,7 +175,7 @@ class RatingHistoryService(
     ): Map<UUID, GlickoRating> {
         val userRatings =
             userIds.associateWith { userId ->
-                ratingHistoryRepository.findFirstByUserIdOrderByValidFromDesc(userId)
+                ratingHistoryRepository.findFirstByUserIdAndRatingTypeOrderByValidFromDesc(userId,RatingType.NORMAL)
             }
         val newRatings =
             userIds.associateWith { userId ->
@@ -180,7 +188,8 @@ class RatingHistoryService(
                     userId = userId,
                     rating = rating.rating,
                     ratingDeviation = rating.ratingDeviation,
-                    validFrom = currentInstant
+                    validFrom = currentInstant,
+                    ratingType = RatingType.NORMAL
                 )
             )
         }

@@ -29,6 +29,7 @@ import delta.codecharacter.server.pvp_game.PvPGameStatusEnum
 import delta.codecharacter.server.user.public_user.PublicUserEntity
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
+import delta.codecharacter.server.user.rating_history.RatingType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.rabbit.annotation.RabbitListener
@@ -452,7 +453,7 @@ class MatchService(
             )
 
         val dcMatches =
-            dailyChallengeMatchRepository.findByUserOrderByCreatedAtDesc(publicUser).takeWhile {
+            dailyChallengeMatchRepository.findByUserOrderByCreatedAtDesc(publicUser,pageRequest).takeWhile {
                 Duration.between(it.createdAt, Instant.now()).toHours() < 24 &&
                         it.verdict != DailyChallengeMatchVerdictEnum.STARTED
             }
@@ -537,7 +538,7 @@ class MatchService(
                     )
                 val finishedMatch = match.copy(verdict = verdict)
                 val (newUserRating, newOpponentRating) =
-                    ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
+                    ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict, ratingType = RatingType.NORMAL)
                 if (match.mode == MatchModeEnum.MANUAL) {
                     if ((
                         match.player1.tier == TierTypeDto.TIER2 &&
@@ -678,16 +679,16 @@ class MatchService(
                     )
                 val finishedMatch = match.copy(verdict = verdict)
                 val (newUserRating, newOpponentRating) =
-                    ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
+                    ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict, ratingType = RatingType.PVP)
 
-                publicUserService.updatePublicRating(
+                publicUserService.updatePublicPvPRating(
                     userId = match.player1.userId,
                     isInitiator = true,
                     verdict = verdict,
                     newRating = newUserRating
                 )
 
-                publicUserService.updatePublicRating(
+                publicUserService.updatePublicPvPRating(
                     userId = match.player2.userId,
                     isInitiator = false,
                     verdict = verdict,
