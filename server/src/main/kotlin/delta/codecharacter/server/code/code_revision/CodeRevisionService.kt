@@ -15,6 +15,7 @@ import java.util.UUID
 class CodeRevisionService(@Autowired private val codeRevisionRepository: CodeRevisionRepository) {
 
     fun createCodeRevision(userId: UUID, createCodeRevisionRequestDto: CreateCodeRevisionRequestDto) {
+        println(createCodeRevisionRequestDto)
         val (code, message, language) = createCodeRevisionRequestDto
         val parentCodeRevision =
             codeRevisionRepository
@@ -54,7 +55,8 @@ class CodeRevisionService(@Autowired private val codeRevisionRepository: CodeRev
                     message = it.message,
                     language = LanguageDto.valueOf(it.language.name),
                     createdAt = it.createdAt,
-                    parentRevision = it.parentRevision?.id
+                    parentRevision = it.parentRevision?.id,
+                    codeType = codeTypeDto
                 )
             }
     }

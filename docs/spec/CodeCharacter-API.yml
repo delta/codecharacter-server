@@ -306,148 +306,148 @@ paths:
     parameters: []
 
   /pvpleaderboard:
-      get:
-        summary: Get PvP leaderboard
-        responses:
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/PvPLeaderBoardResponse'
-                examples:
-                  Example:
-                    value:
-                      - user:
-                          username: testUser
-                          name: >-
-                            Test User1
-                            asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 0
-                        stats:
-                          rating: 500
-                          wins: 6
-                          losses: 0
-                      - user:
-                          username: testUser2
-                          name: >-
-                            Test User2
-                            asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 1
-                        stats:
-                          rating: 50
-                          wins: 3
-                          losses: 3
-                      - user:
-                          username: testUser3
-                          name: >-
-                            Test User3
-                            asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 0
-                        stats:
-                          rating: 80
-                          wins: 1
-                          losses: 0
-                      - user:
-                          username: testUser4
-                          name: Test User4
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 0
-                        stats:
-                          rating: 230
-                          wins: 0
-                          losses: 0
-                      - user:
-                          username: testUser5
-                          name: Test User5 Test Test
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 0
-                        stats:
-                          rating: 850
-                          wins: 0
-                          losses: 0
-                      - user:
-                          username: testUser6
-                          name: >-
-                            Test User6
-                            asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 0
-                        stats:
-                          rating: 600
-                          wins: 0
-                          losses: 0
-                      - user:
-                          username: testUser7
-                          name: >-
-                            Test User7
-                            asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 0
-                        stats:
-                          rating: 57
-                          wins: 20
-                          losses: 70
-                      - user:
-                          username: testUser8
-                          name: Test User8
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 0
-                        stats:
-                          rating: 850
-                          wins: 0
-                          losses: 0
-                      - user:
-                          username: testUser9
-                          name: Test User9
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 0
-                        stats:
-                          rating: 78
-                          wins: 0
-                          losses: 0
-                      - user:
-                          username: testUser10
-                          name: Test User10
-                          country: IN
-                          college: NIT Trichy
-                          avatarId: 0
-                        stats:
-                          rating: 10
-                          wins: 0
-                          losses: 0
-          '401':
-            description: Unauthorized
-        operationId: getPvPLeaderboard
-        tags:
-          - leaderboard
-        parameters:
-          - schema:
-              type: integer
-            in: query
-            name: page
-            description: Index of the page
-          - schema:
-              type: integer
-            in: query
-            name: size
-            description: Size of the page
-        description: Get PvP leaderboard
-      parameters: []
+    get:
+      summary: Get PvP leaderboard
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PvPLeaderBoardResponse'
+              examples:
+                Example:
+                  value:
+                    - user:
+                        username: testUser
+                        name: >-
+                          Test User1
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 500
+                        wins: 6
+                        losses: 0
+                    - user:
+                        username: testUser2
+                        name: >-
+                          Test User2
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 1
+                      stats:
+                        rating: 50
+                        wins: 3
+                        losses: 3
+                    - user:
+                        username: testUser3
+                        name: >-
+                          Test User3
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 80
+                        wins: 1
+                        losses: 0
+                    - user:
+                        username: testUser4
+                        name: Test User4
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 230
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser5
+                        name: Test User5 Test Test
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 850
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser6
+                        name: >-
+                          Test User6
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 600
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser7
+                        name: >-
+                          Test User7
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 57
+                        wins: 20
+                        losses: 70
+                    - user:
+                        username: testUser8
+                        name: Test User8
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 850
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser9
+                        name: Test User9
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 78
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser10
+                        name: Test User10
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 10
+                        wins: 0
+                        losses: 0
+        '401':
+          description: Unauthorized
+      operationId: getPvPLeaderboard
+      tags:
+        - leaderboard
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          description: Index of the page
+        - schema:
+            type: integer
+          in: query
+          name: size
+          description: Size of the page
+      description: Get PvP leaderboard
+    parameters: []
 
   /top-matches:
     get:
@@ -1133,7 +1133,7 @@ paths:
               schema:
                 type: array
                 items:
-                    $ref: '#/components/schemas/Match'
+                  $ref: '#/components/schemas/Match'
               examples:
                 Example:
                   value:
@@ -1800,12 +1800,15 @@ components:
         createdAt:
           type: string
           format: date-time
+        codeType:
+          $ref: '#/components/schemas/CodeType'
       required:
         - id
         - code
         - message
         - language
         - createdAt
+        - codeType
     CreateCodeRevisionRequest:
       title: CreateCodeRevisionRequest
       type: object
@@ -2285,9 +2288,9 @@ components:
         - scorePlayer2
         - status
     PvPGameLog:
-        type: string
-        description: PvP Game log model
-        example: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
+      type: string
+      description: PvP Game log model
+      example: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
     LeaderboardEntry:
       title: LeaderboardEntry
       type: object
