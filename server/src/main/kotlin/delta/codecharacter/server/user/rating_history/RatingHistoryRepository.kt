@@ -4,6 +4,6 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.UUID
 
 interface RatingHistoryRepository : MongoRepository<RatingHistoryEntity, String> {
-    fun findAllByUserId(userId: UUID): List<RatingHistoryEntity>
-    fun findFirstByUserIdOrderByValidFromDesc(userId: UUID): RatingHistoryEntity
+    fun findFirstByUserIdAndRatingTypeOrderByValidFromDesc(userId: UUID,ratingType: RatingType): RatingHistoryEntity
+    fun findAllByUserIdAndRatingType(userId: UUID,ratingType: RatingType): List<RatingHistoryEntity>
 }

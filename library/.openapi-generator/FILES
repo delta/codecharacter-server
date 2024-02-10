@@ -1,10 +1,4 @@
-.openapi-generator-ignore
-README.md
-build.gradle.kts
-pom.xml
-settings.gradle
 src/main/kotlin/delta/codecharacter/SpringDocConfiguration.kt
-src/main/kotlin/delta/codecharacter/core/ApiUtil.kt
 src/main/kotlin/delta/codecharacter/core/AuthApi.kt
 src/main/kotlin/delta/codecharacter/core/CodeApi.kt
 src/main/kotlin/delta/codecharacter/core/CurrentUserApi.kt
@@ -14,6 +8,7 @@ src/main/kotlin/delta/codecharacter/core/LeaderboardApi.kt
 src/main/kotlin/delta/codecharacter/core/MapApi.kt
 src/main/kotlin/delta/codecharacter/core/MatchApi.kt
 src/main/kotlin/delta/codecharacter/core/NotificationApi.kt
+src/main/kotlin/delta/codecharacter/core/PvpGameApi.kt
 src/main/kotlin/delta/codecharacter/core/UserApi.kt
 src/main/kotlin/delta/codecharacter/dtos/ActivateUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/AuthStatusResponseDto.kt
@@ -46,6 +41,11 @@ src/main/kotlin/delta/codecharacter/dtos/NotificationDto.kt
 src/main/kotlin/delta/codecharacter/dtos/PasswordLoginRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/PasswordLoginResponseDto.kt
 src/main/kotlin/delta/codecharacter/dtos/PublicUserDto.kt
+src/main/kotlin/delta/codecharacter/dtos/PvPGameDto.kt
+src/main/kotlin/delta/codecharacter/dtos/PvPGameStatusDto.kt
+src/main/kotlin/delta/codecharacter/dtos/PvPLeaderBoardResponseDto.kt
+src/main/kotlin/delta/codecharacter/dtos/PvPMatchDto.kt
+src/main/kotlin/delta/codecharacter/dtos/PvPUserStatsDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RatingHistoryDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RegisterUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ResetPasswordRequestDto.kt

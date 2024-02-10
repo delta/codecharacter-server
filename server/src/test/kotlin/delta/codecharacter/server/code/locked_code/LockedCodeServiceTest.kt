@@ -49,7 +49,7 @@ internal class LockedCodeServiceTest {
 
         every { lockedCodeRepository.findById(userId) } returns Optional.of(lockedCodeEntity)
 
-        val latestCode = lockedCodeService.getLockedCode(userId)
+        val latestCode = lockedCodeService.getLockedCode(userId, CodeTypeDto.NORMAL)
 
         verify { lockedCodeRepository.findById(userId) }
         confirmVerified(lockedCodeRepository)

@@ -9,5 +9,6 @@ data class RatingHistoryEntity(
     val userId: UUID,
     val rating: Double,
     val ratingDeviation: Double,
-    val validFrom: Instant
+    val validFrom: Instant,
+    val ratingType: RatingType
 )

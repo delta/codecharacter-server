@@ -36,4 +36,19 @@ class WinnerAlgorithm : VerdictAlgorithm {
         if (player1Score > player2Score) return MatchVerdictEnum.PLAYER1
         return MatchVerdictEnum.PLAYER2
     }
+
+    override fun getPvPVerdict(
+        player1HasErrors: Boolean,
+        player1Score: Int,
+        player2HasErrors: Boolean,
+        player2Score: Int
+    ): MatchVerdictEnum {
+        if (player1HasErrors && player2HasErrors) return MatchVerdictEnum.TIE
+        if (player1HasErrors) return MatchVerdictEnum.PLAYER2
+        if (player2HasErrors) return MatchVerdictEnum.PLAYER1
+
+        if (player1Score == player2Score) return MatchVerdictEnum.TIE
+        if (player1Score > player2Score) return MatchVerdictEnum.PLAYER1
+        return MatchVerdictEnum.PLAYER2
+    }
 }

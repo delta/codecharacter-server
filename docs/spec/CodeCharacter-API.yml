@@ -305,6 +305,150 @@ paths:
       description: Get leaderboard
     parameters: []
 
+  /pvpleaderboard:
+    get:
+      summary: Get PvP leaderboard
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PvPLeaderBoardResponse'
+              examples:
+                Example:
+                  value:
+                    - user:
+                        username: testUser
+                        name: >-
+                          Test User1
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 500
+                        wins: 6
+                        losses: 0
+                    - user:
+                        username: testUser2
+                        name: >-
+                          Test User2
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 1
+                      stats:
+                        rating: 50
+                        wins: 3
+                        losses: 3
+                    - user:
+                        username: testUser3
+                        name: >-
+                          Test User3
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 80
+                        wins: 1
+                        losses: 0
+                    - user:
+                        username: testUser4
+                        name: Test User4
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 230
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser5
+                        name: Test User5 Test Test
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 850
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser6
+                        name: >-
+                          Test User6
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 600
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser7
+                        name: >-
+                          Test User7
+                          asdfdsfasdfasdfadsfasdfadsdfasdfasdfasfasdfsfsdfsfadsfasfa
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 57
+                        wins: 20
+                        losses: 70
+                    - user:
+                        username: testUser8
+                        name: Test User8
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 850
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser9
+                        name: Test User9
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 78
+                        wins: 0
+                        losses: 0
+                    - user:
+                        username: testUser10
+                        name: Test User10
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      stats:
+                        rating: 10
+                        wins: 0
+                        losses: 0
+        '401':
+          description: Unauthorized
+      operationId: getPvPLeaderboard
+      tags:
+        - leaderboard
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          description: Index of the page
+        - schema:
+            type: integer
+          in: query
+          name: size
+          description: Size of the page
+      description: Get PvP leaderboard
+    parameters: []
+
   /top-matches:
     get:
       summary: Get top matches
@@ -318,7 +462,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Match'
+                  type: object
               examples:
                 Example:
                   value:
@@ -514,6 +658,25 @@ paths:
                   value: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
       operationId: getGameLogsByGameId
       description: Get game logs by game ID
+  '/pvpgames/{gameId}/logs':
+    parameters:
+      - $ref: '#/components/parameters/gameId'
+    get:
+      summary: Get pvp game logs by game ID
+      tags:
+        - pvp-game
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PvPGameLog'
+              examples:
+                Example:
+                  value: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
+      operationId: getPvpGameLogsByGameId
+      description: Get pvp game logs by game ID
   /user:
     parameters: []
     get:
@@ -997,8 +1160,19 @@ paths:
                         avatarId: 0
         '401':
           description: Unauthorized
-      operationId: getUserMatches
-      description: Get matches played by authenticated user
+      operationId: getUserNormalMatches
+      description: Get normal matches played by authenticated user
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          description: Index of the page
+        - schema:
+            type: integer
+          in: query
+          name: size
+          description: Size of the page
     parameters: []
     post:
       summary: Create match
@@ -1035,6 +1209,60 @@ paths:
                   opponentId: 0a4b34b0-6057-4b82-ae27-a59c36eab667
                   mapRevisionId: f52ddf9e-e933-471a-9250-41078cc39f80
                   codeRevisionId: d9eb9923-651b-4ec4-b6f1-b7625b2a9392
+  /user/pvpmatches:
+    get:
+      summary: Get user pvp matches
+      tags:
+        - match
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PvPMatch'
+              examples:
+                Example:
+                  value:
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                    - game:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          scorePlayer1: 100
+                          scorePlayer2: 45
+                          status: IDLE
+                    - matchMode: PVPSELF
+                    - matchVerdict: PLAYER1
+                    - createdAt: '2019-08-24T14:15:22Z'
+                    - user1:
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                    - user2:
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+        '401':
+          description: Unauthorized
+      operationId: getUserPvPMatches
+      description: Get pvp matches played by authenticated user
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          description: Index of the page
+        - schema:
+            type: integer
+          in: query
+          name: size
+          description: Size of the page
+    parameters: []
   /user/notifications:
     get:
       summary: Get all notifications
@@ -1292,7 +1520,55 @@ paths:
                   value: "[[0,0,0]]"
       tags:
         - Daily Challenges
-
+  /dc/matches:
+    get:
+      summary: Get user daily challenge matches
+      tags:
+        - Daily Challenges
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Match'
+              examples:
+                Example:
+                  value:
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                      games:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          coinsUsed: 100
+                          destruction: 45
+                          status: IDLE
+                      matchMode: SELF
+                      matchVerdict: SUCCESS
+                      createdAt: '2019-08-24T14:15:22Z'
+                      user1:
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      user2: null
+        '401':
+          description: Unauthorized
+      operationId: getUserDCMatches
+      description: Get daily-challenge matches played by authenticated user
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          description: Index of the page
+        - schema:
+            type: integer
+          in: query
+          name: size
+          description: Size of the page
+    parameters: []
 
 components:
   schemas:
@@ -1436,6 +1712,29 @@ components:
         - wins
         - losses
         - ties
+    PvPUserStats:
+      title: PvPUserStats
+      type: object
+      description: PvP User stats model
+      properties:
+        rating:
+          type: number
+          example: 1000
+        wins:
+          type: integer
+          default: 0
+          example: 1
+        losses:
+          type: integer
+          example: 1
+        ties:
+          type: integer
+          example: 1
+      required:
+        - rating
+        - wins
+        - losses
+        - ties
     Code:
       title: Code
       type: object
@@ -1501,12 +1800,15 @@ components:
         createdAt:
           type: string
           format: date-time
+        codeType:
+          $ref: '#/components/schemas/CodeType'
       required:
         - id
         - code
         - message
         - language
         - createdAt
+        - codeType
     CreateCodeRevisionRequest:
       title: CreateCodeRevisionRequest
       type: object
@@ -1872,6 +2174,36 @@ components:
         - matchVerdict
         - createdAt
         - user1
+    PvPMatch:
+      description: PvP Match model
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        game:
+          $ref: '#/components/schemas/PvPGame'
+        matchMode:
+          $ref: '#/components/schemas/MatchMode'
+        matchVerdict:
+          $ref: '#/components/schemas/Verdict'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+        user1:
+          $ref: '#/components/schemas/PublicUser'
+        user2:
+          $ref: '#/components/schemas/PublicUser'
+      required:
+        - id
+        - game
+        - matchMode
+        - matchVerdict
+        - createdAt
+        - user1
+        - user2
     CreateMatchRequest:
       title: CreateMatchRequest
       type: object
@@ -1900,6 +2232,11 @@ components:
           format: uuid
           description: Revision of the code
           nullable: true
+        codeRevisionId2:
+          type: string
+          format: uuid
+          description: Revision of the code (for SELF-PVP mode)
+          nullable: true
       required:
         - mode
     Game:
@@ -1927,6 +2264,33 @@ components:
       type: string
       description: Game log model
       example: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
+
+    PvPGame:
+      title: PvPGame
+      type: object
+      description: PvP Game model
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        scorePlayer1:
+          type: integer
+          example: 69
+        scorePlayer2:
+          type: integer
+          example: 69
+        status:
+          $ref: '#/components/schemas/PvPGameStatus'
+      required:
+        - id
+        - scorePlayer1
+        - scorePlayer2
+        - status
+    PvPGameLog:
+      type: string
+      description: PvP Game log model
+      example: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
     LeaderboardEntry:
       title: LeaderboardEntry
       type: object
@@ -1939,6 +2303,18 @@ components:
         - user
         - stats
       description: Leaderboard entry model
+    PvPLeaderBoardResponse:
+      title: PvPLeaderboardResponse
+      description: Response model for PvP leaderboard
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/PublicUser'
+        stats:
+          $ref: '#/components/schemas/PvPUserStats'
+      required:
+        - user
+        - stats
 
     DailyChallengeGetRequest:
       title: Get daily challenge
@@ -2032,6 +2408,8 @@ components:
         - MANUAL
         - AUTO
         - DAILYCHALLENGE
+        - PVP
+        - SELFPVP
       description: Match Mode
     Verdict:
       type: string
@@ -2045,6 +2423,14 @@ components:
       description: Match/Game verdict
     GameStatus:
       title: GameStatus
+      type: string
+      enum:
+        - IDLE
+        - EXECUTING
+        - EXECUTED
+        - EXECUTE_ERROR
+    PvPGameStatus:
+      title: PvPGameStatus
       type: string
       enum:
         - IDLE
@@ -2081,6 +2467,7 @@ components:
       enum:
         - NORMAL
         - DAILY_CHALLENGE
+        - PVP
       default: NORMAL
     GameMapType:
       title: GameMapType
@@ -2161,6 +2548,7 @@ tags:
   - name: code
   - name: current-user
   - name: game
+  - name: pvp-game
   - name: leaderboard
   - name: map
   - name: match

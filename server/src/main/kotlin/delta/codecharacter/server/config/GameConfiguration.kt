@@ -22,6 +22,9 @@ class GameConfiguration {
                     speed = 4,
                     price = 2,
                     aerial = 0,
+                    weight = 1,
+                    numAbilityTurns = 5,
+                    abilityActivationCost = 1,
                 ),
                 Attacker(
                     id = 2,
@@ -31,6 +34,9 @@ class GameConfiguration {
                     speed = 2,
                     price = 2,
                     aerial = 0,
+                    weight = 2,
+                    numAbilityTurns = 5,
+                    abilityActivationCost = 1,
                 ),
                 Attacker(
                     id = 3,
@@ -40,6 +46,9 @@ class GameConfiguration {
                     speed = 4,
                     price = 4,
                     aerial = 1,
+                    weight = 3,
+                    numAbilityTurns = 5,
+                    abilityActivationCost = 2,
                 ),
             ),
             defenders =

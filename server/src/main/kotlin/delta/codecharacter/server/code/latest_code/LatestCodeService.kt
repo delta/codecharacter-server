@@ -19,9 +19,14 @@ class LatestCodeService(
     @Autowired private val defaultCodeMapConfiguration: DefaultCodeMapConfiguration
 ) {
 
-    fun getLatestCode(userId: UUID, codeType: CodeTypeDto = CodeTypeDto.NORMAL): CodeDto {
+    fun getLatestCode(userId: UUID, codeType: CodeTypeDto): CodeDto {
         val latestCode = HashMap<CodeTypeDto, Code>()
-        latestCode[codeType] = defaultCodeMapConfiguration.defaultLatestCode
+        if(codeType == CodeTypeDto.NORMAL) {
+            latestCode[codeType] = defaultCodeMapConfiguration.defaultLatestCode
+        }
+        else if(codeType == CodeTypeDto.PVP) {
+            latestCode[codeType] = defaultCodeMapConfiguration.defaultPvPLatestCode
+        }
         val code: CodeDto =
             latestCodeRepository
                 .findById(userId)
@@ -33,7 +38,7 @@ class LatestCodeService(
                 )
                 .let { code ->
                     CodeDto(
-                        code = code.latestCode[codeType]?.code ?: defaultCodeMapConfiguration.defaultCode,
+                        code = code.latestCode[codeType]?.code ?: if(codeType==CodeTypeDto.NORMAL)  defaultCodeMapConfiguration.defaultCode else defaultCodeMapConfiguration.defaultPvPCode ,
                         language =
                         LanguageDto.valueOf(
                             code.latestCode[codeType]?.language?.name

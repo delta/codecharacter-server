@@ -20,6 +20,9 @@ import delta.codecharacter.server.game.queue.entities.GameStatusUpdateEntity
 import delta.codecharacter.server.game_map.GameMap
 import delta.codecharacter.server.game_map.locked_map.LockedMapEntity
 import delta.codecharacter.server.game_map.map_revision.MapRevisionEntity
+import delta.codecharacter.server.params.GameCode
+import delta.codecharacter.server.pvp_game.PvPGameEntity
+import delta.codecharacter.server.pvp_game.pvp_game_log.PvPGameLogEntity
 import delta.codecharacter.server.user.UserEntity
 import delta.codecharacter.server.user.public_user.PublicUserEntity
 import org.assertj.core.api.Assertions.assertThat
@@ -65,6 +68,7 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
         mongoTemplate.save<PublicUserEntity>(TestAttributes.publicUser)
         try {
             rabbitAdmin.purgeQueue("gameRequestQueue", true)
+            rabbitAdmin.purgeQueue("gamePvpRequestQueue", true)
             rabbitAdmin.purgeQueue("gameStatusUpdateQueue", true)
         } catch (e: Exception) {
             println("RabbitMQ queues are not available")
@@ -135,8 +139,12 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
         val gameRequestEntity = mapper.readValue(gameRequestEntityString, GameRequestEntity::class.java)
         assertThat(gameRequestEntity.gameId).isEqualTo(game.id)
         assertThat(gameRequestEntity.map).isEqualTo(mapRevision.map)
-        assertThat(gameRequestEntity.sourceCode).isEqualTo(codeRevision.code)
-        assertThat(gameRequestEntity.language).isEqualTo(codeRevision.language)
+        assertThat(gameRequestEntity.playerCode).isEqualTo(
+            GameCode(
+                codeRevision.code,
+                codeRevision.language
+            )
+        )
     }
 
     @Test
@@ -220,10 +228,13 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
             assertThat(gameRequestEntity1.gameId).isEqualTo(game1.id)
             assertThat(gameRequestEntity1.map)
                 .isEqualTo(opponentLockedMap.lockedMap[GameMapTypeDto.NORMAL]?.map.toString())
-            assertThat(gameRequestEntity1.sourceCode)
-                .isEqualTo(userLockedCode.lockedCode[CodeTypeDto.NORMAL]?.code)
-            assertThat(gameRequestEntity1.language)
-                .isEqualTo(userLockedCode.lockedCode[CodeTypeDto.NORMAL]?.language)
+            assertThat(gameRequestEntity1.playerCode)
+                .isEqualTo(
+                    GameCode(
+                        userLockedCode.lockedCode[CodeTypeDto.NORMAL]!!.code,
+                        userLockedCode.lockedCode[CodeTypeDto.NORMAL]!!.language
+                    )
+                )
         }
         val gameRequestEntityString2 =
             this.rabbitTemplate.receiveAndConvert("gameRequestQueue") as String?
@@ -235,10 +246,15 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
             assertThat(gameRequestEntity2.gameId).isEqualTo(game2.id)
             assertThat(gameRequestEntity2.map)
                 .isEqualTo(userLockedMap.lockedMap[GameMapTypeDto.NORMAL]?.map)
-            assertThat(gameRequestEntity2.sourceCode)
-                .isEqualTo(opponentLockedCode.lockedCode[CodeTypeDto.NORMAL]?.code)
-            assertThat(gameRequestEntity2.language)
                 .isEqualTo(opponentLockedCode.lockedCode[CodeTypeDto.NORMAL]?.language)
+            assertThat(gameRequestEntity2.playerCode)
+                .isEqualTo(
+                    GameCode(
+                        opponentLockedCode.lockedCode[CodeTypeDto.NORMAL]!!.code,
+                        opponentLockedCode.lockedCode[CodeTypeDto.NORMAL]!!.language
+                    )
+                )
+
         }
     }
 
@@ -345,6 +361,9 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
         mongoTemplate.dropCollection<GameEntity>()
         mongoTemplate.dropCollection<GameLogEntity>()
         mongoTemplate.dropCollection<MatchEntity>()
+        mongoTemplate.dropCollection<PvPGameEntity>()
+        mongoTemplate.dropCollection<PvPGameLogEntity>()
+        mongoTemplate.dropCollection<PvPMatchEntity>()
         mongoTemplate.dropCollection<LockedCodeEntity>()
         mongoTemplate.dropCollection<LockedMapEntity>()
         mongoTemplate.dropCollection<CodeRevisionEntity>()
@@ -352,6 +371,7 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
 
         try {
             rabbitAdmin.purgeQueue("gameRequestQueue", true)
+            rabbitAdmin.purgeQueue("gamePvpRequestQueue", true)
             rabbitAdmin.purgeQueue("gameStatusUpdateQueue", true)
         } catch (e: Exception) {
             println("RabbitMQ queues are not available")

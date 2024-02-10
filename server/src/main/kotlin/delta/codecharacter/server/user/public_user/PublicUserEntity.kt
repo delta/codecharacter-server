@@ -17,6 +17,7 @@ data class PublicUserEntity(
     val tier: TierTypeDto,
     val tutorialLevel: Int,
     val rating: Double,
+    val pvpRating: Double,
     val wins: Int,
     val losses: Int,
     val ties: Int,

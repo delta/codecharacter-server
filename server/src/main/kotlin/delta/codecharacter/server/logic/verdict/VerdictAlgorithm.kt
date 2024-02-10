@@ -11,4 +11,11 @@ interface VerdictAlgorithm {
         player2CoinsUsed: Int,
         player2Destruction: Double
     ): MatchVerdictEnum
+
+    fun getPvPVerdict(
+        player1HasErrors: Boolean,
+        player1Score: Int,
+        player2HasErrors: Boolean,
+        player2Score: Int,
+    ) : MatchVerdictEnum
 }

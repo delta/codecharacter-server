@@ -40,6 +40,7 @@ class SchedulingService(
         publicUserService.updateLeaderboardAfterPracticePhase()
     }
 
+
     @Scheduled(cron = "\${environment.promote-demote-time}", zone = "GMT+5:30")
     fun createAutoMatch() {
         matchService.createAutoMatch()

@@ -9,6 +9,7 @@ import delta.codecharacter.dtos.DailyChallengeGetRequestDto
 import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
 import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
 import delta.codecharacter.dtos.GenericErrorDto
+import delta.codecharacter.dtos.MatchDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
 import io.swagger.v3.oas.annotations.media.*
@@ -100,6 +101,25 @@ interface DailyChallengesApi {
             produces = ["application/json"]
     )
     fun getDailyChallengeLeaderBoard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<DailyChallengeLeaderBoardResponseDto>> {
+        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    }
+
+    @Operation(
+        summary = "Get user daily challenge matches",
+        operationId = "getUserDCMatches",
+        description = """Get daily-challenge matches played by authenticated user""",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = MatchDto::class)))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized")
+        ],
+        security = [ SecurityRequirement(name = "http-bearer") ]
+    )
+    @RequestMapping(
+            method = [RequestMethod.GET],
+            value = ["/dc/matches"],
+            produces = ["application/json"]
+    )
+    fun getUserDCMatches(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<MatchDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }

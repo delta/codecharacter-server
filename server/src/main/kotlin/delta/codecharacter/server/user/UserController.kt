@@ -5,6 +5,7 @@ import delta.codecharacter.dtos.ActivateUserRequestDto
 import delta.codecharacter.dtos.RatingHistoryDto
 import delta.codecharacter.dtos.RegisterUserRequestDto
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
+import delta.codecharacter.server.user.rating_history.RatingType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -34,7 +35,8 @@ class UserController(
     }
 
     override fun getRatingHistory(userId: UUID): ResponseEntity<List<RatingHistoryDto>> {
-        val ratingHistory = ratingHistoryService.getRatingHistory(userId)
+        //EDIT AND TAKE AS PARAMETER
+        val ratingHistory = ratingHistoryService.getRatingHistory(userId,RatingType.NORMAL)
         return ResponseEntity.ok(ratingHistory)
     }
 }

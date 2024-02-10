@@ -8,6 +8,7 @@ package delta.codecharacter.core
 import delta.codecharacter.dtos.CreateMatchRequestDto
 import delta.codecharacter.dtos.GenericErrorDto
 import delta.codecharacter.dtos.MatchDto
+import delta.codecharacter.dtos.PvPMatchDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
 import io.swagger.v3.oas.annotations.media.*
@@ -65,7 +66,7 @@ interface MatchApi {
         operationId = "getTopMatches",
         description = """Get top matches""",
         responses = [
-            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = MatchDto::class)))]),
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = kotlin.Any::class)))]),
             ApiResponse(responseCode = "401", description = "Unauthorized")
         ],
         security = [ SecurityRequirement(name = "http-bearer") ]
@@ -75,14 +76,14 @@ interface MatchApi {
             value = ["/top-matches"],
             produces = ["application/json"]
     )
-    fun getTopMatches(): ResponseEntity<List<MatchDto>> {
+    fun getTopMatches(): ResponseEntity<List<kotlin.Any>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 
     @Operation(
         summary = "Get user matches",
-        operationId = "getUserMatches",
-        description = """Get matches played by authenticated user""",
+        operationId = "getUserNormalMatches",
+        description = """Get normal matches played by authenticated user""",
         responses = [
             ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = MatchDto::class)))]),
             ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -94,7 +95,26 @@ interface MatchApi {
             value = ["/user/matches"],
             produces = ["application/json"]
     )
-    fun getUserMatches(): ResponseEntity<List<MatchDto>> {
+    fun getUserNormalMatches(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<MatchDto>> {
+        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    }
+
+    @Operation(
+        summary = "Get user pvp matches",
+        operationId = "getUserPvPMatches",
+        description = """Get pvp matches played by authenticated user""",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(array = ArraySchema(schema = Schema(implementation = PvPMatchDto::class)))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized")
+        ],
+        security = [ SecurityRequirement(name = "http-bearer") ]
+    )
+    @RequestMapping(
+            method = [RequestMethod.GET],
+            value = ["/user/pvpmatches"],
+            produces = ["application/json"]
+    )
+    fun getUserPvPMatches(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<PvPMatchDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }

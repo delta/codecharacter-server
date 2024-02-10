@@ -4,6 +4,7 @@ import delta.codecharacter.core.DailyChallengesApi
 import delta.codecharacter.dtos.DailyChallengeGetRequestDto
 import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
 import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
+import delta.codecharacter.dtos.MatchDto
 import delta.codecharacter.server.match.MatchService
 import delta.codecharacter.server.user.UserEntity
 import delta.codecharacter.server.user.public_user.PublicUserService
@@ -37,5 +38,11 @@ class DailyChallengeController(
     ): ResponseEntity<Unit> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         return ResponseEntity.ok(matchService.createDCMatch(user.id, dailyChallengeMatchRequestDto))
+    }
+
+    @Secured(value = ["ROLE_USER"])
+    override fun getUserDCMatches(page: Int?, size: Int?): ResponseEntity<List<MatchDto>> {
+        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
+        return ResponseEntity.ok(matchService.getUserDCMatches(user.id, page, size))
     }
 }

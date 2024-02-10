@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param opponentUsername Username of the opponent
  * @param mapRevisionId Revision ID of the map
  * @param codeRevisionId Revision of the code
+ * @param codeRevisionId2 Revision of the code (for SELF-PVP mode)
  */
 data class CreateMatchRequestDto(
 
@@ -35,7 +36,10 @@ data class CreateMatchRequestDto(
     @get:JsonProperty("mapRevisionId") val mapRevisionId: java.util.UUID? = null,
 
     @Schema(example = "null", description = "Revision of the code")
-    @get:JsonProperty("codeRevisionId") val codeRevisionId: java.util.UUID? = null
+    @get:JsonProperty("codeRevisionId") val codeRevisionId: java.util.UUID? = null,
+
+    @Schema(example = "null", description = "Revision of the code (for SELF-PVP mode)")
+    @get:JsonProperty("codeRevisionId2") val codeRevisionId2: java.util.UUID? = null
 ) {
 
 }

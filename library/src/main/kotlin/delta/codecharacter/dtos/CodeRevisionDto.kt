@@ -3,6 +3,7 @@ package delta.codecharacter.dtos
 import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
+import delta.codecharacter.dtos.CodeTypeDto
 import delta.codecharacter.dtos.LanguageDto
 import jakarta.validation.constraints.DecimalMax
 import jakarta.validation.constraints.DecimalMin
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param message 
  * @param language 
  * @param createdAt 
+ * @param codeType 
  * @param parentRevision 
  */
 data class CodeRevisionDto(
@@ -41,6 +43,10 @@ data class CodeRevisionDto(
 
     @Schema(example = "null", required = true, description = "")
     @get:JsonProperty("createdAt", required = true) val createdAt: java.time.Instant,
+
+    @field:Valid
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("codeType", required = true) val codeType: CodeTypeDto = CodeTypeDto.NORMAL,
 
     @Schema(example = "123e4567-e89b-12d3-a456-426614174111", description = "")
     @get:JsonProperty("parentRevision") val parentRevision: java.util.UUID? = null

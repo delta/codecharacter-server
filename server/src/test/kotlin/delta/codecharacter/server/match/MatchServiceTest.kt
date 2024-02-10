@@ -1,13 +1,6 @@
 package delta.codecharacter.server.match
 
-import delta.codecharacter.dtos.ChallengeTypeDto
-import delta.codecharacter.dtos.CodeRevisionDto
-import delta.codecharacter.dtos.CreateMatchRequestDto
-import delta.codecharacter.dtos.DailyChallengeGetRequestDto
-import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
-import delta.codecharacter.dtos.GameMapRevisionDto
-import delta.codecharacter.dtos.LanguageDto
-import delta.codecharacter.dtos.MatchModeDto
+import delta.codecharacter.dtos.*
 import delta.codecharacter.server.TestAttributes
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
@@ -17,6 +10,7 @@ import delta.codecharacter.server.daily_challenge.DailyChallengeService
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchRepository
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.GameEntity
+import delta.codecharacter.server.game.GameRepository
 import delta.codecharacter.server.game.GameService
 import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
@@ -24,6 +18,9 @@ import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
+import delta.codecharacter.server.params.GameCode
+import delta.codecharacter.server.pvp_game.PvPGameRepository
+import delta.codecharacter.server.pvp_game.PvPGameService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import io.mockk.confirmVerified
@@ -44,6 +41,7 @@ internal class MatchServiceTest {
 
     private lateinit var matchRepository: MatchRepository
     private lateinit var gameService: GameService
+    private lateinit var pvPGameService: PvPGameService
     private lateinit var latestCodeService: LatestCodeService
     private lateinit var codeRevisionService: CodeRevisionService
     private lateinit var lockedCodeService: LockedCodeService
@@ -61,11 +59,15 @@ internal class MatchServiceTest {
     private lateinit var mapValidator: MapValidator
     private lateinit var matchService: MatchService
     private lateinit var autoMatchRepository: AutoMatchRepository
+    private lateinit var pvPMatchRepository: PvPMatchRepository
+    private lateinit var gameRepository: GameRepository
+    private lateinit var pvPGameRepository: PvPGameRepository
 
     @BeforeEach
     fun setUp() {
         matchRepository = mockk(relaxed = true)
         gameService = mockk(relaxed = true)
+        pvPGameService = mockk(relaxed = true)
         latestCodeService = mockk(relaxed = true)
         codeRevisionService = mockk(relaxed = true)
         lockedCodeService = mockk(relaxed = true)
@@ -82,11 +84,15 @@ internal class MatchServiceTest {
         simpMessagingTemplate = mockk(relaxed = true)
         mapValidator = mockk(relaxed = true)
         autoMatchRepository = mockk(relaxed = true)
+        pvPMatchRepository = mockk(relaxed = true)
+        gameRepository = mockk(relaxed = true)
+        pvPGameRepository = mockk(relaxed = true)
 
         matchService =
             MatchService(
                 matchRepository,
                 gameService,
+                pvPGameService,
                 latestCodeService,
                 codeRevisionService,
                 lockedCodeService,
@@ -102,7 +108,10 @@ internal class MatchServiceTest {
                 jackson2ObjectMapperBuilder,
                 simpMessagingTemplate,
                 mapValidator,
-                autoMatchRepository
+                autoMatchRepository,
+                pvPMatchRepository,
+                gameRepository,
+                pvPGameRepository,
             )
     }
 
@@ -123,7 +132,7 @@ internal class MatchServiceTest {
                 mapRevisionId = mapRevisionId
             )
 
-        every { codeRevisionService.getCodeRevisions(userId) } returns listOf(codeRevision)
+        every { codeRevisionService.getCodeRevisions(userId, CodeTypeDto.NORMAL) } returns listOf(codeRevision)
         every { mapRevisionService.getMapRevisions(userId) } returns listOf(mapRevision)
 
         val exception =
@@ -150,7 +159,7 @@ internal class MatchServiceTest {
                 mapRevisionId = UUID.randomUUID()
             )
 
-        every { codeRevisionService.getCodeRevisions(userId) } returns listOf(codeRevision)
+        every { codeRevisionService.getCodeRevisions(userId, CodeTypeDto.NORMAL) } returns listOf(codeRevision)
         every { mapRevisionService.getMapRevisions(userId) } returns listOf(mapRevision)
 
         val exception =
@@ -177,7 +186,7 @@ internal class MatchServiceTest {
                 mapRevisionId = mapRevisionId
             )
 
-        every { codeRevisionService.getCodeRevisions(userId) } returns listOf(codeRevision)
+        every { codeRevisionService.getCodeRevisions(userId, CodeTypeDto.NORMAL) } returns listOf(codeRevision)
         every { mapRevisionService.getMapRevisions(userId) } returns listOf(mapRevision)
         every { gameService.createGame(any()) } returns game
         every { matchRepository.save(any()) } returns mockk()
@@ -186,7 +195,7 @@ internal class MatchServiceTest {
         matchService.createMatch(userId, createMatchRequestDto)
 
         verify {
-            codeRevisionService.getCodeRevisions(userId)
+            codeRevisionService.getCodeRevisions(userId, CodeTypeDto.NORMAL)
             mapRevisionService.getMapRevisions(userId)
             gameService.createGame(any())
             matchRepository.save(any())
@@ -234,11 +243,30 @@ internal class MatchServiceTest {
     }
 
     @Test
+    @Throws(CustomException::class)
+    fun `should throw bad request if opponent id is empty in pvp match`() {
+        val createMatchRequestDto =
+            CreateMatchRequestDto(
+                mode = MatchModeDto.PVP,
+                codeRevisionId = UUID.randomUUID(),
+                mapRevisionId = UUID.randomUUID(),
+                opponentUsername = null
+            )
+
+        val exception =
+            assertThrows<CustomException> { matchService.createMatch(mockk(), createMatchRequestDto) }
+
+        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(exception.message).isEqualTo("Opponent ID is required")
+    }
+
+    @Test
     fun `should create manual match`() {
         val userId = UUID.randomUUID()
         val opponentId = UUID.randomUUID()
         val opponentPublicUser =
             TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
+        val publicUser = TestAttributes.publicUser.copy(userId = userId, username = "public-user")
 
         val userCode = Pair(LanguageEnum.CPP, "user-code")
         val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
@@ -251,10 +279,10 @@ internal class MatchServiceTest {
                 opponentUsername = opponentPublicUser.username,
             )
 
-        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
-            opponentPublicUser
-        every { lockedCodeService.getLockedCode(userId) } returns userCode
-        every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
+        every { publicUserService.getPublicUser(userId) } returns publicUser
+        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns opponentPublicUser
+        every { lockedCodeService.getLockedCode(userId, CodeTypeDto.NORMAL) } returns userCode
+        every { lockedCodeService.getLockedCode(opponentId, CodeTypeDto.NORMAL) } returns opponentCode
         every { lockedMapService.getLockedMap(userId) } returns userMap
         every { lockedMapService.getLockedMap(opponentId) } returns opponentMap
         every { gameService.createGame(any()) } returns mockk()
@@ -269,8 +297,8 @@ internal class MatchServiceTest {
 
         verify {
             publicUserService.getPublicUserByUsername(opponentPublicUser.username)
-            lockedCodeService.getLockedCode(userId)
-            lockedCodeService.getLockedCode(opponentId)
+            lockedCodeService.getLockedCode(userId, CodeTypeDto.NORMAL)
+            lockedCodeService.getLockedCode(opponentId, CodeTypeDto.NORMAL)
             lockedMapService.getLockedMap(userId)
             lockedMapService.getLockedMap(opponentId)
             gameService.createGame(any())
@@ -284,9 +312,57 @@ internal class MatchServiceTest {
     }
 
     @Test
+    fun `should create a pvp match`() {
+        val userId = UUID.randomUUID()
+        val opponentId = UUID.randomUUID()
+        val opponentPublicUser =
+            TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
+        val publicUser = TestAttributes.publicUser.copy(userId = userId, username = "public-user")
+
+        val userCode = Pair(LanguageEnum.CPP, "user-code")
+        val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
+
+        val createMatchRequestDto =
+            CreateMatchRequestDto(
+                mode = MatchModeDto.PVP,
+                opponentUsername = opponentPublicUser.username,
+            )
+
+        every { publicUserService.getPublicUser(userId) } returns publicUser
+        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns opponentPublicUser
+        every { lockedCodeService.getLockedCode(userId, CodeTypeDto.PVP) } returns userCode
+        every { lockedCodeService.getLockedCode(opponentId, CodeTypeDto.PVP) } returns opponentCode
+        every { pvPGameService.createPvPGame(any()) } returns mockk()
+        every { pvPMatchRepository.save(any()) } returns mockk()
+        every {
+            pvPGameService.sendPvPGameRequest(any(),
+                GameCode(userCode.second, userCode.first),
+                GameCode(opponentCode.second, opponentCode.first))
+        } returns Unit
+
+        matchService.createMatch(userId, createMatchRequestDto)
+
+        verify {
+            publicUserService.getPublicUserByUsername(opponentPublicUser.username)
+            lockedCodeService.getLockedCode(userId, CodeTypeDto.PVP)
+            lockedCodeService.getLockedCode(opponentId, CodeTypeDto.PVP)
+            pvPGameService.createPvPGame(any())
+            pvPMatchRepository.save(any())
+            pvPGameService.sendPvPGameRequest(any(),
+                GameCode(userCode.second, userCode.first),
+                GameCode(opponentCode.second, opponentCode.first))
+        }
+        confirmVerified(
+            codeRevisionService, mapRevisionService, pvPGameService, pvPMatchRepository, pvPGameService
+        )
+    }
+
+    @Test
     fun `should create auto match`() {
         val userId = UUID.randomUUID()
         val opponentId = UUID.randomUUID()
+        val publicUser =
+            TestAttributes.publicUser.copy(userId = userId, username = "public user")
         val opponentPublicUser =
             TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
 
@@ -301,10 +377,11 @@ internal class MatchServiceTest {
                 opponentUsername = opponentPublicUser.username,
             )
 
+        every { publicUserService.getPublicUser(userId) } returns publicUser
         every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
             opponentPublicUser
-        every { lockedCodeService.getLockedCode(userId) } returns userCode
-        every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
+        every { lockedCodeService.getLockedCode(userId, CodeTypeDto.NORMAL) } returns userCode
+        every { lockedCodeService.getLockedCode(opponentId, CodeTypeDto.NORMAL) } returns opponentCode
         every { lockedMapService.getLockedMap(userId) } returns userMap
         every { lockedMapService.getLockedMap(opponentId) } returns opponentMap
         every { gameService.createGame(any()) } returns mockk()
@@ -319,8 +396,8 @@ internal class MatchServiceTest {
 
         verify {
             publicUserService.getPublicUserByUsername(opponentPublicUser.username)
-            lockedCodeService.getLockedCode(userId)
-            lockedCodeService.getLockedCode(opponentId)
+            lockedCodeService.getLockedCode(userId, CodeTypeDto.NORMAL)
+            lockedCodeService.getLockedCode(opponentId, CodeTypeDto.NORMAL)
             lockedMapService.getLockedMap(userId)
             lockedMapService.getLockedMap(opponentId)
             gameService.createGame(any())

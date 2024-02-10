@@ -2,12 +2,14 @@ package delta.codecharacter.server.user.public_user
 
 import delta.codecharacter.dtos.CurrentUserProfileDto
 import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
+import delta.codecharacter.dtos.PvPLeaderBoardResponseDto
 import delta.codecharacter.dtos.LeaderboardEntryDto
 import delta.codecharacter.dtos.PublicUserDto
 import delta.codecharacter.dtos.TierTypeDto
 import delta.codecharacter.dtos.TutorialUpdateTypeDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UserStatsDto
+import delta.codecharacter.dtos.PvPUserStatsDto
 import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.match.MatchVerdictEnum
@@ -55,7 +57,8 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 // registering after practice phase
                 tier = TierTypeDto.TIER2,
                 tutorialLevel = 1,
-                dailyChallengeHistory = HashMap()
+                dailyChallengeHistory = HashMap(),
+                pvpRating = 1500.0
             )
         publicUserRepository.save(publicUser)
     }
@@ -156,6 +159,38 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         return publicUserRepository.findAll(pageRequest).content.map {
             DailyChallengeLeaderBoardResponseDto(
                 userName = it.username, score = BigDecimal(it.score), avatarId = it.avatarId
+            )
+        }
+    }
+
+    fun getPvPLeaderboard(
+        page: Int?,
+        size: Int?
+    ): List<PvPLeaderBoardResponseDto> {
+        val pageRequest =
+            PageRequest.of(
+                    page ?: 0,
+                    size ?: 10,
+                    Sort.by(Sort.Order.desc("pvpRating"), Sort.Order.desc("wins"), Sort.Order.asc("username"))
+            )
+        return publicUserRepository.findAll(pageRequest).content.map {
+            PvPLeaderBoardResponseDto(
+                user =
+                PublicUserDto(
+                    username = it.username,
+                    name = it.name,
+                    tier = TierTypeDto.valueOf(it.tier.name),
+                    country = it.country,
+                    college = it.college,
+                    avatarId = it.avatarId,
+                ),
+                stats =
+                PvPUserStatsDto(
+                    rating = BigDecimal(it.pvpRating),
+                    wins = it.wins,
+                    losses = it.losses,
+                    ties = it.ties
+                ),
             )
         }
     }
@@ -267,6 +302,33 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 else user.losses,
                 ties = if (verdict == MatchVerdictEnum.TIE) user.ties + 1 else user.ties
             )
+        publicUserRepository.save(updatedUser)
+    }
+
+    fun updatePublicPvPRating(
+        userId: UUID,
+        isInitiator: Boolean,
+        verdict: MatchVerdictEnum,
+        newRating: Double
+    ) {
+        val publicUser = publicUserRepository.findById(userId).get()
+        val updatedUser =
+                publicUser.copy(
+                    pvpRating = newRating,
+                    wins =
+                    if ((isInitiator && verdict == MatchVerdictEnum.PLAYER1) ||
+                            (!isInitiator && verdict == MatchVerdictEnum.PLAYER2)
+                    )
+                        publicUser.wins + 1
+                    else publicUser.wins,
+                    losses =
+                    if ((isInitiator && verdict == MatchVerdictEnum.PLAYER2) ||
+                            (!isInitiator && verdict == MatchVerdictEnum.PLAYER1)
+                    )
+                        publicUser.losses + 1
+                    else publicUser.losses,
+                    ties = if (verdict == MatchVerdictEnum.TIE) publicUser.ties + 1 else publicUser.ties
+                )
         publicUserRepository.save(updatedUser)
     }
 
