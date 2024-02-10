@@ -9,6 +9,7 @@ src/main/kotlin/delta/codecharacter/core/MapApi.kt
 src/main/kotlin/delta/codecharacter/core/MatchApi.kt
 src/main/kotlin/delta/codecharacter/core/NotificationApi.kt
 src/main/kotlin/delta/codecharacter/core/PvpGameApi.kt
+src/main/kotlin/delta/codecharacter/core/StatsApi.kt
 src/main/kotlin/delta/codecharacter/core/UserApi.kt
 src/main/kotlin/delta/codecharacter/dtos/ActivateUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/AuthStatusResponseDto.kt
@@ -55,5 +56,7 @@ src/main/kotlin/delta/codecharacter/dtos/UpdateCurrentUserProfileDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateLatestCodeRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateLatestMapRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdatePasswordRequestDto.kt
+src/main/kotlin/delta/codecharacter/dtos/UserMatchStatDto.kt
+src/main/kotlin/delta/codecharacter/dtos/UserMatchStatsInnerDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UserStatsDto.kt
 src/main/kotlin/delta/codecharacter/dtos/VerdictDto.kt

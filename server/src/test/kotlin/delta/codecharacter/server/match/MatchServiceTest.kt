@@ -21,6 +21,7 @@ import delta.codecharacter.server.notifications.NotificationService
 import delta.codecharacter.server.params.GameCode
 import delta.codecharacter.server.pvp_game.PvPGameRepository
 import delta.codecharacter.server.pvp_game.PvPGameService
+import delta.codecharacter.server.stats.StatsService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import io.mockk.confirmVerified
@@ -62,6 +63,7 @@ internal class MatchServiceTest {
     private lateinit var pvPMatchRepository: PvPMatchRepository
     private lateinit var gameRepository: GameRepository
     private lateinit var pvPGameRepository: PvPGameRepository
+    private lateinit var statsService: StatsService
 
     @BeforeEach
     fun setUp() {
@@ -87,6 +89,7 @@ internal class MatchServiceTest {
         pvPMatchRepository = mockk(relaxed = true)
         gameRepository = mockk(relaxed = true)
         pvPGameRepository = mockk(relaxed = true)
+        statsService = mockk(relaxed = true)
 
         matchService =
             MatchService(
@@ -109,6 +112,7 @@ internal class MatchServiceTest {
                 simpMessagingTemplate,
                 mapValidator,
                 autoMatchRepository,
+                statsService,
                 pvPMatchRepository,
                 gameRepository,
                 pvPGameRepository,

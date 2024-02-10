@@ -1099,7 +1099,7 @@ paths:
       responses:
         200:
           description: OK
-          headers: { }
+          headers: {}
           content:
             application/json:
               schema:
@@ -1493,7 +1493,7 @@ paths:
           description: Created
         '400':
           description: Bad Request
-          headers: { }
+          headers: {}
           content:
             application/json:
               schema:
@@ -1513,11 +1513,11 @@ paths:
             examples:
               CodeExample:
                 value:
-                  value : "#include<iostream>"
+                  value: '#include<iostream>'
                   language: CPP
               MapExample:
                 value:
-                  value: "[[0,0,0]]"
+                  value: '[[0,0,0]]'
       tags:
         - Daily Challenges
   /dc/matches:
@@ -1570,8 +1570,44 @@ paths:
           description: Size of the page
     parameters: []
 
+  '/stats/':
+    get:
+      summary: Get all General Stats for current user and top user
+      tags:
+        - stats
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserMatchStats'
+      operationId: getStats
+      description: Gets all statistics for the current user
+    parameters: []
+
 components:
   schemas:
+    UserMatchStats:
+      title: UserMatchStats
+      type: object
+      description: User Match Stats model
+      properties:
+        avgAtk:
+          type: number
+          default: 0
+        dc_wins:
+          type: number
+          default: 0
+        coins:
+          type: number
+          default: 0
+      required:
+        - avgAtk
+        - dc_wins
+        - coins
     PasswordLoginRequest:
       title: PasswordLoginRequest
       type: object
@@ -2376,7 +2412,7 @@ components:
       properties:
         value:
           type: string
-          example: "#include<iostream>"
+          example: '#include<iostream>'
         language:
           $ref: '#/components/schemas/Language'
       required:
@@ -2554,3 +2590,4 @@ tags:
   - name: match
   - name: notification
   - name: user
+  - name: stats
