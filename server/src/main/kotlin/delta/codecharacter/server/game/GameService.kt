@@ -3,6 +3,7 @@ package delta.codecharacter.server.game
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import delta.codecharacter.server.code.LanguageEnum
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchRepository
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.game_log.GameLogService
 import delta.codecharacter.server.game.queue.entities.GameRequestEntity
@@ -21,6 +22,7 @@ class GameService(
     @Autowired private val gameLogService: GameLogService,
     @Autowired private val rabbitTemplate: RabbitTemplate,
     @Autowired private val parameters: GameParameters,
+    @Autowired private val codeTutorialMatchRepository: CodeTutorialMatchRepository,
 ) {
     private var mapper = ObjectMapper().registerKotlinModule()
 
@@ -53,9 +55,7 @@ class GameService(
         rabbitTemplate.convertAndSend("gameRequestQueue", mapper.writeValueAsString(gameRequest))
     }
 
-    fun updateGameStatus(gameStatusUpdateJson: String): GameEntity {
-        val gameStatusUpdateEntity =
-            mapper.readValue(gameStatusUpdateJson, GameStatusUpdateEntity::class.java)
+    fun updateGameStatus(gameStatusUpdateEntity: GameStatusUpdateEntity): GameEntity {
         val oldGameEntity =
             gameRepository.findById(gameStatusUpdateEntity.gameId).orElseThrow {
                 throw CustomException(HttpStatus.NOT_FOUND, "Game not found")
@@ -80,7 +80,12 @@ class GameService(
                 destruction = destructionPercentage, coinsUsed = coinsUsed, status = gameStatus
             )
         val game = gameRepository.save(newGameEntity)
-        gameLogService.saveGameLog(game.id, gameResult.log)
+        if(!codeTutorialMatchRepository.findById(game.matchId).isPresent) {
+            gameLogService.saveGameLog(game.id, gameResult.log)
+        }
+        else{
+            gameRepository.deleteById(game.id)
+        }
         return game
     }
 }

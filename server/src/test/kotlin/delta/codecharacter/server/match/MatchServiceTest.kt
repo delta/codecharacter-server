@@ -6,12 +6,15 @@ import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
+import delta.codecharacter.server.code_tutorial.CodeTutorialService
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchRepository
 import delta.codecharacter.server.daily_challenge.DailyChallengeService
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchRepository
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.GameEntity
 import delta.codecharacter.server.game.GameRepository
 import delta.codecharacter.server.game.GameService
+import delta.codecharacter.server.game.game_log.GameLogService
 import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
@@ -22,6 +25,7 @@ import delta.codecharacter.server.params.GameCode
 import delta.codecharacter.server.pvp_game.PvPGameRepository
 import delta.codecharacter.server.pvp_game.PvPGameService
 import delta.codecharacter.server.stats.StatsService
+import delta.codecharacter.server.user.public_user.PublicUserRepository
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import io.mockk.confirmVerified
@@ -54,7 +58,9 @@ internal class MatchServiceTest {
     private lateinit var ratingHistoryService: RatingHistoryService
     private lateinit var notificationService: NotificationService
     private lateinit var dailyChallengeService: DailyChallengeService
+    private lateinit var codeTutorialService: CodeTutorialService
     private lateinit var dailyChallengeMatchRepository: DailyChallengeMatchRepository
+    private lateinit var codeTutorialMatchRepository: CodeTutorialMatchRepository
     private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
     private lateinit var simpMessagingTemplate: SimpMessagingTemplate
     private lateinit var mapValidator: MapValidator
@@ -81,7 +87,9 @@ internal class MatchServiceTest {
         ratingHistoryService = mockk(relaxed = true)
         notificationService = mockk(relaxed = true)
         dailyChallengeService = mockk(relaxed = true)
+        codeTutorialService = mockk(relaxed = true)
         dailyChallengeMatchRepository = mockk(relaxed = true)
+        codeTutorialMatchRepository = mockk(relaxed = true)
         jackson2ObjectMapperBuilder = Jackson2ObjectMapperBuilder()
         simpMessagingTemplate = mockk(relaxed = true)
         mapValidator = mockk(relaxed = true)
@@ -107,7 +115,9 @@ internal class MatchServiceTest {
                 ratingHistoryService,
                 notificationService,
                 dailyChallengeService,
+                codeTutorialService,
                 dailyChallengeMatchRepository,
+                codeTutorialMatchRepository,
                 jackson2ObjectMapperBuilder,
                 simpMessagingTemplate,
                 mapValidator,

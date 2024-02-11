@@ -2,6 +2,7 @@ package delta.codecharacter.server.game
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import delta.codecharacter.server.code.LanguageEnum
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchRepository
 import delta.codecharacter.server.config.GameConfiguration
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.game_log.GameLogService
@@ -30,17 +31,19 @@ internal class GameServiceTest {
     private lateinit var rabbitTemplate: RabbitTemplate
     private lateinit var mapper: ObjectMapper
     private lateinit var gameParameters: GameParameters
+    private lateinit var codeTutorialMatchRepository: CodeTutorialMatchRepository
 
     @BeforeEach
     fun setUp() {
         gameRepository = mockk(relaxed = true)
         gameLogService = mockk(relaxed = true)
         rabbitTemplate = mockk(relaxed = true)
+        codeTutorialMatchRepository = mockk(relaxed = true)
         mapper = ObjectMapper()
         val gameConfiguration = GameConfiguration()
         gameParameters = gameConfiguration.gameParameters()
 
-        gameService = GameService(gameRepository, gameLogService, rabbitTemplate, gameParameters)
+        gameService = GameService(gameRepository, gameLogService, rabbitTemplate, gameParameters, codeTutorialMatchRepository)
     }
 
     @Test
@@ -142,7 +145,7 @@ internal class GameServiceTest {
             )
         } returns mockk()
 
-        gameService.updateGameStatus(mapper.writeValueAsString(gameStatusUpdate))
+        gameService.updateGameStatus(gameStatusUpdate)
 
         verify { gameRepository.findById(game.id) }
         verify {
@@ -187,7 +190,7 @@ internal class GameServiceTest {
         every { gameRepository.findById(game.id) } returns Optional.of(game)
         every { gameRepository.save(updatedGameEntity) } returns updatedGameEntity
 
-        gameService.updateGameStatus(mapper.writeValueAsString(gameStatusUpdate))
+        gameService.updateGameStatus(gameStatusUpdate)
 
         verify { gameRepository.findById(game.id) }
         verify {

@@ -28,6 +28,7 @@ import java.util.UUID
 class PublicUserService(@Autowired private val publicUserRepository: PublicUserRepository) {
 
     @Value("\${environment.no-of-tutorial-level}") private lateinit var totalTutorialLevels: Number
+    @Value("\${environment.total-no-of-code-tutorial-levels}") private var totalCodeTutorialLevels: Int = 4
     @Value("\${environment.no-of-tier-1-players}") private var tier1Players: Number = 1
     @Value("\${environment.no-of-players-for-promotion}") private var topPlayer: Number = 1
     private val logger: Logger = LoggerFactory.getLogger(PublicUserService::class.java)
@@ -58,7 +59,8 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 tier = TierTypeDto.TIER2,
                 tutorialLevel = 1,
                 dailyChallengeHistory = HashMap(),
-                pvpRating = 1500.0
+                pvpRating = 1500.0,
+                codeTutorialLevel = 1,
             )
         publicUserRepository.save(publicUser)
     }
@@ -205,8 +207,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
             country = user.country,
             college = user.college,
             tutorialLevel = user.tutorialLevel,
+            codeTutorialLevel = user.codeTutorialLevel,
             avatarId = user.avatarId,
-            isTutorialComplete = user.tutorialLevel == totalTutorialLevels.toInt()
+            isTutorialComplete = user.tutorialLevel == totalTutorialLevels.toInt(),
         )
     }
 
@@ -247,6 +250,14 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                     updateCurrentUserProfileDto.updateTutorialLevel, user.tutorialLevel
                 )
             )
+        publicUserRepository.save(updatedUser)
+    }
+    fun updateUserCodeTutorialLevel(userId: UUID, updateCodeTutorial: Boolean?) {
+        val user = publicUserRepository.findById(userId).get()
+        val updatedUser =
+                user.copy(
+                        codeTutorialLevel = updateCodeTutorialLevel(user.userId, updateCodeTutorial)
+                )
         publicUserRepository.save(updatedUser)
     }
 
@@ -376,6 +387,20 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         current[dailyChallenge.day] = DailyChallengeHistory(score, dailyChallenge)
         val updatedUser = user.copy(score = user.score + score, dailyChallengeHistory = current)
         publicUserRepository.save(updatedUser)
+    }
+
+    fun updateCodeTutorialLevel(userId: UUID, updateCodeTutorial: Boolean?): Int {
+        val user = publicUserRepository.findById(userId).get()
+        var currentCodeTutorialLevel = user.codeTutorialLevel
+        return if(updateCodeTutorial == true)
+        {
+            if(currentCodeTutorialLevel >= totalCodeTutorialLevels)
+                totalCodeTutorialLevels
+            else
+                ++currentCodeTutorialLevel
+        }
+        else
+            currentCodeTutorialLevel
     }
 
     fun getTopNUsers(): List<PublicUserEntity> {

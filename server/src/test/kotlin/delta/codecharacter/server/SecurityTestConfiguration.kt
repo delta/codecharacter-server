@@ -3,6 +3,8 @@ package delta.codecharacter.server
 import delta.codecharacter.dtos.ChallengeTypeDto
 import delta.codecharacter.dtos.DailyChallengeObjectDto
 import delta.codecharacter.dtos.TierTypeDto
+import delta.codecharacter.dtos.TutorialCodeObjectDto
+import delta.codecharacter.server.code_tutorial.CodeTutorialEntity
 import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.user.LoginType
 import delta.codecharacter.server.user.UserEntity
@@ -59,6 +61,16 @@ class TestAttributes {
                 map = "",
                 description = "description"
             )
+        val codeTutorialCode =
+            CodeTutorialEntity(
+                id = UUID.randomUUID(),
+                number = 1,
+                tutName = "tutorialName",
+                tutType = ChallengeTypeDto.MAP,
+                tutorial = TutorialCodeObjectDto(cpp = "example cpp code"),
+                map = "",
+                description = "description"
+            )
         val publicUser =
             PublicUserEntity(
                 userId = user.id,
@@ -76,6 +88,7 @@ class TestAttributes {
                 dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
                 tutorialLevel = 1,
                 pvpRating = 1000.0
+                codeTutorialLevel = 1,
             )
 
         val publicOpponent =
@@ -94,7 +107,8 @@ class TestAttributes {
                 score = 0.0,
                 dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
                 tutorialLevel = 1,
-                pvpRating = 1000.0
+                pvpRating = 1000.0,
+                codeTutorialLevel = 1
             )
     }
 }
