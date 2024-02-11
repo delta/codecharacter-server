@@ -31,6 +31,7 @@ internal class LeaderboardTest {
             avatarId = 1,
             tier = TierTypeDto.TIER1,
             tutorialLevel = 1,
+            codeTutorialLevel = 1,
             rating = 2000.0,
             wins = 0,
             losses = 0,
@@ -40,6 +41,9 @@ internal class LeaderboardTest {
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
             pvpRating = 2000.0,
+            pvPWins = 0,
+            pvPLosses = 0,
+            pvPTies = 0,
         )
     private var user2 =
         PublicUserEntity(
@@ -51,6 +55,7 @@ internal class LeaderboardTest {
             avatarId = 1,
             tier = TierTypeDto.TIER1,
             tutorialLevel = 1,
+            codeTutorialLevel = 1,
             rating = 1800.0,
             wins = 0,
             losses = 0,
@@ -60,6 +65,9 @@ internal class LeaderboardTest {
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
             pvpRating = 1800.0,
+            pvPTies = 0,
+            pvPWins = 0,
+            pvPLosses = 0,
         )
     private var user3 =
         PublicUserEntity(
@@ -71,6 +79,7 @@ internal class LeaderboardTest {
             avatarId = 1,
             tier = TierTypeDto.TIER2,
             tutorialLevel = 1,
+            codeTutorialLevel = 1,
             rating = 1600.0,
             wins = 0,
             losses = 0,
@@ -80,6 +89,9 @@ internal class LeaderboardTest {
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
             pvpRating = 1600.0,
+            pvPTies = 0,
+            pvPWins = 0,
+            pvPLosses = 0,
         )
     private var user4 =
         PublicUserEntity(
@@ -91,6 +103,7 @@ internal class LeaderboardTest {
             avatarId = 1,
             tier = TierTypeDto.TIER2,
             tutorialLevel = 1,
+            codeTutorialLevel = 1,
             rating = 1500.0,
             wins = 0,
             losses = 0,
@@ -99,7 +112,10 @@ internal class LeaderboardTest {
             score = 0.0,
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
-            pvpRating = 1500.0
+            pvpRating = 1500.0,
+            pvPLosses = 0,
+            pvPTies = 0,
+            pvPWins = 0,
         )
 
     @BeforeEach
