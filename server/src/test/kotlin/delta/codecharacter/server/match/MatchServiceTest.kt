@@ -115,9 +115,7 @@ internal class MatchServiceTest {
                 ratingHistoryService,
                 notificationService,
                 dailyChallengeService,
-                codeTutorialService,
                 dailyChallengeMatchRepository,
-                codeTutorialMatchRepository,
                 jackson2ObjectMapperBuilder,
                 simpMessagingTemplate,
                 mapValidator,
@@ -126,6 +124,8 @@ internal class MatchServiceTest {
                 pvPMatchRepository,
                 gameRepository,
                 pvPGameRepository,
+                codeTutorialService,
+                codeTutorialMatchRepository,
             )
     }
 

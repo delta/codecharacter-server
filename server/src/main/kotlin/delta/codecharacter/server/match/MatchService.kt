@@ -538,10 +538,8 @@ class MatchService(
             throw CustomException(HttpStatus.NOT_FOUND, "Game not found")
         }
 
-        val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
-        val matchId = updatedGame.matchId
         if (matchRepository.findById(matchId).isPresent) {
-            val updatedGame = gameService.updateGameStatus(gameStatusUpdateJson)
+            val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
             val match = matchRepository.findById(updatedGame.matchId).get()
             if (match.mode != MatchModeEnum.AUTO && match.games.first().id == updatedGame.id) {
                 simpMessagingTemplate.convertAndSend(
@@ -684,7 +682,7 @@ class MatchService(
                 }
             }
         } else if (dailyChallengeMatchRepository.findById(matchId).isPresent) {
-            val updatedGame = gameService.updateGameStatus(gameStatusUpdateJson)
+            val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
             val match = dailyChallengeMatchRepository.findById(matchId).get()
             simpMessagingTemplate.convertAndSend(
                 "/updates/${match.user.userId}",
@@ -781,6 +779,7 @@ class MatchService(
             }
         }
         else if(codeTutorialMatchRepository.findById(matchId).isPresent) {
+            val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
             val match = codeTutorialMatchRepository.findById(matchId).get()
             simpMessagingTemplate.convertAndSend(
                     "/updates/${match.user.userId}",

@@ -87,7 +87,7 @@ class TestAttributes {
                 score = 0.0,
                 dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
                 tutorialLevel = 1,
-                pvpRating = 1000.0
+                pvpRating = 1000.0,
                 codeTutorialLevel = 1,
             )
 
