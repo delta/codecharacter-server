@@ -11,5 +11,4 @@ interface MatchRepository : MongoRepository<MatchEntity, UUID> {
     fun findTop10ByOrderByTotalPointsDesc(): List<MatchEntity>
     fun findByPlayer1OrderByCreatedAtDesc(player1: PublicUserEntity, pageRequest: PageRequest): List<MatchEntity>
     fun findByIdIn(matchIds: List<UUID>): List<MatchEntity>
-    fun countByPlayer1(player1: PublicUserEntity): Long
 }

@@ -13,6 +13,7 @@ import delta.codecharacter.dtos.PvPUserStatsDto
 import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.match.MatchVerdictEnum
+import delta.codecharacter.server.user.rating_history.RatingType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,6 +29,7 @@ import java.util.UUID
 class PublicUserService(@Autowired private val publicUserRepository: PublicUserRepository) {
 
     @Value("\${environment.no-of-tutorial-level}") private lateinit var totalTutorialLevels: Number
+    @Value("\${environment.total-no-of-code-tutorial-levels}") private var totalCodeTutorialLevels: Int = 4
     @Value("\${environment.no-of-tier-1-players}") private var tier1Players: Number = 1
     @Value("\${environment.no-of-players-for-promotion}") private var topPlayer: Number = 1
     private val logger: Logger = LoggerFactory.getLogger(PublicUserService::class.java)
@@ -52,13 +54,17 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 wins = 0,
                 losses = 0,
                 ties = 0,
+                pvPWins = 0,
+                pvPLosses = 0,
+                pvPTies = 0,
                 score = 0.0,
-                // tier = TierTypeDto.TIER_PRACTICE, TODO: Automatically assign tier2 to players
+                // tier = TierTypeDto.TIER_PRACTICE, //TODO: Automatically assign tier2 to players
                 // registering after practice phase
                 tier = TierTypeDto.TIER2,
                 tutorialLevel = 1,
                 dailyChallengeHistory = HashMap(),
-                pvpRating = 1500.0
+                pvpRating = 1500.0,
+                codeTutorialLevel = 1,
             )
         publicUserRepository.save(publicUser)
     }
@@ -187,9 +193,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 stats =
                 PvPUserStatsDto(
                     rating = BigDecimal(it.pvpRating),
-                    wins = it.wins,
-                    losses = it.losses,
-                    ties = it.ties
+                    wins = it.pvPWins,
+                    losses = it.pvPLosses,
+                    ties = it.pvPTies,
                 ),
             )
         }
@@ -205,8 +211,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
             country = user.country,
             college = user.college,
             tutorialLevel = user.tutorialLevel,
+            codeTutorialLevel = user.codeTutorialLevel,
             avatarId = user.avatarId,
-            isTutorialComplete = user.tutorialLevel == totalTutorialLevels.toInt()
+            isTutorialComplete = user.tutorialLevel == totalTutorialLevels.toInt(),
         )
     }
 
@@ -249,6 +256,14 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
             )
         publicUserRepository.save(updatedUser)
     }
+    fun updateUserCodeTutorialLevel(userId: UUID, updateCodeTutorial: Boolean?) {
+        val user = publicUserRepository.findById(userId).get()
+        val updatedUser =
+                user.copy(
+                        codeTutorialLevel = updateCodeTutorialLevel(user.userId, updateCodeTutorial)
+                )
+        publicUserRepository.save(updatedUser)
+    }
 
     fun updateTutorialLevel(updateTutorialType: TutorialUpdateTypeDto?, tutorialLevel: Int): Int {
         var updatedTutorialLevel = tutorialLevel
@@ -282,26 +297,25 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         userId: UUID,
         isInitiator: Boolean,
         verdict: MatchVerdictEnum,
-        newRating: Double
+        newRating: Double,
     ) {
         val user = publicUserRepository.findById(userId).get()
-        val updatedUser =
-            user.copy(
-                rating = newRating,
-                wins =
-                if ((isInitiator && verdict == MatchVerdictEnum.PLAYER1) ||
-                    (!isInitiator && verdict == MatchVerdictEnum.PLAYER2)
-                )
-                    user.wins + 1
-                else user.wins,
-                losses =
-                if ((isInitiator && verdict == MatchVerdictEnum.PLAYER2) ||
-                    (!isInitiator && verdict == MatchVerdictEnum.PLAYER1)
-                )
-                    user.losses + 1
-                else user.losses,
-                ties = if (verdict == MatchVerdictEnum.TIE) user.ties + 1 else user.ties
+        val updatedUser = user.copy(
+            rating = newRating,
+            wins =
+            if ((isInitiator && verdict == MatchVerdictEnum.PLAYER1) ||
+                (!isInitiator && verdict == MatchVerdictEnum.PLAYER2)
             )
+                user.wins + 1
+            else user.wins,
+            losses =
+            if ((isInitiator && verdict == MatchVerdictEnum.PLAYER2) ||
+                (!isInitiator && verdict == MatchVerdictEnum.PLAYER1)
+            )
+                user.losses + 1
+            else user.losses,
+            ties = if (verdict == MatchVerdictEnum.TIE) user.ties + 1 else user.ties
+        )
         publicUserRepository.save(updatedUser)
     }
 
@@ -315,19 +329,19 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         val updatedUser =
                 publicUser.copy(
                     pvpRating = newRating,
-                    wins =
+                    pvPWins =
                     if ((isInitiator && verdict == MatchVerdictEnum.PLAYER1) ||
                             (!isInitiator && verdict == MatchVerdictEnum.PLAYER2)
                     )
-                        publicUser.wins + 1
-                    else publicUser.wins,
-                    losses =
+                        publicUser.pvPWins + 1
+                    else publicUser.pvPWins,
+                    pvPLosses =
                     if ((isInitiator && verdict == MatchVerdictEnum.PLAYER2) ||
                             (!isInitiator && verdict == MatchVerdictEnum.PLAYER1)
                     )
-                        publicUser.losses + 1
-                    else publicUser.losses,
-                    ties = if (verdict == MatchVerdictEnum.TIE) publicUser.ties + 1 else publicUser.ties
+                        publicUser.pvPLosses + 1
+                    else publicUser.pvPLosses,
+                    pvPTies = if (verdict == MatchVerdictEnum.TIE) publicUser.pvPTies + 1 else publicUser.pvPTies
                 )
         publicUserRepository.save(updatedUser)
     }
@@ -376,6 +390,20 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         current[dailyChallenge.day] = DailyChallengeHistory(score, dailyChallenge)
         val updatedUser = user.copy(score = user.score + score, dailyChallengeHistory = current)
         publicUserRepository.save(updatedUser)
+    }
+
+    fun updateCodeTutorialLevel(userId: UUID, updateCodeTutorial: Boolean?): Int {
+        val user = publicUserRepository.findById(userId).get()
+        var currentCodeTutorialLevel = user.codeTutorialLevel
+        return if(updateCodeTutorial == true)
+        {
+            if(currentCodeTutorialLevel >= totalCodeTutorialLevels)
+                totalCodeTutorialLevels
+            else
+                ++currentCodeTutorialLevel
+        }
+        else
+            currentCodeTutorialLevel
     }
 
     fun getTopNUsers(): List<PublicUserEntity> {

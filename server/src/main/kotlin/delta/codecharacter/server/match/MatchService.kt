@@ -7,6 +7,10 @@ import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
+import delta.codecharacter.server.code_tutorial.CodeTutorialService
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchEntity
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchRepository
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchVerdictEnum
 import delta.codecharacter.server.daily_challenge.DailyChallengeService
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchEntity
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchRepository
@@ -27,6 +31,7 @@ import delta.codecharacter.server.pvp_game.PvPGameRepository
 import delta.codecharacter.server.pvp_game.PvPGameService
 import delta.codecharacter.server.pvp_game.PvPGameStatusEnum
 import delta.codecharacter.server.user.public_user.PublicUserEntity
+import delta.codecharacter.server.stats.StatsService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import delta.codecharacter.server.user.rating_history.RatingType
@@ -66,9 +71,12 @@ class MatchService(
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
     @Autowired private val mapValidator: MapValidator,
     @Autowired private val autoMatchRepository: AutoMatchRepository,
+    @Autowired private val statsService : StatsService,
     @Autowired private val pvPMatchRepository: PvPMatchRepository,
     @Autowired private val gameRepository: GameRepository,
     @Autowired private val pvPGameRepository: PvPGameRepository,
+    @Autowired private val codeTutorialService: CodeTutorialService,
+    @Autowired private val codeTutorialMatchRepository: CodeTutorialMatchRepository,
 ) {
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
     private val logger: Logger = LoggerFactory.getLogger(MatchService::class.java)
@@ -273,6 +281,46 @@ class MatchService(
                 game = game
             )
         dailyChallengeMatchRepository.save(match)
+        gameService.sendGameRequest(game, code, language, map)
+    }
+    fun createTutorialMatch(userId: UUID, codeTutorialMatchRequestDto: CodeTutorialMatchRequestDto) {
+        val tutorial = codeTutorialService.getTutorialByNumberForUser(userId, codeTutorialMatchRequestDto.codeTutorialNumber).tutorialCodes
+        val tutType = codeTutorialService.getTutorialByNumberForUser(userId, codeTutorialMatchRequestDto.codeTutorialNumber).tutorialType
+        val ct = codeTutorialService.getTutorialByNumber(codeTutorialMatchRequestDto.codeTutorialNumber)
+        val value = codeTutorialMatchRequestDto.value
+        val language: LanguageEnum
+        val map: String
+        val code: String
+        when (tutType) {
+            ChallengeTypeDto.CODE -> {
+                mapValidator.validateMap(value)
+                code = tutorial.cpp.toString()
+                language = LanguageEnum.CPP
+                map = value
+            }
+            ChallengeTypeDto.MAP -> {
+                map = ct.map
+                language = LanguageEnum.valueOf(codeTutorialMatchRequestDto.language.toString())
+                code = value
+            }
+
+            null -> {
+                throw CustomException(HttpStatus.BAD_REQUEST, "Invalid tutorial type")
+            }
+        }
+        val matchId = UUID.randomUUID()
+        val game = gameService.createGame(matchId)
+        val user = publicUserService.getPublicUser(userId)
+        val match =
+                CodeTutorialMatchEntity(
+                        id = matchId,
+                        createdAt = Instant.now(),
+                        user = user,
+                        game = game,
+                        verdict = CodeTutorialMatchVerdictEnum.STARTED,
+                        number = codeTutorialMatchRequestDto.codeTutorialNumber
+                )
+        codeTutorialMatchRepository.save(match)
         gameService.sendGameRequest(game, code, language, map)
     }
     fun createMatch(userId: UUID, createMatchRequestDto: CreateMatchRequestDto) {
@@ -491,7 +539,7 @@ class MatchService(
         }
 
         if (matchRepository.findById(matchId).isPresent) {
-            val updatedGame = gameService.updateGameStatus(gameStatusUpdateJson)
+            val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
             val match = matchRepository.findById(updatedGame.matchId).get()
             if (match.mode != MatchModeEnum.AUTO && match.games.first().id == updatedGame.id) {
                 simpMessagingTemplate.convertAndSend(
@@ -553,13 +601,27 @@ class MatchService(
                             userId = match.player1.userId,
                             isInitiator = true,
                             verdict = verdict,
-                            newRating = newUserRating
+                            newRating = newUserRating,
                         )
                         publicUserService.updatePublicRating(
                             userId = match.player2.userId,
                             isInitiator = false,
                             verdict = verdict,
-                            newRating = newOpponentRating
+                            newRating = newOpponentRating,
+                        )
+                        statsService.updateStats(
+                            userId = match.player1.userId,
+                            verdict = null,
+                            atkDmg = player1Game.destruction,
+                            dcAttempts = 0,
+                            coins = player1Game.coinsUsed,
+                        )
+                        statsService.updateStats(
+                            userId = match.player2.userId,
+                            verdict = null,
+                            atkDmg = player2Game.destruction,
+                            dcAttempts = 0,
+                            coins = player2Game.coinsUsed,
                         )
                     }
                     notificationService.sendNotification(
@@ -620,7 +682,7 @@ class MatchService(
                 }
             }
         } else if (dailyChallengeMatchRepository.findById(matchId).isPresent) {
-            val updatedGame = gameService.updateGameStatus(gameStatusUpdateJson)
+            val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
             val match = dailyChallengeMatchRepository.findById(matchId).get()
             simpMessagingTemplate.convertAndSend(
                 "/updates/${match.user.userId}",
@@ -634,11 +696,18 @@ class MatchService(
                 )
             )
             if (updatedGame.status != GameStatusEnum.EXECUTING) {
+               val verdict = dailyChallengeService.completeDailyChallenge(updatedGame, match.user.userId)
                 val updatedMatch =
                     match.copy(
-                        verdict =
-                        dailyChallengeService.completeDailyChallenge(updatedGame, match.user.userId)
+                        verdict = verdict
                     )
+                statsService.updateStats(
+                    userId = match.user.userId,
+                    verdict = verdict,
+                    atkDmg = 0.0,
+                    dcAttempts = 1,
+                    coins = updatedGame.coinsUsed
+                )
                 notificationService.sendNotification(
                     match.user.userId,
                     title = "Daily Challenge Results",
@@ -707,6 +776,42 @@ class MatchService(
                         }
                     } against ${match.player2.username}",
                 )
+            }
+        }
+        else if(codeTutorialMatchRepository.findById(matchId).isPresent) {
+            val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
+            val match = codeTutorialMatchRepository.findById(matchId).get()
+            simpMessagingTemplate.convertAndSend(
+                    "/updates/${match.user.userId}",
+                    mapper.writeValueAsString(
+                            TutorialGameDto(
+                                    id = updatedGame.id,
+                                    destruction = BigDecimal(updatedGame.destruction),
+                                    coinsUsed = updatedGame.coinsUsed,
+                                    status = GameStatusDto.valueOf(updatedGame.status.name),
+                                    logs = gameStatusUpdateEntity.gameResult?.log
+                            )
+                    )
+            )
+            if (updatedGame.status != GameStatusEnum.EXECUTING) {
+                val updatedMatch =
+                        match.copy(
+                                verdict =
+                                codeTutorialService.completeCodeTutorial(updatedGame, match.user.userId, match.number)
+                        )
+                notificationService.sendNotification(
+                        match.user.userId,
+                        title = "Tutorial Results",
+                        content =
+                        when (updatedMatch.verdict) {
+                            CodeTutorialMatchVerdictEnum.SUCCESS -> "Successfully completed tutorial"
+                            CodeTutorialMatchVerdictEnum.FAILURE -> "Failed to complete tutorial"
+                            else -> {
+                                "Some error occurred. Try again!"
+                            }
+                        }
+                )
+                codeTutorialMatchRepository.delete(match)
             }
         }
     }

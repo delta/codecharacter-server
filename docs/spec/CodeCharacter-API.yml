@@ -699,6 +699,7 @@ paths:
                     college: NITT
                     avatarId: 1
                     tutorialLevel: 2
+                    codeTutorialLevel: 3
                     tier: TIER1
                     isProfileComplete: true
                     isTutorialComplete: true
@@ -1099,7 +1100,7 @@ paths:
       responses:
         200:
           description: OK
-          headers: { }
+          headers: {}
           content:
             application/json:
               schema:
@@ -1493,7 +1494,7 @@ paths:
           description: Created
         '400':
           description: Bad Request
-          headers: { }
+          headers: {}
           content:
             application/json:
               schema:
@@ -1513,11 +1514,11 @@ paths:
             examples:
               CodeExample:
                 value:
-                  value : "#include<iostream>"
+                  value: '#include<iostream>'
                   language: CPP
               MapExample:
                 value:
-                  value: "[[0,0,0]]"
+                  value: '[[0,0,0]]'
       tags:
         - Daily Challenges
   /dc/matches:
@@ -1570,8 +1571,113 @@ paths:
           description: Size of the page
     parameters: []
 
+  '/stats/':
+    get:
+      summary: Get all General Stats for current user and top user
+      tags:
+        - stats
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserMatchStats'
+      operationId: getStats
+      description: Gets all statistics for the current user
+    parameters: []
+
+
+  '/codetutorial/get/{codeTutorialNumber}':
+    get:
+      summary: Get tutorial by number
+      description: Get a single tutorial
+      operationId: getCodeTutorialByNumber
+      parameters:
+        - name: codeTutorialNumber
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TutorialsGetRequest'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not found
+      tags:
+        - Tutorials
+
+  /codetutorial/submit:
+    post:
+      summary: Match Execution for Tutorials
+      description: Match making for Tutorials
+      operationId: createCodeTutorialMatch
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          headers: { }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericError'
+              examples:
+                Example:
+                  value:
+                    message: Some field missing
+        '401':
+          description: Unauthorized
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeTutorialMatchRequest'
+            examples:
+              CodeExample:
+                value:
+                  value : "#include<iostream>"
+                  language: CPP
+                  codeTutorialNumber: 2
+              MapExample:
+                value:
+                  value: "[[0,0,0]]"
+                  codeTutorialNumber: 6
+      tags:
+        - Tutorials
+
+
 components:
   schemas:
+    UserMatchStats:
+      title: UserMatchStats
+      type: object
+      description: User Match Stats model
+      properties:
+        avgAtk:
+          type: number
+          default: 0
+        dc_wins:
+          type: number
+          default: 0
+        coins:
+          type: number
+          default: 0
+      required:
+        - avgAtk
+        - dc_wins
+        - coins
     PasswordLoginRequest:
       title: PasswordLoginRequest
       type: object
@@ -2024,6 +2130,9 @@ components:
         tutorialLevel:
           type: integer
           example: 1
+        codeTutorialLevel:
+          type: integer
+          example: 3
         tier:
           $ref: '#/components/schemas/TierType'
         isProfileComplete:
@@ -2041,6 +2150,7 @@ components:
         - college
         - avatarId
         - tutorialLevel
+        - codeTutorialLevel
         - isProfileComplete
         - isTutorialComplete
     UpdateCurrentUserProfile:
@@ -2260,6 +2370,29 @@ components:
         - destruction
         - coinsUsed
         - status
+    TutorialGame:
+      title: Game
+      type: object
+      description: Game model
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        destruction:
+          type: number
+          example: 100
+        coinsUsed:
+          type: integer
+        logs:
+          type: string
+        status:
+          $ref: '#/components/schemas/GameStatus'
+      required:
+        - id
+        - destruction
+        - coinsUsed
+        - status
     GameLog:
       type: string
       description: Game log model
@@ -2315,6 +2448,46 @@ components:
       required:
         - user
         - stats
+    TutorialsGetRequest:
+      title: Get tutorials
+      description: Get the game tutorials
+      type: object
+      properties:
+        tutorialId:
+          type: integer
+          example: 1
+        tutorialName:
+          type: string
+          example: Tutorial for Spawning attacker
+        tutorialType:
+          $ref: '#/components/schemas/ChallengeType'
+        description:
+          type: string
+          example: Brief description of how the code works
+        tutorialCodes:
+          $ref: '#/components/schemas/TutorialCodeObject'
+      required:
+        - tutorialId
+        - tutorialName
+        - tutorialCodes
+
+    TutorialCodeObject:
+      title: Tutorial Code Object
+      description: The object containing the code for the tutorial
+      type: object
+      properties:
+        cpp:
+          type: string
+          example: This would have the cpp code for the tutorial
+        java:
+          type: string
+          example: This would have the java code for the tutorial
+        python:
+          type: string
+          example: This would have the python code for the tutorial
+        image:
+          type: string
+
 
     DailyChallengeGetRequest:
       title: Get daily challenge
@@ -2376,11 +2549,27 @@ components:
       properties:
         value:
           type: string
-          example: "#include<iostream>"
+          example: '#include<iostream>'
         language:
           $ref: '#/components/schemas/Language'
       required:
         - value
+    CodeTutorialMatchRequest:
+      title: CodeTutorialMatchRequest
+      description: Request Model for the tutorial mode
+      type: object
+      properties:
+        value:
+          type: string
+          example: "#include<iostream>"
+        language:
+          $ref: '#/components/schemas/Language'
+        codeTutorialNumber:
+          type: integer
+          nullable: false
+      required:
+        - value
+        - codeTutorialNumber
     GenericError:
       title: GenericError
       type: object
@@ -2554,3 +2743,4 @@ tags:
   - name: match
   - name: notification
   - name: user
+  - name: stats
