@@ -3,11 +3,13 @@ package delta.codecharacter.server.stats
 import delta.codecharacter.dtos.UserMatchStatsInnerDto
 import delta.codecharacter.server.daily_challenge.DailyChallengeService
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchVerdictEnum
+import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.public_user.PublicUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Duration
@@ -79,7 +81,9 @@ class StatsService(@Autowired private val statsRepository:StatsRepository,
                 Sort.by(Sort.Order.desc("rating"), Sort.Order.desc("wins"), Sort.Order.asc("username"))
             )
         val topUserUUID = publicUserRepository.findAll(pageRequest).get().findFirst().get().userId
-        val topUser =  statsRepository.findById(topUserUUID).get()
+        val topUser =  statsRepository.findById(topUserUUID).orElseThrow {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Stats dont exist")
+        }
         var lTop = convertToDTO(topUser)
         val userExists =  statsRepository.existsById(userId)
         if(!userExists || (userId == topUserUUID)){

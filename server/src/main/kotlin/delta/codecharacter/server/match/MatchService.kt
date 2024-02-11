@@ -601,13 +601,13 @@ class MatchService(
                             userId = match.player1.userId,
                             isInitiator = true,
                             verdict = verdict,
-                            newRating = newUserRating
+                            newRating = newUserRating,
                         )
                         publicUserService.updatePublicRating(
                             userId = match.player2.userId,
                             isInitiator = false,
                             verdict = verdict,
-                            newRating = newOpponentRating
+                            newRating = newOpponentRating,
                         )
                         statsService.updateStats(
                             userId = match.player1.userId,

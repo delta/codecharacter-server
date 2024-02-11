@@ -13,6 +13,7 @@ import delta.codecharacter.dtos.PvPUserStatsDto
 import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.match.MatchVerdictEnum
+import delta.codecharacter.server.user.rating_history.RatingType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,8 +54,11 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 wins = 0,
                 losses = 0,
                 ties = 0,
+                pvPWins = 0,
+                pvPLosses = 0,
+                pvPTies = 0,
                 score = 0.0,
-                // tier = TierTypeDto.TIER_PRACTICE, TODO: Automatically assign tier2 to players
+                // tier = TierTypeDto.TIER_PRACTICE, //TODO: Automatically assign tier2 to players
                 // registering after practice phase
                 tier = TierTypeDto.TIER2,
                 tutorialLevel = 1,
@@ -189,9 +193,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 stats =
                 PvPUserStatsDto(
                     rating = BigDecimal(it.pvpRating),
-                    wins = it.wins,
-                    losses = it.losses,
-                    ties = it.ties
+                    wins = it.pvPWins,
+                    losses = it.pvPLosses,
+                    ties = it.pvPTies,
                 ),
             )
         }
@@ -293,26 +297,25 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         userId: UUID,
         isInitiator: Boolean,
         verdict: MatchVerdictEnum,
-        newRating: Double
+        newRating: Double,
     ) {
         val user = publicUserRepository.findById(userId).get()
-        val updatedUser =
-            user.copy(
-                rating = newRating,
-                wins =
-                if ((isInitiator && verdict == MatchVerdictEnum.PLAYER1) ||
-                    (!isInitiator && verdict == MatchVerdictEnum.PLAYER2)
-                )
-                    user.wins + 1
-                else user.wins,
-                losses =
-                if ((isInitiator && verdict == MatchVerdictEnum.PLAYER2) ||
-                    (!isInitiator && verdict == MatchVerdictEnum.PLAYER1)
-                )
-                    user.losses + 1
-                else user.losses,
-                ties = if (verdict == MatchVerdictEnum.TIE) user.ties + 1 else user.ties
+        val updatedUser = user.copy(
+            rating = newRating,
+            wins =
+            if ((isInitiator && verdict == MatchVerdictEnum.PLAYER1) ||
+                (!isInitiator && verdict == MatchVerdictEnum.PLAYER2)
             )
+                user.wins + 1
+            else user.wins,
+            losses =
+            if ((isInitiator && verdict == MatchVerdictEnum.PLAYER2) ||
+                (!isInitiator && verdict == MatchVerdictEnum.PLAYER1)
+            )
+                user.losses + 1
+            else user.losses,
+            ties = if (verdict == MatchVerdictEnum.TIE) user.ties + 1 else user.ties
+        )
         publicUserRepository.save(updatedUser)
     }
 
@@ -326,19 +329,19 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         val updatedUser =
                 publicUser.copy(
                     pvpRating = newRating,
-                    wins =
+                    pvPWins =
                     if ((isInitiator && verdict == MatchVerdictEnum.PLAYER1) ||
                             (!isInitiator && verdict == MatchVerdictEnum.PLAYER2)
                     )
-                        publicUser.wins + 1
-                    else publicUser.wins,
-                    losses =
+                        publicUser.pvPWins + 1
+                    else publicUser.pvPWins,
+                    pvPLosses =
                     if ((isInitiator && verdict == MatchVerdictEnum.PLAYER2) ||
                             (!isInitiator && verdict == MatchVerdictEnum.PLAYER1)
                     )
-                        publicUser.losses + 1
-                    else publicUser.losses,
-                    ties = if (verdict == MatchVerdictEnum.TIE) publicUser.ties + 1 else publicUser.ties
+                        publicUser.pvPLosses + 1
+                    else publicUser.pvPLosses,
+                    pvPTies = if (verdict == MatchVerdictEnum.TIE) publicUser.pvPTies + 1 else publicUser.pvPTies
                 )
         publicUserRepository.save(updatedUser)
     }

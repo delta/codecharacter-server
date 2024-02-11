@@ -41,6 +41,9 @@ internal class LeaderboardTest {
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
             pvpRating = 2000.0,
+            pvPWins = 0,
+            pvPLosses = 0,
+            pvPTies = 0,
         )
     private var user2 =
         PublicUserEntity(
@@ -62,6 +65,9 @@ internal class LeaderboardTest {
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
             pvpRating = 1800.0,
+            pvPTies = 0,
+            pvPWins = 0,
+            pvPLosses = 0,
         )
     private var user3 =
         PublicUserEntity(
@@ -83,6 +89,9 @@ internal class LeaderboardTest {
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
             pvpRating = 1600.0,
+            pvPTies = 0,
+            pvPWins = 0,
+            pvPLosses = 0,
         )
     private var user4 =
         PublicUserEntity(
@@ -103,7 +112,10 @@ internal class LeaderboardTest {
             score = 0.0,
             dailyChallengeHistory =
             hashMapOf(0 to DailyChallengeHistory(0.0, TestAttributes.dailyChallengeCode)),
-            pvpRating = 1500.0
+            pvpRating = 1500.0,
+            pvPLosses = 0,
+            pvPTies = 0,
+            pvPWins = 0,
         )
 
     @BeforeEach

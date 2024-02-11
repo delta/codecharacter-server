@@ -22,6 +22,9 @@ data class PublicUserEntity(
     val wins: Int,
     val losses: Int,
     val ties: Int,
+    val pvPWins: Int,
+    val pvPLosses: Int,
+    val pvPTies: Int,
     val isActivated: Boolean = true,
     val score: Double,
     val dailyChallengeHistory: HashMap<Int, DailyChallengeHistory>
