@@ -84,12 +84,32 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         logger.info("Leaderboard tier set during the start of game phase")
     }
 
+    fun updatePvPLeaderboardAfterPracticePhase() {
+        val publicUsers = publicUserRepository.findAll()
+        publicUsers.forEachIndexed { index, user ->
+            if (index < tier1Players.toInt()) {
+                publicUserRepository.save(user.copy(pvPTier = TierTypeDto.TIER1))
+            } else {
+                publicUserRepository.save(user.copy(pvPTier = TierTypeDto.TIER2))
+            }
+        }
+        logger.info("PvP Leaderboard tier set during the start of game phase")
+    }
+
     fun resetRatingsAfterPracticePhase() {
         val users = publicUserRepository.findAll()
         users.forEach { user ->
             publicUserRepository.save(user.copy(rating = 1500.0, wins = 0, ties = 0, losses = 0))
         }
         logger.info("Ratings reset after practice phase done")
+    }
+
+    fun resetPvPRatingsAfterPracticePhase() {
+        val users = publicUserRepository.findAll()
+        users.forEach { user ->
+            publicUserRepository.save(user.copy(pvpRating = 1500.0, pvPWins = 0, pvPTies = 0, pvPLosses = 0))
+        }
+        logger.info("PvP Ratings reset after practice phase done")
     }
 
     fun promoteTiers() {

@@ -31,6 +31,7 @@ class SchedulingService(
     fun updateTempLeaderboard() {
         logger.info("Practice phase ended!!")
         publicUserService.resetRatingsAfterPracticePhase()
+        publicUserService.resetPvPRatingsAfterPracticePhase()
         codeRevisionService.resetCodeRevisionAfterPracticePhase()
         latestCodeService.resetLatestCodeAfterPracticePhase()
         lockedCodeService.resetLockedCodeAfterPracticePhase()
@@ -38,6 +39,7 @@ class SchedulingService(
         lockedMapService.resetLockedMapAfterPracticePhase()
         mapRevisionService.resetMapRevisionAfterPracticePhase()
         publicUserService.updateLeaderboardAfterPracticePhase()
+        publicUserService.updatePvPLeaderboardAfterPracticePhase()
     }
 
 

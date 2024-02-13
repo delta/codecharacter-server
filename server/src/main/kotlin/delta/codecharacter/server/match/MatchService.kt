@@ -131,8 +131,6 @@ class MatchService(
         if (codeRevisionId1==codeRevisionId2) {
             throw CustomException(HttpStatus.BAD_REQUEST, "Codes must be different")
         }
-        println(codeRevisionId1)
-        println(codeRevisionId2)
         val (code1, language1) = getCodeFromRevision(userId, codeRevisionId1, CodeTypeDto.PVP)
         val (code2, language2) = getCodeFromRevision(userId, codeRevisionId2, CodeTypeDto.PVP)
         val matchId = UUID.randomUUID()
@@ -334,7 +332,6 @@ class MatchService(
         gameService.sendGameRequest(game, code, language, map)
     }
     fun createMatch(userId: UUID, createMatchRequestDto: CreateMatchRequestDto) {
-        println(createMatchRequestDto)
         when (createMatchRequestDto.mode) {
             MatchModeDto.SELF -> {
                 val (_, _, mapRevisionId, codeRevisionId, _) = createMatchRequestDto
@@ -833,15 +830,11 @@ class MatchService(
 
                 pvPMatchRepository.save(finishedMatch)
 
-                println(match.mode)
-
                 if (match.mode == MatchModeEnum.AUTOPVP) {
-                    println("not come")
                     if (pvPAutoMatchRepository.findAll().all { autoMatch ->
                             val status = pvPMatchRepository.findById(autoMatch.matchId).get().game.status
                             status == PvPGameStatusEnum.EXECUTED || status == PvPGameStatusEnum.EXECUTE_ERROR
                     }) {
-                        println("It came here")
                         val matches =
                             pvPMatchRepository.findByIdIn(pvPAutoMatchRepository.findAll().map { it.matchId })
                         val userIds =
@@ -857,8 +850,6 @@ class MatchService(
                         val newRatings =
                             ratingHistoryService.updateAndGetPvPAutoMatchRatings(userIds.toList(), matches)
                         newRatings.forEach { (userId, newRating) ->
-                            println(userId)
-                            println(newRating)
                             publicUserService.updateAutoMatchPvPRating(userId = userId, newRating = newRating.rating)
                         }
                         logger.info("PvP LeaderBoard Tier Promotion and Demotion started")
