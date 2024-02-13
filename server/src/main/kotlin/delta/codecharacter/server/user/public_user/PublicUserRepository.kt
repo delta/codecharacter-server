@@ -12,4 +12,8 @@ interface PublicUserRepository : MongoRepository<PublicUserEntity, UUID> {
     fun findAllByTier(tier: TierTypeDto?, pageRequest: PageRequest): List<PublicUserEntity>
 
     fun findAllByTier(tier: TierTypeDto?): List<PublicUserEntity>
+
+    fun findAllByPvPTier(pvPTier: TierTypeDto?, pageRequest: PageRequest): List<PublicUserEntity>
+
+    fun findAllByPvPTier(pvPTier: TierTypeDto?): List<PublicUserEntity>
 }

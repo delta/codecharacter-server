@@ -1661,23 +1661,31 @@ paths:
 components:
   schemas:
     UserMatchStats:
-      title: UserMatchStats
+      title: UserMatchStat
+      type: array
+      description: User Match Stats array model
+      items:
+        anyOf:
+          - $ref: '#/components/schemas/UserMatchStat'
+      required:
+        - stat
+
+    UserMatchStat:
+      title: UserMatchStat
       type: object
-      description: User Match Stats model
+      description: User Match Stat model
       properties:
         avgAtk:
           type: number
-          default: 0
         dc_wins:
           type: number
-          default: 0
         coins:
           type: number
-          default: 0
       required:
         - avgAtk
         - dc_wins
         - coins
+
     PasswordLoginRequest:
       title: PasswordLoginRequest
       type: object
@@ -2599,6 +2607,7 @@ components:
         - DAILYCHALLENGE
         - PVP
         - SELFPVP
+        - AUTOPVP
       description: Match Mode
     Verdict:
       type: string

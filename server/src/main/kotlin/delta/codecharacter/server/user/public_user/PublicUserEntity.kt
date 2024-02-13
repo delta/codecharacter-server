@@ -15,6 +15,7 @@ data class PublicUserEntity(
     val college: String,
     val avatarId: Int,
     val tier: TierTypeDto,
+    val pvPTier: TierTypeDto,
     val tutorialLevel: Int,
     val codeTutorialLevel: Int,
     val rating: Double,

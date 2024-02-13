@@ -5,6 +5,7 @@ import delta.codecharacter.server.logic.rating.GlickoRating
 import delta.codecharacter.server.logic.rating.RatingAlgorithm
 import delta.codecharacter.server.match.MatchEntity
 import delta.codecharacter.server.match.MatchVerdictEnum
+import delta.codecharacter.server.match.PvPMatchEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -144,6 +145,49 @@ class RatingHistoryService(
             verdicts
         )
     }
+
+    private fun getNewRatingAfterPvPAutoMatches(
+        userId: UUID,
+        userRatings: Map<UUID, RatingHistoryEntity>,
+        pvPAutoMatches: List<PvPMatchEntity>
+    ): GlickoRating {
+        val userAsPlayer1Matches = pvPAutoMatches.filter { it.player1.userId == userId }
+        val userAsPlayer2Matches = pvPAutoMatches.filter { it.player2.userId == userId }
+
+        val usersWeightedRatingDeviations =
+            userRatings
+                .map {
+                    it.key to
+                        ratingAlgorithm.getWeightedRatingDeviationSinceLastCompetition(
+                            it.value.ratingDeviation, it.value.validFrom
+                        )
+                }
+                .toMap()
+
+        val ratingsForUserAsPlayer1 =
+            userAsPlayer1Matches.map { match ->
+                GlickoRating(match.player2.pvpRating, usersWeightedRatingDeviations[match.player2.userId]!!)
+            }
+        val verdictsForUserAsPlayer1 =
+            userAsPlayer1Matches.map { match -> convertVerdictToMatchResult(match.verdict) }
+
+        val ratingsForUserAsPlayer2 =
+            userAsPlayer2Matches.map { match ->
+                GlickoRating(match.player1.pvpRating, usersWeightedRatingDeviations[match.player1.userId]!!)
+            }
+        val verdictsForUserAsPlayer2 =
+            userAsPlayer2Matches.map { match -> 1.0 - convertVerdictToMatchResult(match.verdict) }
+
+        val ratings = ratingsForUserAsPlayer1 + ratingsForUserAsPlayer2
+        val verdicts = verdictsForUserAsPlayer1 + verdictsForUserAsPlayer2
+
+        return ratingAlgorithm.calculateNewRating(
+            GlickoRating(userRatings[userId]!!.rating, usersWeightedRatingDeviations[userId]!!),
+            ratings,
+            verdicts
+        )
+    }
+
     fun updateTotalWinsTiesLosses(
         userIds: List<UUID>,
         matches: List<MatchEntity>
@@ -169,6 +213,33 @@ class RatingHistoryService(
         }
         return Triple(userIdWinMap.toMap(), userIdLossMap.toMap(), userIdTieMap.toMap())
     }
+
+    fun updateTotalWinsTiesLossesPvP(
+        userIds: List<UUID>,
+        matches: List<PvPMatchEntity>
+    ): Triple<Map<UUID, Int>, Map<UUID, Int>, Map<UUID, Int>> {
+        val userIdWinMap = userIds.associateWith { 0 }.toMutableMap()
+        val userIdLossMap = userIds.associateWith { 0 }.toMutableMap()
+        val userIdTieMap = userIds.associateWith { 0 }.toMutableMap()
+        matches.forEach { match ->
+            when (match.verdict) {
+                MatchVerdictEnum.PLAYER1 -> {
+                    userIdWinMap[match.player1.userId] = userIdWinMap[match.player1.userId]!! + 1
+                    userIdLossMap[match.player2.userId] = userIdLossMap[match.player2.userId]!! + 1
+                }
+                MatchVerdictEnum.PLAYER2 -> {
+                    userIdWinMap[match.player2.userId] = userIdWinMap[match.player2.userId]!! + 1
+                    userIdLossMap[match.player1.userId] = userIdLossMap[match.player1.userId]!! + 1
+                }
+                MatchVerdictEnum.TIE -> {
+                    userIdTieMap[match.player1.userId] = userIdTieMap[match.player1.userId]!! + 1
+                    userIdTieMap[match.player2.userId] = userIdTieMap[match.player2.userId]!! + 1
+                }
+            }
+        }
+        return Triple(userIdWinMap.toMap(), userIdLossMap.toMap(), userIdTieMap.toMap())
+    }
+
     fun updateAndGetAutoMatchRatings(
         userIds: List<UUID>,
         matches: List<MatchEntity>
@@ -193,7 +264,33 @@ class RatingHistoryService(
                 )
             )
         }
+        return newRatings
+    }
 
+    fun updateAndGetPvPAutoMatchRatings(
+        userIds: List<UUID>,
+        matches: List<PvPMatchEntity>
+    ): Map<UUID, GlickoRating> {
+        val userRatings =
+            userIds.associateWith { userId ->
+                ratingHistoryRepository.findFirstByUserIdAndRatingTypeOrderByValidFromDesc(userId,RatingType.PVP)
+            }
+        val newRatings =
+            userIds.associateWith { userId ->
+                getNewRatingAfterPvPAutoMatches(userId, userRatings, matches)
+            }
+        val currentInstant = Instant.now()
+        newRatings.forEach { (userId, rating) ->
+            ratingHistoryRepository.save(
+                RatingHistoryEntity(
+                    userId = userId,
+                    rating = rating.rating,
+                    ratingDeviation = rating.ratingDeviation,
+                    validFrom = currentInstant,
+                    ratingType = RatingType.PVP
+                )
+            )
+        }
         return newRatings
     }
 }

@@ -66,6 +66,7 @@ internal class MatchServiceTest {
     private lateinit var mapValidator: MapValidator
     private lateinit var matchService: MatchService
     private lateinit var autoMatchRepository: AutoMatchRepository
+    private lateinit var pvPAutoMatchRepository: PvPAutoMatchRepository
     private lateinit var pvPMatchRepository: PvPMatchRepository
     private lateinit var gameRepository: GameRepository
     private lateinit var pvPGameRepository: PvPGameRepository
@@ -94,6 +95,7 @@ internal class MatchServiceTest {
         simpMessagingTemplate = mockk(relaxed = true)
         mapValidator = mockk(relaxed = true)
         autoMatchRepository = mockk(relaxed = true)
+        pvPAutoMatchRepository = mockk(relaxed = true)
         pvPMatchRepository = mockk(relaxed = true)
         gameRepository = mockk(relaxed = true)
         pvPGameRepository = mockk(relaxed = true)
@@ -120,6 +122,7 @@ internal class MatchServiceTest {
                 simpMessagingTemplate,
                 mapValidator,
                 autoMatchRepository,
+                pvPAutoMatchRepository,
                 statsService,
                 pvPMatchRepository,
                 gameRepository,

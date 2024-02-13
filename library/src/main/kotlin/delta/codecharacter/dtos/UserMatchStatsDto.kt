@@ -12,24 +12,23 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import jakarta.validation.Valid
 import io.swagger.v3.oas.annotations.media.Schema
-import java.math.BigDecimal
 
 /**
- * User Match Stat model
- * @param avgAtk
- * @param dcWins
- * @param coins
+ * User Match Stats model
+ * @param avgAtk 
+ * @param dcWins 
+ * @param coins 
  */
-data class UserMatchStatDto(
+data class UserMatchStatsDto(
 
     @Schema(example = "null", required = true, description = "")
-    @get:JsonProperty("avgAtk", required = true) val avgAtk: java.math.BigDecimal = BigDecimal.ZERO,
+    @get:JsonProperty("avgAtk", required = true) val avgAtk: java.math.BigDecimal,
 
     @Schema(example = "null", required = true, description = "")
-    @get:JsonProperty("dc_wins", required = true) val dcWins: java.math.BigDecimal = BigDecimal.ZERO,
+    @get:JsonProperty("dc_wins", required = true) val dcWins: java.math.BigDecimal,
 
     @Schema(example = "null", required = true, description = "")
-    @get:JsonProperty("coins", required = true) val coins: java.math.BigDecimal = BigDecimal.ZERO
+    @get:JsonProperty("coins", required = true) val coins: java.math.BigDecimal
 ) {
 
 }

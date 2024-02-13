@@ -2,7 +2,6 @@ package delta.codecharacter.server.match
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import delta.codecharacter.dtos.*
-import delta.codecharacter.server.code.Code
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
@@ -71,6 +70,7 @@ class MatchService(
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
     @Autowired private val mapValidator: MapValidator,
     @Autowired private val autoMatchRepository: AutoMatchRepository,
+    @Autowired private val pvPAutoMatchRepository: PvPAutoMatchRepository,
     @Autowired private val statsService : StatsService,
     @Autowired private val pvPMatchRepository: PvPMatchRepository,
     @Autowired private val gameRepository: GameRepository,
@@ -194,7 +194,11 @@ class MatchService(
         return matchId
     }
 
-    private fun createPvPMatch(publicUser: PublicUserEntity, publicOpponent: PublicUserEntity) : UUID {
+    private fun createPvPMatch(
+        publicUser: PublicUserEntity,
+        publicOpponent: PublicUserEntity,
+        mode: MatchModeEnum
+    ) : UUID {
         val userId = publicUser.userId
         val opponentId = publicOpponent.userId
 
@@ -209,7 +213,7 @@ class MatchService(
             PvPMatchEntity(
                 id = matchId,
                 game = game,
-                mode = MatchModeEnum.PVP,
+                mode = mode,
                 verdict = MatchVerdictEnum.TIE,
                 createdAt = Instant.now(),
                 totalPoints = 0,
@@ -219,6 +223,12 @@ class MatchService(
         pvPMatchRepository.save(match)
 
         pvPGameService.sendPvPGameRequest(game, GameCode(userCode, userLanguage), GameCode(opponentCode, opponentLanguage))
+
+        if (mode == MatchModeEnum.AUTOPVP) {
+            logger.info(
+                "Auto match started between ${match.player1.username} and ${match.player2.username}"
+            )
+        }
 
         return matchId
     }
@@ -231,11 +241,11 @@ class MatchService(
             throw CustomException(HttpStatus.BAD_REQUEST, "You cannot play against yourself")
         }
         return when(mode) {
-            MatchModeEnum.MANUAL, MatchModeEnum.AUTO -> {
+            MatchModeEnum.MANUAL, MatchModeEnum.AUTO-> {
                 createNormalMatch(publicUser, publicOpponent, mode)
             }
-            MatchModeEnum.PVP -> {
-                createPvPMatch(publicUser, publicOpponent)
+            MatchModeEnum.PVP, MatchModeEnum.AUTOPVP  -> {
+                createPvPMatch(publicUser, publicOpponent, mode)
             }
             else -> {
                 throw CustomException(HttpStatus.BAD_REQUEST, "MatchMode does not exist")
@@ -334,7 +344,7 @@ class MatchService(
                 val (_, _, _, codeRevisionId1, codeRevisionId2) = createMatchRequestDto
                 createPvPSelfMatch(userId, codeRevisionId1, codeRevisionId2)
             }
-            MatchModeDto.MANUAL, MatchModeDto.AUTO , MatchModeDto.PVP -> {
+            MatchModeDto.MANUAL, MatchModeDto.AUTO , MatchModeDto.PVP, MatchModeDto.AUTOPVP -> {
                 if (createMatchRequestDto.opponentUsername == null) {
                     throw CustomException(HttpStatus.BAD_REQUEST, "Opponent ID is required")
                 }
@@ -358,6 +368,23 @@ class MatchService(
                     val opponentUsername = usernames[j]
                     val matchId = createDualMatch(userId, opponentUsername, MatchModeEnum.AUTO)
                     autoMatchRepository.save(AutoMatchEntity(matchId, 0))
+                }
+            }
+        }
+    }
+
+    fun createPvPAutoMatch() {
+        val topNUsers = publicUserService.getPvPTopNUsers()
+        val userIds = topNUsers.map { it.userId }
+        val usernames = topNUsers.map { it.username }
+        logger.info("PvP Auto matches started for users: $usernames")
+        pvPAutoMatchRepository.deleteAll()
+        userIds.forEachIndexed { i, userId ->
+            run {
+                for (j in i + 1 until userIds.size) {
+                    val opponentUsername = usernames[j]
+                    val pvPMatchId = createDualMatch(userId, opponentUsername, MatchModeEnum.AUTOPVP)
+                    pvPAutoMatchRepository.save(PvPAutoMatchEntity(pvPMatchId, 0))
                 }
             }
         }
@@ -563,6 +590,7 @@ class MatchService(
                 if (match.mode == MatchModeEnum.AUTO) {
                     if (match.games.any { game -> game.status == GameStatusEnum.EXECUTE_ERROR }) {
                         val autoMatch = autoMatchRepository.findById(match.id).get()
+                        // If both games are executed and one of them is execute error, then retry the match
                         if (autoMatch.tries < 2) {
                             autoMatchRepository.delete(autoMatch)
                             val newMatchId =
@@ -655,7 +683,7 @@ class MatchService(
                                 userIds = userIds.toList(), matches = matches
                             )
                         publicUserService.updateAutoMatchWinsLosses(
-                            userIds.toList(), userIdWinMap, userIdLossMap, userIdTieMap
+                            userIds.toList(), userIdWinMap, userIdLossMap, userIdTieMap, MatchModeEnum.AUTO
                         )
                         val newRatings =
                             ratingHistoryService.updateAndGetAutoMatchRatings(userIds.toList(), matches)
@@ -725,7 +753,7 @@ class MatchService(
         } else if(pvPMatchRepository.findById(matchId).isPresent) {
             val updatedGame = pvPGameService.updateGameStatus(gameStatusUpdateJson)
             val match = pvPMatchRepository.findById(updatedGame.matchId).get()
-            if (match.game.matchId == updatedGame.matchId) {
+            if (match.mode != MatchModeEnum.AUTOPVP && match.game.matchId == updatedGame.matchId) {
                 simpMessagingTemplate.convertAndSend(
                     "/updates/${match.player1.userId}",
                     mapper.writeValueAsString(
@@ -738,7 +766,22 @@ class MatchService(
                     )
                 )
             }
-            if (match.game.status == PvPGameStatusEnum.EXECUTED) {
+            if (match.mode != MatchModeEnum.SELFPVP &&
+                (match.game.status == PvPGameStatusEnum.EXECUTED || match.game.status == PvPGameStatusEnum.EXECUTE_ERROR)
+            ) {
+
+                if (match.mode == MatchModeEnum.AUTOPVP) {
+                    if (match.game.status == PvPGameStatusEnum.EXECUTE_ERROR) {
+                        val pvPAutoMatch = pvPAutoMatchRepository.findById(match.id).get()
+                        if (pvPAutoMatch.tries < 2) {
+                            pvPAutoMatchRepository.delete(pvPAutoMatch)
+                            val newMatchId =
+                                createDualMatch(match.player1.userId, match.player2.username, MatchModeEnum.AUTOPVP)
+                            pvPAutoMatchRepository.save(PvPAutoMatchEntity(newMatchId, pvPAutoMatch.tries + 1))
+                            return
+                        }
+                    }
+                }
                 val verdict =
                     verdictAlgorithm.getPvPVerdict(
                         match.game.status == PvPGameStatusEnum.EXECUTE_ERROR,
@@ -750,32 +793,92 @@ class MatchService(
                 val (newUserRating, newOpponentRating) =
                     ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict, ratingType = RatingType.PVP)
 
-                publicUserService.updatePublicPvPRating(
-                    userId = match.player1.userId,
-                    isInitiator = true,
-                    verdict = verdict,
-                    newRating = newUserRating
-                )
 
-                publicUserService.updatePublicPvPRating(
-                    userId = match.player2.userId,
-                    isInitiator = false,
-                    verdict = verdict,
-                    newRating = newOpponentRating
-                )
+                if (match.mode == MatchModeEnum.PVP) {
+                    if ((
+                                match.player1.pvPTier == TierTypeDto.TIER2 &&
+                                        match.player2.pvPTier == TierTypeDto.TIER2
+                                ) ||
+                        (
+                                match.player1.pvPTier == TierTypeDto.TIER_PRACTICE &&
+                                        match.player2.pvPTier == TierTypeDto.TIER_PRACTICE
+                                )
+                    ) {
+                        publicUserService.updatePublicPvPRating(
+                            userId = match.player1.userId,
+                            isInitiator = true,
+                            verdict = verdict,
+                            newRating = newUserRating
+                        )
+
+                        publicUserService.updatePublicPvPRating(
+                            userId = match.player2.userId,
+                            isInitiator = false,
+                            verdict = verdict,
+                            newRating = newOpponentRating
+                        )
+                    }
+                    notificationService.sendNotification(
+                        match.player1.userId,
+                        "Match Result",
+                        "${
+                            when (verdict) {
+                                MatchVerdictEnum.PLAYER1 -> "Won"
+                                MatchVerdictEnum.PLAYER2 -> "Lost"
+                                MatchVerdictEnum.TIE -> "Tied"
+                            }
+                        } against ${match.player2.username}",
+                    )
+                }
 
                 pvPMatchRepository.save(finishedMatch)
-                notificationService.sendNotification(
-                    match.player1.userId,
-                    "Match Result",
-                    "${
-                        when (verdict) {
-                            MatchVerdictEnum.PLAYER1 -> "Won"
-                            MatchVerdictEnum.PLAYER2 -> "Lost"
-                            MatchVerdictEnum.TIE -> "Tied"
+
+                println(match.mode)
+
+                if (match.mode == MatchModeEnum.AUTOPVP) {
+                    println("not come")
+                    if (pvPAutoMatchRepository.findAll().all { autoMatch ->
+                            val status = pvPMatchRepository.findById(autoMatch.matchId).get().game.status
+                            status == PvPGameStatusEnum.EXECUTED || status == PvPGameStatusEnum.EXECUTE_ERROR
+                    }) {
+                        println("It came here")
+                        val matches =
+                            pvPMatchRepository.findByIdIn(pvPAutoMatchRepository.findAll().map { it.matchId })
+                        val userIds =
+                            matches.map { it.player1.userId }.toSet() +
+                                    matches.map { it.player2.userId }.toSet()
+                        val (userIdWinMap, userIdLossMap, userIdTieMap) =
+                            ratingHistoryService.updateTotalWinsTiesLossesPvP(
+                                userIds = userIds.toList(), matches = matches
+                            )
+                        publicUserService.updateAutoMatchWinsLosses(
+                            userIds.toList(), userIdWinMap, userIdLossMap, userIdTieMap, MatchModeEnum.AUTOPVP
+                        )
+                        val newRatings =
+                            ratingHistoryService.updateAndGetPvPAutoMatchRatings(userIds.toList(), matches)
+                        newRatings.forEach { (userId, newRating) ->
+                            println(userId)
+                            println(newRating)
+                            publicUserService.updateAutoMatchPvPRating(userId = userId, newRating = newRating.rating)
                         }
-                    } against ${match.player2.username}",
-                )
+                        logger.info("PvP LeaderBoard Tier Promotion and Demotion started")
+                        publicUserService.promotePvPTiers()
+                    }
+                    notificationService.sendNotification(
+                        match.player1.userId,
+                        "Auto Match Result",
+                        "${
+                            when (verdict) {
+                                MatchVerdictEnum.PLAYER1 -> "Won"
+                                MatchVerdictEnum.PLAYER2 -> "Lost"
+                                MatchVerdictEnum.TIE -> "Tied"
+                            }
+                        } against ${match.player2.username}",
+                    )
+                    logger.info(
+                        "Match between ${match.player1.username} and ${match.player2.username} completed with verdict $verdict"
+                    )
+                }
             }
         }
         else if(codeTutorialMatchRepository.findById(matchId).isPresent) {
