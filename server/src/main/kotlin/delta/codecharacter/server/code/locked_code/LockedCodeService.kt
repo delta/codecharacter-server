@@ -33,7 +33,7 @@ class LockedCodeService(
             .let { code ->
                 Pair(
                     code.lockedCode[codeType]?.language ?: defaultCodeMapConfiguration.defaultLanguage,
-                    code.lockedCode[codeType]?.code ?: defaultCodeMapConfiguration.defaultCode
+                    code.lockedCode[codeType]?.code ?: if (codeType == CodeTypeDto.NORMAL) defaultCodeMapConfiguration.defaultCode else defaultCodeMapConfiguration.defaultPvPCode,
                 )
             }
     }
