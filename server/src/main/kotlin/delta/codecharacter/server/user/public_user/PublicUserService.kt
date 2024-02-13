@@ -207,32 +207,39 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
 
     fun getPvPLeaderboard(
         page: Int?,
-        size: Int?
+        size: Int?,
+        tier: TierTypeDto?,
     ): List<PvPLeaderBoardResponseDto> {
         val pageRequest =
-            PageRequest.of(
-                    page ?: 0,
-                    size ?: 10,
-                    Sort.by(Sort.Order.desc("pvpRating"), Sort.Order.desc("wins"), Sort.Order.asc("username"))
-            )
-        return publicUserRepository.findAll(pageRequest).content.map {
+                PageRequest.of(
+                        page ?: 0,
+                        size ?: 10,
+                        Sort.by(Sort.Order.desc("pvpRating"), Sort.Order.desc("pvPWins"), Sort.Order.asc("username"))
+                )
+        val publicUsers =
+                if (tier == null) {
+                    publicUserRepository.findAll(pageRequest).content
+                } else {
+                    publicUserRepository.findAllByPvPTier(tier, pageRequest)
+                }
+        return publicUsers.map {
             PvPLeaderBoardResponseDto(
-                user =
-                PublicUserDto(
-                    username = it.username,
-                    name = it.name,
-                    tier = TierTypeDto.valueOf(it.tier.name),
-                    country = it.country,
-                    college = it.college,
-                    avatarId = it.avatarId,
-                ),
-                stats =
-                PvPUserStatsDto(
-                    rating = BigDecimal(it.pvpRating),
-                    wins = it.pvPWins,
-                    losses = it.pvPLosses,
-                    ties = it.pvPTies,
-                ),
+                    user =
+                    PublicUserDto(
+                            username = it.username,
+                            name = it.name,
+                            tier = TierTypeDto.valueOf(it.pvPTier.name),
+                            country = it.country,
+                            college = it.college,
+                            avatarId = it.avatarId,
+                    ),
+                    stats =
+                    PvPUserStatsDto(
+                            rating = BigDecimal(it.pvpRating),
+                            wins = it.pvPWins,
+                            losses = it.pvPLosses,
+                            ties = it.pvPTies
+                    ),
             )
         }
     }

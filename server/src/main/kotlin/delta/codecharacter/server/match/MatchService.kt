@@ -751,7 +751,7 @@ class MatchService(
                 dailyChallengeMatchRepository.save(updatedMatch)
             }
         } else if(pvPMatchRepository.findById(matchId).isPresent) {
-            val updatedGame = pvPGameService.updateGameStatus(gameStatusUpdateJson)
+            val (updatedGame, player1HasErrors, player2HasErrors) = pvPGameService.updateGameStatus(gameStatusUpdateJson)
             val match = pvPMatchRepository.findById(updatedGame.matchId).get()
             if (match.mode != MatchModeEnum.AUTOPVP && match.game.matchId == updatedGame.matchId) {
                 simpMessagingTemplate.convertAndSend(
@@ -784,9 +784,9 @@ class MatchService(
                 }
                 val verdict =
                     verdictAlgorithm.getPvPVerdict(
-                        match.game.status == PvPGameStatusEnum.EXECUTE_ERROR,
+                        player1HasErrors,
                         match.game.scorePlayer1,
-                        match.game.status == PvPGameStatusEnum.EXECUTE_ERROR,
+                        player2HasErrors,
                         match.game.scorePlayer2,
                     )
                 val finishedMatch = match.copy(verdict = verdict)

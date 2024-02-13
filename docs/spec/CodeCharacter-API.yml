@@ -446,6 +446,11 @@ paths:
           in: query
           name: size
           description: Size of the page
+        - schema:
+            $ref: '#/components/schemas/TierType'
+          in: query
+          name: tier
+          description: Leaderboard Tier
       description: Get PvP leaderboard
     parameters: []
 

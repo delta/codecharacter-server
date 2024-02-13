@@ -73,7 +73,7 @@ interface LeaderboardApi {
             value = ["/pvpleaderboard"],
             produces = ["application/json"]
     )
-    fun getPvPLeaderboard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<PvPLeaderBoardResponseDto>> {
+    fun getPvPLeaderboard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?,@Parameter(description = "Leaderboard Tier", schema = Schema(allowableValues = ["TIER_PRACTICE", "TIER1", "TIER2", "TIER3", "TIER4"])) @Valid @RequestParam(value = "tier", required = false) tier: TierTypeDto?): ResponseEntity<List<PvPLeaderBoardResponseDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }
