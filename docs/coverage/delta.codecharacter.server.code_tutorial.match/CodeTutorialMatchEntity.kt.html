@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CodeTutorialMatchEntity.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.code_tutorial.match</a> &gt; <span class="el_source">CodeTutorialMatchEntity.kt</span></div><h1>CodeTutorialMatchEntity.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.code_tutorial.match
+
+import delta.codecharacter.server.game.GameEntity
+import delta.codecharacter.server.user.public_user.PublicUserEntity
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.DocumentReference
+import java.time.Instant
+import java.util.UUID
+
+<span class="nc" id="L11">@Document(collection = &quot;code_tutorial_match&quot;)</span>
+<span class="nc" id="L12">data class CodeTutorialMatchEntity(</span>
+<span class="nc" id="L13">        @Id val id: UUID,</span>
+<span class="nc" id="L14">        val number: Int,</span>
+<span class="nc" id="L15">        @DocumentReference(lazy = true) val game: GameEntity,</span>
+<span class="nc" id="L16">        val verdict: CodeTutorialMatchVerdictEnum,</span>
+<span class="nc" id="L17">        @DocumentReference(lazy = true) val user: PublicUserEntity,</span>
+<span class="nc" id="L18">        val createdAt: Instant</span>
+)
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

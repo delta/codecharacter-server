@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CodeTutorialController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.code_tutorial</a> &gt; <span class="el_source">CodeTutorialController.kt</span></div><h1>CodeTutorialController.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.code_tutorial
+
+import delta.codecharacter.core.TutorialsApi
+import delta.codecharacter.dtos.CodeTutorialMatchRequestDto
+import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
+import delta.codecharacter.dtos.TutorialsGetRequestDto
+import delta.codecharacter.server.match.MatchService
+import delta.codecharacter.server.user.UserEntity
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.RestController
+
+<span class="fc" id="L15">@RestController</span>
+<span class="fc" id="L16">class CodeTutorialController(</span>
+<span class="fc" id="L17">        @Autowired private val codeTutorialService: CodeTutorialService,</span>
+<span class="fc" id="L18">        @Autowired private val matchService: MatchService</span>
+) : TutorialsApi {
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun getCodeTutorialByNumber(codeTutorialNumber: Int): ResponseEntity&lt;TutorialsGetRequestDto&gt; {
+<span class="fc" id="L22">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="nc" id="L23">        return ResponseEntity.ok(codeTutorialService.getTutorialByNumberForUser(user.id,codeTutorialNumber))</span>
+    }
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun createCodeTutorialMatch(
+            codeTutorialMatchRequestDto: CodeTutorialMatchRequestDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="nc" id="L29">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="nc" id="L30">        return ResponseEntity.ok(matchService.createTutorialMatch(user.id, codeTutorialMatchRequestDto))</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

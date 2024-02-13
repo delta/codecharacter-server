@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StatsService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.stats</a> &gt; <span class="el_source">StatsService.kt</span></div><h1>StatsService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.stats
+
+import delta.codecharacter.dtos.UserMatchStatsInnerDto
+import delta.codecharacter.server.daily_challenge.DailyChallengeService
+import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchVerdictEnum
+import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.user.public_user.PublicUserRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import java.math.BigDecimal
+import java.time.Duration
+import java.time.Instant
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.math.min
+
+<span class="fc" id="L22">@Service</span>
+<span class="fc" id="L23">class StatsService(@Autowired private val statsRepository:StatsRepository,</span>
+<span class="fc" id="L24">                    @Autowired private val publicUserRepository: PublicUserRepository){</span>
+
+    @Value(&quot;\${environment.event-start-date}&quot;) private lateinit var startDate: String
+    fun findNumberOfDays(): Int {
+<span class="nc bnc" id="L28" title="All 2 branches missed.">        val givenDateTime = Instant.parse(startDate)</span>
+<span class="nc" id="L29">        val nowDateTime = Instant.now()</span>
+<span class="nc" id="L30">        val period: Duration = Duration.between(givenDateTime, nowDateTime)</span>
+<span class="nc" id="L31">        return period.toDays().toInt()</span>
+    }
+    fun updateStats(
+        userId: UUID,
+        atkDmg: Double,
+        coins: Int,
+        dcAttempts: Int,
+        verdict: DailyChallengeMatchVerdictEnum?,
+    ) {
+<span class="nc" id="L40">        val currentDay = findNumberOfDays()</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if(statsRepository.existsById(userId)) {</span>
+<span class="nc" id="L42">            val user = (statsRepository.findById(userId).get())</span>
+            val userStats:StatEntity;
+<span class="nc bnc" id="L44" title="All 2 branches missed.">            if(user.stats.containsKey(currentDay)){</span>
+<span class="nc" id="L45">               userStats = user.stats[currentDay]!!</span>
+            } else {
+<span class="nc" id="L47">                var win  = 0</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">                if(dcAttempts!=0){</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">                    win = if(verdict == DailyChallengeMatchVerdictEnum.SUCCESS) 1 else 0</span>
+                }
+<span class="nc" id="L51">                user.stats[currentDay] = StatEntity(atkDmg,win,coins, Instant.now());</span>
+<span class="nc" id="L52">                userStats = user.stats[currentDay]!!</span>
+            }
+<span class="nc" id="L54">            val updatedUserStat =</span>
+<span class="nc" id="L55">                userStats.copy(</span>
+<span class="nc" id="L56">                    avgAtk = (userStats.avgAtk * user.stats.size  + atkDmg) / (1+user.stats.size),</span>
+<span class="nc" id="L57">                    coins = (userStats.coins * user.stats.size + coins) / (1+user.stats.size),</span>
+                    dc_wins =
+<span class="nc bnc" id="L59" title="All 4 branches missed.">                    if (dcAttempts != 0 &amp;&amp; verdict == DailyChallengeMatchVerdictEnum.SUCCESS)</span>
+<span class="nc" id="L60">                        userStats.dc_wins + 1</span>
+<span class="nc" id="L61">                    else userStats.dc_wins,</span>
+                )
+<span class="nc" id="L63">            user.stats[currentDay] = updatedUserStat;</span>
+<span class="nc" id="L64">            statsRepository.save(user)</span>
+        } else {
+<span class="nc" id="L66">            val initialMap = HashMap&lt;Int,StatEntity&gt;();</span>
+<span class="nc" id="L67">            var win  = 0</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">            if(dcAttempts!=0){</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">                win = if(verdict == DailyChallengeMatchVerdictEnum.SUCCESS) 1 else 0</span>
+            }
+<span class="nc" id="L71">            initialMap[currentDay] = StatEntity(atkDmg,win,coins,Instant.now())</span>
+<span class="nc" id="L72">            statsRepository.insert(PublicStatEntity(userId,initialMap))</span>
+        }
+<span class="nc" id="L74">    }</span>
+    fun getInfo(userId: UUID): List&lt;List&lt;UserMatchStatsInnerDto&gt;&gt; {
+<span class="nc" id="L76">        val l =  ArrayList&lt;List&lt;UserMatchStatsInnerDto&gt;&gt;();</span>
+<span class="nc" id="L77">        val pageRequest =</span>
+<span class="nc" id="L78">            PageRequest.of(</span>
+<span class="nc" id="L79">                 0,</span>
+<span class="nc" id="L80">                 10,</span>
+<span class="nc" id="L81">                Sort.by(Sort.Order.desc(&quot;rating&quot;), Sort.Order.desc(&quot;wins&quot;), Sort.Order.asc(&quot;username&quot;))</span>
+            )
+<span class="nc" id="L83">        val topUserUUID = publicUserRepository.findAll(pageRequest).get().findFirst().get().userId</span>
+<span class="nc" id="L84">        val topUser =  statsRepository.findById(topUserUUID).orElseThrow {</span>
+<span class="nc" id="L85">            throw CustomException(HttpStatus.BAD_REQUEST, &quot;Stats dont exist&quot;)</span>
+        }
+<span class="nc" id="L87">        var lTop = convertToDTO(topUser)</span>
+<span class="nc" id="L88">        val userExists =  statsRepository.existsById(userId)</span>
+<span class="nc bnc" id="L89" title="All 4 branches missed.">        if(!userExists || (userId == topUserUUID)){</span>
+<span class="nc" id="L90">            l.add(lTop)</span>
+<span class="nc" id="L91">            return  l</span>
+        }
+<span class="nc" id="L93">        val currentUserStats =  statsRepository.findById(userId).get()</span>
+<span class="nc" id="L94">        var lUser = convertToDTO(currentUserStats)</span>
+
+<span class="nc" id="L96">        val minEle = min(lUser.size,lTop.size)</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        if(lUser.size &lt; lTop.size){</span>
+<span class="nc" id="L98">           lTop = lTop.slice(IntRange(lTop.size-minEle,lTop.size))</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        } else if (lUser.size &gt; lTop.size) {</span>
+<span class="nc" id="L100">            lUser = lUser.slice(IntRange(lUser.size-minEle,lUser.size))</span>
+        }
+<span class="nc" id="L102">        l.add(lUser)</span>
+<span class="nc" id="L103">        l.add(lTop)</span>
+<span class="nc" id="L104">        return  l</span>
+    }
+
+    private fun convertToDTO(currentUserStatsArr: PublicStatEntity): List&lt;UserMatchStatsInnerDto&gt; {
+<span class="nc" id="L108">        return currentUserStatsArr.stats.values.map {it -&gt;</span>
+<span class="nc" id="L109">             UserMatchStatsInnerDto(</span>
+<span class="nc" id="L110">                avgAtk = BigDecimal(it.avgAtk),</span>
+<span class="nc" id="L111">                dcWins = BigDecimal(it.dc_wins),</span>
+<span class="nc" id="L112">                coins = BigDecimal(it.coins)</span>
+            )
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

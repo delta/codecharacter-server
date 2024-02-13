@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - CodeTutorialControllerIntegrationTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>CodeTutorialControllerIntegrationTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/delta.codecharacter.server.code_tutorial.html">delta.codecharacter.server.code_tutorial</a> &gt; CodeTutorialControllerIntegrationTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.437s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">should not allow getting new tutorial if current one is not completed()</td>
+<td class="success">0.437s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2024-02-13T14:35:58.515Z  INFO 2540 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [delta.codecharacter.server.code_tutorial.CodeTutorialControllerIntegrationTest]: CodeTutorialControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2024-02-13T14:35:58.589Z  INFO 2540 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration delta.codecharacter.server.ServerApplication for test class delta.codecharacter.server.code_tutorial.CodeTutorialControllerIntegrationTest
+2024-02-13T14:35:58.632Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:58.631+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20320,   &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;createCollection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;,&quot;uuidDisposition&quot;:&quot;generated&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;7f681cde-f186-495d-aef2-571464b60705&quot;}},&quot;options&quot;:{}}}
+2024-02-13T14:35:58.642Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:58.642+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;INDEX&quot;,    &quot;id&quot;:20345,   &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;Index build: done building&quot;,&quot;attr&quot;:{&quot;buildUUID&quot;:null,&quot;collectionUUID&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;7f681cde-f186-495d-aef2-571464b60705&quot;}},&quot;namespace&quot;:&quot;test.user&quot;,&quot;index&quot;:&quot;_id_&quot;,&quot;ident&quot;:&quot;index-36-3374258319243772850&quot;,&quot;collectionIdent&quot;:&quot;collection-35-3374258319243772850&quot;,&quot;commitTimestamp&quot;:null}}
+2024-02-13T14:35:59.004Z  INFO 2540 --- [MessageBroker-4] d.c.server.schedulers.SchedulingService  : Practice phase ended!!
+2024-02-13T14:35:59.025Z  INFO 2540 --- [MessageBroker-4] d.c.s.u.public_user.PublicUserService    : Ratings reset after practice phase done
+2024-02-13T14:35:59.036Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:59.036+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;COMMAND&quot;,  &quot;id&quot;:518070,  &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;CMD: drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;}}
+2024-02-13T14:35:59.037Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:59.036+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20318,   &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;Finishing collection drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;7f681cde-f186-495d-aef2-571464b60705&quot;}}}}
+2024-02-13T14:35:59.037Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:59.036+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22206,   &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;Deferring table drop for index&quot;,&quot;attr&quot;:{&quot;index&quot;:&quot;_id_&quot;,&quot;namespace&quot;:&quot;test.user&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;7f681cde-f186-495d-aef2-571464b60705&quot;}},&quot;ident&quot;:&quot;index-36-3374258319243772850&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:59.037Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:59.036+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22214,   &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;Deferring table drop for collection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.user&quot;,&quot;ident&quot;:&quot;collection-35-3374258319243772850&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:59.038Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:59.038+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;COMMAND&quot;,  &quot;id&quot;:518070,  &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;CMD: drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.public_user&quot;}}
+2024-02-13T14:35:59.039Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:59.038+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:20318,   &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;Finishing collection drop&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.public_user&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;1da63e39-2b84-4d99-bcf8-8df51decff93&quot;}}}}
+2024-02-13T14:35:59.039Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:59.038+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22206,   &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;Deferring table drop for index&quot;,&quot;attr&quot;:{&quot;index&quot;:&quot;_id_&quot;,&quot;namespace&quot;:&quot;test.public_user&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;1da63e39-2b84-4d99-bcf8-8df51decff93&quot;}},&quot;ident&quot;:&quot;index-11-3374258319243772850&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:59.039Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:59.038+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22206,   &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;Deferring table drop for index&quot;,&quot;attr&quot;:{&quot;index&quot;:&quot;username&quot;,&quot;namespace&quot;:&quot;test.public_user&quot;,&quot;uuid&quot;:{&quot;uuid&quot;:{&quot;$uuid&quot;:&quot;1da63e39-2b84-4d99-bcf8-8df51decff93&quot;}},&quot;ident&quot;:&quot;index-12-3374258319243772850&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:59.040Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:59.038+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22214,   &quot;ctx&quot;:&quot;conn3&quot;,&quot;msg&quot;:&quot;Deferring table drop for collection&quot;,&quot;attr&quot;:{&quot;namespace&quot;:&quot;test.public_user&quot;,&quot;ident&quot;:&quot;collection-10-3374258319243772850&quot;,&quot;commitTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:59.039Z  INFO 2540 --- [MessageBroker-4] d.c.s.u.public_user.PublicUserService    : PvP Ratings reset after practice phase done
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.5</a> at Feb 13, 2024, 2:36:14 PM</p>
+</div>
+</div>
+</body>
+</html>

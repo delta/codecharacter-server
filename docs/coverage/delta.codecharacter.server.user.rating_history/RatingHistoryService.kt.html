@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RatingHistoryService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.user.rating_history</a> &gt; <span class="el_source">RatingHistoryService.kt</span></div><h1>RatingHistoryService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.user.rating_history
+
+import delta.codecharacter.dtos.RatingHistoryDto
+import delta.codecharacter.server.logic.rating.GlickoRating
+import delta.codecharacter.server.logic.rating.RatingAlgorithm
+import delta.codecharacter.server.match.MatchEntity
+import delta.codecharacter.server.match.MatchVerdictEnum
+import delta.codecharacter.server.match.PvPMatchEntity
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
+import java.math.BigDecimal
+import java.time.Instant
+import java.util.UUID
+
+<span class="fc" id="L15">@Service</span>
+<span class="fc" id="L16">class RatingHistoryService(</span>
+<span class="fc" id="L17">    @Autowired private val ratingHistoryRepository: RatingHistoryRepository,</span>
+<span class="fc" id="L18">    @Autowired private val ratingAlgorithm: RatingAlgorithm</span>
+) {
+    fun create(userId: UUID) {
+<span class="nc" id="L21">        val ratingHistoryNormal =</span>
+<span class="nc" id="L22">            RatingHistoryEntity(</span>
+<span class="nc" id="L23">                userId = userId, rating = 1500.0, ratingDeviation = 350.0, validFrom = Instant.now(), ratingType = RatingType.NORMAL</span>
+            )
+<span class="nc" id="L25">        val ratingHistoryPvP =</span>
+<span class="nc" id="L26">            RatingHistoryEntity(</span>
+<span class="nc" id="L27">                userId = userId, rating = 1500.0, ratingDeviation = 350.0, validFrom = Instant.now(), ratingType = RatingType.PVP</span>
+            )
+<span class="nc" id="L29">        ratingHistoryRepository.save(ratingHistoryNormal)</span>
+<span class="nc" id="L30">        ratingHistoryRepository.save(ratingHistoryPvP)</span>
+<span class="nc" id="L31">    }</span>
+
+    fun getRatingHistory(userId: UUID, ratingType:RatingType): List&lt;RatingHistoryDto&gt; {
+<span class="nc" id="L34">        return ratingHistoryRepository.findAllByUserIdAndRatingType(userId,ratingType).map {</span>
+<span class="nc" id="L35">            RatingHistoryDto(</span>
+<span class="nc" id="L36">                rating = BigDecimal(it.rating),</span>
+<span class="nc" id="L37">                ratingDeviation = BigDecimal(it.ratingDeviation),</span>
+<span class="nc" id="L38">                validFrom = it.validFrom</span>
+            )
+        }
+    }
+
+    private fun convertVerdictToMatchResult(verdict: MatchVerdictEnum): Double {
+<span class="nc bnc" id="L44" title="All 3 branches missed.">        return when (verdict) {</span>
+<span class="nc" id="L45">            MatchVerdictEnum.PLAYER1 -&gt; 1.0</span>
+<span class="nc" id="L46">            MatchVerdictEnum.PLAYER2 -&gt; 0.0</span>
+<span class="nc" id="L47">            MatchVerdictEnum.TIE -&gt; 0.5</span>
+        }
+    }
+
+    fun updateRating(
+        userId: UUID,
+        opponentId: UUID,
+        verdict: MatchVerdictEnum,
+        ratingType: RatingType
+    ): Pair&lt;Double, Double&gt; {
+<span class="nc" id="L57">        val (_, userRating, userRatingDeviation, userRatingValidFrom) =</span>
+<span class="nc" id="L58">            ratingHistoryRepository.findFirstByUserIdAndRatingTypeOrderByValidFromDesc(userId,ratingType)</span>
+<span class="nc" id="L59">        val (_, opponentRating, opponentRatingDeviation, opponentRatingValidFrom) =</span>
+<span class="nc" id="L60">            ratingHistoryRepository.findFirstByUserIdAndRatingTypeOrderByValidFromDesc(opponentId,ratingType)</span>
+
+<span class="nc" id="L62">        val userWeightedRatingDeviation =</span>
+<span class="nc" id="L63">            ratingAlgorithm.getWeightedRatingDeviationSinceLastCompetition(</span>
+<span class="nc" id="L64">                userRatingDeviation, userRatingValidFrom</span>
+            )
+<span class="nc" id="L66">        val opponentWeightedRatingDeviation =</span>
+<span class="nc" id="L67">            ratingAlgorithm.getWeightedRatingDeviationSinceLastCompetition(</span>
+<span class="nc" id="L68">                opponentRatingDeviation, opponentRatingValidFrom</span>
+            )
+
+<span class="nc" id="L71">        val newUserRating =</span>
+<span class="nc" id="L72">            ratingAlgorithm.calculateNewRating(</span>
+<span class="nc" id="L73">                GlickoRating(userRating, userWeightedRatingDeviation),</span>
+<span class="nc" id="L74">                listOf(GlickoRating(opponentRating, opponentWeightedRatingDeviation)),</span>
+<span class="nc" id="L75">                listOf(convertVerdictToMatchResult(verdict))</span>
+            )
+<span class="nc" id="L77">        val newOpponentRating =</span>
+<span class="nc" id="L78">            ratingAlgorithm.calculateNewRating(</span>
+<span class="nc" id="L79">                GlickoRating(opponentRating, opponentWeightedRatingDeviation),</span>
+<span class="nc" id="L80">                listOf(GlickoRating(userRating, userWeightedRatingDeviation)),</span>
+<span class="nc" id="L81">                listOf(1.0 - convertVerdictToMatchResult(verdict))</span>
+            )
+
+<span class="nc" id="L84">        val currentInstant = Instant.now()</span>
+<span class="nc" id="L85">        ratingHistoryRepository.save(</span>
+<span class="nc" id="L86">            RatingHistoryEntity(</span>
+<span class="nc" id="L87">                userId = userId,</span>
+<span class="nc" id="L88">                rating = newUserRating.rating,</span>
+<span class="nc" id="L89">                ratingDeviation = newUserRating.ratingDeviation,</span>
+<span class="nc" id="L90">                validFrom = currentInstant,</span>
+<span class="nc" id="L91">                ratingType = ratingType</span>
+            )
+        )
+<span class="nc" id="L94">        ratingHistoryRepository.save(</span>
+<span class="nc" id="L95">            RatingHistoryEntity(</span>
+<span class="nc" id="L96">                userId = opponentId,</span>
+<span class="nc" id="L97">                rating = newOpponentRating.rating,</span>
+<span class="nc" id="L98">                ratingDeviation = newOpponentRating.ratingDeviation,</span>
+<span class="nc" id="L99">                validFrom = currentInstant,</span>
+<span class="nc" id="L100">                ratingType = ratingType</span>
+            )
+        )
+
+<span class="nc" id="L104">        return Pair(newUserRating.rating, newOpponentRating.rating)</span>
+    }
+
+    private fun getNewRatingAfterAutoMatches(
+        userId: UUID,
+        userRatings: Map&lt;UUID, RatingHistoryEntity&gt;,
+        autoMatches: List&lt;MatchEntity&gt;
+    ): GlickoRating {
+<span class="nc" id="L112">        val userAsInitiatorMatches = autoMatches.filter { it.player1.userId == userId }</span>
+<span class="nc" id="L113">        val userAsOpponentMatches = autoMatches.filter { it.player2.userId == userId }</span>
+
+<span class="nc" id="L115">        val usersWeightedRatingDeviations =</span>
+<span class="nc" id="L116">            userRatings</span>
+<span class="nc" id="L117">                .map {</span>
+<span class="nc" id="L118">                    it.key to</span>
+<span class="nc" id="L119">                        ratingAlgorithm.getWeightedRatingDeviationSinceLastCompetition(</span>
+<span class="nc" id="L120">                            it.value.ratingDeviation, it.value.validFrom</span>
+                        )
+                }
+<span class="nc" id="L123">                .toMap()</span>
+
+<span class="nc" id="L125">        val ratingsForUserAsPlayer1 =</span>
+<span class="nc" id="L126">            userAsInitiatorMatches.map { match -&gt;</span>
+<span class="nc" id="L127">                GlickoRating(match.player2.rating, usersWeightedRatingDeviations[match.player2.userId]!!)</span>
+            }
+<span class="nc" id="L129">        val verdictsForUserAsPlayer1 =</span>
+<span class="nc" id="L130">            userAsInitiatorMatches.map { match -&gt; convertVerdictToMatchResult(match.verdict) }</span>
+
+<span class="nc" id="L132">        val ratingsForUserAsPlayer2 =</span>
+<span class="nc" id="L133">            userAsOpponentMatches.map { match -&gt;</span>
+<span class="nc" id="L134">                GlickoRating(match.player1.rating, usersWeightedRatingDeviations[match.player1.userId]!!)</span>
+            }
+<span class="nc" id="L136">        val verdictsForUserAsPlayer2 =</span>
+<span class="nc" id="L137">            userAsOpponentMatches.map { match -&gt; 1.0 - convertVerdictToMatchResult(match.verdict) }</span>
+
+<span class="nc" id="L139">        val ratings = ratingsForUserAsPlayer1 + ratingsForUserAsPlayer2</span>
+<span class="nc" id="L140">        val verdicts = verdictsForUserAsPlayer1 + verdictsForUserAsPlayer2</span>
+
+<span class="nc" id="L142">        return ratingAlgorithm.calculateNewRating(</span>
+<span class="nc" id="L143">            GlickoRating(userRatings[userId]!!.rating, usersWeightedRatingDeviations[userId]!!),</span>
+<span class="nc" id="L144">            ratings,</span>
+<span class="nc" id="L145">            verdicts</span>
+        )
+    }
+
+    private fun getNewRatingAfterPvPAutoMatches(
+        userId: UUID,
+        userRatings: Map&lt;UUID, RatingHistoryEntity&gt;,
+        pvPAutoMatches: List&lt;PvPMatchEntity&gt;
+    ): GlickoRating {
+<span class="nc" id="L154">        val userAsPlayer1Matches = pvPAutoMatches.filter { it.player1.userId == userId }</span>
+<span class="nc" id="L155">        val userAsPlayer2Matches = pvPAutoMatches.filter { it.player2.userId == userId }</span>
+
+<span class="nc" id="L157">        val usersWeightedRatingDeviations =</span>
+<span class="nc" id="L158">            userRatings</span>
+<span class="nc" id="L159">                .map {</span>
+<span class="nc" id="L160">                    it.key to</span>
+<span class="nc" id="L161">                        ratingAlgorithm.getWeightedRatingDeviationSinceLastCompetition(</span>
+<span class="nc" id="L162">                            it.value.ratingDeviation, it.value.validFrom</span>
+                        )
+                }
+<span class="nc" id="L165">                .toMap()</span>
+
+<span class="nc" id="L167">        val ratingsForUserAsPlayer1 =</span>
+<span class="nc" id="L168">            userAsPlayer1Matches.map { match -&gt;</span>
+<span class="nc" id="L169">                GlickoRating(match.player2.pvpRating, usersWeightedRatingDeviations[match.player2.userId]!!)</span>
+            }
+<span class="nc" id="L171">        val verdictsForUserAsPlayer1 =</span>
+<span class="nc" id="L172">            userAsPlayer1Matches.map { match -&gt; convertVerdictToMatchResult(match.verdict) }</span>
+
+<span class="nc" id="L174">        val ratingsForUserAsPlayer2 =</span>
+<span class="nc" id="L175">            userAsPlayer2Matches.map { match -&gt;</span>
+<span class="nc" id="L176">                GlickoRating(match.player1.pvpRating, usersWeightedRatingDeviations[match.player1.userId]!!)</span>
+            }
+<span class="nc" id="L178">        val verdictsForUserAsPlayer2 =</span>
+<span class="nc" id="L179">            userAsPlayer2Matches.map { match -&gt; 1.0 - convertVerdictToMatchResult(match.verdict) }</span>
+
+<span class="nc" id="L181">        val ratings = ratingsForUserAsPlayer1 + ratingsForUserAsPlayer2</span>
+<span class="nc" id="L182">        val verdicts = verdictsForUserAsPlayer1 + verdictsForUserAsPlayer2</span>
+
+<span class="nc" id="L184">        return ratingAlgorithm.calculateNewRating(</span>
+<span class="nc" id="L185">            GlickoRating(userRatings[userId]!!.rating, usersWeightedRatingDeviations[userId]!!),</span>
+<span class="nc" id="L186">            ratings,</span>
+<span class="nc" id="L187">            verdicts</span>
+        )
+    }
+
+    fun updateTotalWinsTiesLosses(
+        userIds: List&lt;UUID&gt;,
+        matches: List&lt;MatchEntity&gt;
+    ): Triple&lt;Map&lt;UUID, Int&gt;, Map&lt;UUID, Int&gt;, Map&lt;UUID, Int&gt;&gt; {
+<span class="nc" id="L195">        val userIdWinMap = userIds.associateWith { 0 }.toMutableMap()</span>
+<span class="nc" id="L196">        val userIdLossMap = userIds.associateWith { 0 }.toMutableMap()</span>
+<span class="nc" id="L197">        val userIdTieMap = userIds.associateWith { 0 }.toMutableMap()</span>
+<span class="nc" id="L198">        matches.forEach { match -&gt;</span>
+<span class="nc bnc" id="L199" title="All 4 branches missed.">            when (match.verdict) {</span>
+                MatchVerdictEnum.PLAYER1 -&gt; {
+<span class="nc" id="L201">                    userIdWinMap[match.player1.userId] = userIdWinMap[match.player1.userId]!! + 1</span>
+<span class="nc" id="L202">                    userIdLossMap[match.player2.userId] = userIdLossMap[match.player2.userId]!! + 1</span>
+                }
+                MatchVerdictEnum.PLAYER2 -&gt; {
+<span class="nc" id="L205">                    userIdWinMap[match.player2.userId] = userIdWinMap[match.player2.userId]!! + 1</span>
+<span class="nc" id="L206">                    userIdLossMap[match.player1.userId] = userIdLossMap[match.player1.userId]!! + 1</span>
+                }
+                MatchVerdictEnum.TIE -&gt; {
+<span class="nc" id="L209">                    userIdTieMap[match.player1.userId] = userIdTieMap[match.player1.userId]!! + 1</span>
+<span class="nc" id="L210">                    userIdTieMap[match.player2.userId] = userIdTieMap[match.player2.userId]!! + 1</span>
+                }
+            }
+<span class="nc" id="L213">        }</span>
+<span class="nc" id="L214">        return Triple(userIdWinMap.toMap(), userIdLossMap.toMap(), userIdTieMap.toMap())</span>
+    }
+
+    fun updateTotalWinsTiesLossesPvP(
+        userIds: List&lt;UUID&gt;,
+        matches: List&lt;PvPMatchEntity&gt;
+    ): Triple&lt;Map&lt;UUID, Int&gt;, Map&lt;UUID, Int&gt;, Map&lt;UUID, Int&gt;&gt; {
+<span class="nc" id="L221">        val userIdWinMap = userIds.associateWith { 0 }.toMutableMap()</span>
+<span class="nc" id="L222">        val userIdLossMap = userIds.associateWith { 0 }.toMutableMap()</span>
+<span class="nc" id="L223">        val userIdTieMap = userIds.associateWith { 0 }.toMutableMap()</span>
+<span class="nc" id="L224">        matches.forEach { match -&gt;</span>
+<span class="nc bnc" id="L225" title="All 4 branches missed.">            when (match.verdict) {</span>
+                MatchVerdictEnum.PLAYER1 -&gt; {
+<span class="nc" id="L227">                    userIdWinMap[match.player1.userId] = userIdWinMap[match.player1.userId]!! + 1</span>
+<span class="nc" id="L228">                    userIdLossMap[match.player2.userId] = userIdLossMap[match.player2.userId]!! + 1</span>
+                }
+                MatchVerdictEnum.PLAYER2 -&gt; {
+<span class="nc" id="L231">                    userIdWinMap[match.player2.userId] = userIdWinMap[match.player2.userId]!! + 1</span>
+<span class="nc" id="L232">                    userIdLossMap[match.player1.userId] = userIdLossMap[match.player1.userId]!! + 1</span>
+                }
+                MatchVerdictEnum.TIE -&gt; {
+<span class="nc" id="L235">                    userIdTieMap[match.player1.userId] = userIdTieMap[match.player1.userId]!! + 1</span>
+<span class="nc" id="L236">                    userIdTieMap[match.player2.userId] = userIdTieMap[match.player2.userId]!! + 1</span>
+                }
+            }
+<span class="nc" id="L239">        }</span>
+<span class="nc" id="L240">        return Triple(userIdWinMap.toMap(), userIdLossMap.toMap(), userIdTieMap.toMap())</span>
+    }
+
+    fun updateAndGetAutoMatchRatings(
+        userIds: List&lt;UUID&gt;,
+        matches: List&lt;MatchEntity&gt;
+    ): Map&lt;UUID, GlickoRating&gt; {
+<span class="nc" id="L247">        val userRatings =</span>
+<span class="nc" id="L248">            userIds.associateWith { userId -&gt;</span>
+<span class="nc" id="L249">                ratingHistoryRepository.findFirstByUserIdAndRatingTypeOrderByValidFromDesc(userId,RatingType.NORMAL)</span>
+            }
+<span class="nc" id="L251">        val newRatings =</span>
+<span class="nc" id="L252">            userIds.associateWith { userId -&gt;</span>
+<span class="nc" id="L253">                getNewRatingAfterAutoMatches(userId, userRatings, matches)</span>
+            }
+<span class="nc" id="L255">        val currentInstant = Instant.now()</span>
+<span class="nc" id="L256">        newRatings.forEach { (userId, rating) -&gt;</span>
+<span class="nc" id="L257">            ratingHistoryRepository.save(</span>
+<span class="nc" id="L258">                RatingHistoryEntity(</span>
+<span class="nc" id="L259">                    userId = userId,</span>
+<span class="nc" id="L260">                    rating = rating.rating,</span>
+<span class="nc" id="L261">                    ratingDeviation = rating.ratingDeviation,</span>
+<span class="nc" id="L262">                    validFrom = currentInstant,</span>
+<span class="nc" id="L263">                    ratingType = RatingType.NORMAL</span>
+                )
+            )
+<span class="nc" id="L266">        }</span>
+<span class="nc" id="L267">        return newRatings</span>
+    }
+
+    fun updateAndGetPvPAutoMatchRatings(
+        userIds: List&lt;UUID&gt;,
+        matches: List&lt;PvPMatchEntity&gt;
+    ): Map&lt;UUID, GlickoRating&gt; {
+<span class="nc" id="L274">        val userRatings =</span>
+<span class="nc" id="L275">            userIds.associateWith { userId -&gt;</span>
+<span class="nc" id="L276">                ratingHistoryRepository.findFirstByUserIdAndRatingTypeOrderByValidFromDesc(userId,RatingType.PVP)</span>
+            }
+<span class="nc" id="L278">        val newRatings =</span>
+<span class="nc" id="L279">            userIds.associateWith { userId -&gt;</span>
+<span class="nc" id="L280">                getNewRatingAfterPvPAutoMatches(userId, userRatings, matches)</span>
+            }
+<span class="nc" id="L282">        val currentInstant = Instant.now()</span>
+<span class="nc" id="L283">        newRatings.forEach { (userId, rating) -&gt;</span>
+<span class="nc" id="L284">            ratingHistoryRepository.save(</span>
+<span class="nc" id="L285">                RatingHistoryEntity(</span>
+<span class="nc" id="L286">                    userId = userId,</span>
+<span class="nc" id="L287">                    rating = rating.rating,</span>
+<span class="nc" id="L288">                    ratingDeviation = rating.ratingDeviation,</span>
+<span class="nc" id="L289">                    validFrom = currentInstant,</span>
+<span class="nc" id="L290">                    ratingType = RatingType.PVP</span>
+                )
+            )
+<span class="nc" id="L293">        }</span>
+<span class="nc" id="L294">        return newRatings</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

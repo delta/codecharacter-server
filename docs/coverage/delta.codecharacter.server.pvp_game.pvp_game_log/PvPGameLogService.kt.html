@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PvPGameLogService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.pvp_game.pvp_game_log</a> &gt; <span class="el_source">PvPGameLogService.kt</span></div><h1>PvPGameLogService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.pvp_game.pvp_game_log
+
+import delta.codecharacter.server.match.MatchRepository
+import delta.codecharacter.server.match.PvPMatchRepository
+import delta.codecharacter.server.user.public_user.PublicUserEntity
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.annotation.Id
+import org.springframework.stereotype.Service
+import java.util.UUID
+
+<span class="fc" id="L11">@Service</span>
+<span class="fc" id="L12">class PvPGameLogService(</span>
+<span class="fc" id="L13">    @Autowired private val pvPGameLogRepository: PvPGameLogRepository,</span>
+<span class="fc" id="L14">    @Autowired private val pvPMatchRepository: PvPMatchRepository,</span>
+) {
+
+    fun getPlayerLog(gameId: UUID, userId: UUID): String {
+<span class="fc" id="L18">        val match = pvPMatchRepository.findById(gameId)</span>
+
+<span class="fc bfc" id="L20" title="All 2 branches covered.">        if (!match.isPresent) {</span>
+<span class="fc" id="L21">            return &quot;&quot;</span>
+        }
+
+<span class="fc" id="L24">        val pvPGameLog = pvPGameLogRepository.findById(gameId)</span>
+<span class="fc" id="L25">        val player1 : PublicUserEntity = match.get().player1</span>
+<span class="fc" id="L26">        val player2 : PublicUserEntity = match.get().player2</span>
+
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">        return if (pvPGameLog.isPresent) {</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">            if (player1.userId == userId) {</span>
+<span class="fc" id="L30">                pvPGameLog.get().player1Log</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">            } else if (player2.userId == userId) {</span>
+<span class="fc" id="L32">                pvPGameLog.get().player2Log</span>
+            } else {
+<span class="nc" id="L34">                &quot;&quot;</span>
+            }
+        } else {
+<span class="nc" id="L37">            &quot;&quot;</span>
+        }
+    }
+
+    fun savePvPGameLog(gameId: UUID, player1Log: String, player2Log: String) {
+<span class="nc" id="L42">        val pvPGameLog = PvPGameLogEntity(gameId, player1Log, player2Log)</span>
+<span class="nc" id="L43">        pvPGameLogRepository.save(pvPGameLog)</span>
+<span class="nc" id="L44">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

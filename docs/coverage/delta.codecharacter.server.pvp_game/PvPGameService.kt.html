@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PvPGameService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.pvp_game</a> &gt; <span class="el_source">PvPGameService.kt</span></div><h1>PvPGameService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.pvp_game
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.params.GameCode
+import delta.codecharacter.server.params.GameParameters
+import delta.codecharacter.server.pvp_game.pvp_game_log.PvPGameLogService
+import delta.codecharacter.server.pvp_game.queue.entities.PvPGameRequestEntity
+import delta.codecharacter.server.pvp_game.queue.entities.PvPGameStatusUpdateEntity
+import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import java.util.UUID
+
+<span class="fc" id="L17">@Service</span>
+<span class="fc" id="L18">class PvPGameService(</span>
+<span class="fc" id="L19">    @Autowired private val pvPGameRepository: PvPGameRepository,</span>
+<span class="fc" id="L20">    @Autowired private val pvPGameLogService: PvPGameLogService,</span>
+<span class="fc" id="L21">    @Autowired private val rabbitTemplate: RabbitTemplate,</span>
+<span class="fc" id="L22">    @Autowired private val parameters: GameParameters</span>
+) {
+<span class="fc" id="L24">    private var mapper = ObjectMapper().registerKotlinModule()</span>
+
+    fun getPvPGame(matchId: UUID): PvPGameEntity {
+<span class="fc" id="L27">        return pvPGameRepository.findById(matchId).orElseThrow {</span>
+<span class="fc" id="L28">            throw CustomException(HttpStatus.NOT_FOUND, &quot;PvPGame not found&quot;)</span>
+        }
+    }
+
+    fun createPvPGame(matchId: UUID): PvPGameEntity {
+<span class="nc" id="L33">        val pvPGame =</span>
+<span class="nc" id="L34">            PvPGameEntity(</span>
+<span class="nc" id="L35">                matchId = matchId,</span>
+<span class="nc" id="L36">                scorePlayer1 = 0,</span>
+<span class="nc" id="L37">                scorePlayer2 = 0,</span>
+<span class="nc" id="L38">                status = PvPGameStatusEnum.IDLE,</span>
+            )
+<span class="nc" id="L40">        return pvPGameRepository.save(pvPGame)</span>
+    }
+
+    fun sendPvPGameRequest(pvPGame: PvPGameEntity, player1Code: GameCode, player2Code: GameCode) {
+<span class="fc" id="L44">        val pvPGameRequest =</span>
+<span class="fc" id="L45">            PvPGameRequestEntity(</span>
+<span class="fc" id="L46">                gameId = pvPGame.matchId,</span>
+<span class="fc" id="L47">                parameters = parameters,</span>
+<span class="fc" id="L48">                player1 = player1Code,</span>
+<span class="fc" id="L49">                player2 = player2Code</span>
+            )
+<span class="fc" id="L51">        rabbitTemplate.convertAndSend(&quot;gamePvpRequestQueue&quot;, mapper.writeValueAsString(pvPGameRequest))</span>
+<span class="fc" id="L52">    }</span>
+
+    fun updateGameStatus(gameStatusUpdateJson: String): Triple&lt;PvPGameEntity, Boolean, Boolean&gt; {
+<span class="fc" id="L55">        val gameStatusUpdateEntity =</span>
+<span class="fc" id="L56">            mapper.readValue(gameStatusUpdateJson, PvPGameStatusUpdateEntity::class.java)</span>
+<span class="fc" id="L57">        val oldPvPGameEntity =</span>
+<span class="fc" id="L58">            pvPGameRepository.findById(gameStatusUpdateEntity.gameId).orElseThrow {</span>
+<span class="nc" id="L59">                throw CustomException(HttpStatus.NOT_FOUND, &quot;PvPGame not found&quot;)</span>
+            }
+<span class="pc bpc" id="L61" title="1 of 4 branches missed.">        if(gameStatusUpdateEntity.gameResultPlayer1 == null || gameStatusUpdateEntity.gameResultPlayer2 == null) {</span>
+<span class="fc" id="L62">            val newPvPGameEntity = oldPvPGameEntity.copy(status = gameStatusUpdateEntity.gameStatus)</span>
+<span class="fc" id="L63">            return Triple(pvPGameRepository.save(newPvPGameEntity), false, false)</span>
+        }
+
+<span class="fc" id="L66">        val gameResultPlayer1 = gameStatusUpdateEntity.gameResultPlayer1</span>
+<span class="fc" id="L67">        val gameResultPlayer2 = gameStatusUpdateEntity.gameResultPlayer2</span>
+
+<span class="fc" id="L69">        val gameStatus =</span>
+<span class="pc bpc" id="L70" title="2 of 4 branches missed.">            if (gameResultPlayer1.hasErrors || gameResultPlayer2.hasErrors) {</span>
+<span class="nc" id="L71">                PvPGameStatusEnum.EXECUTE_ERROR</span>
+            } else {
+<span class="fc" id="L73">                PvPGameStatusEnum.EXECUTED</span>
+            }
+
+<span class="fc" id="L76">        val newPvPGameEntity =</span>
+<span class="fc" id="L77">            oldPvPGameEntity.copy(</span>
+<span class="fc" id="L78">                scorePlayer1 = gameResultPlayer1.score,</span>
+<span class="fc" id="L79">                scorePlayer2 = gameResultPlayer2.score,</span>
+<span class="fc" id="L80">                status = gameStatus</span>
+            )
+
+<span class="fc" id="L83">        val pvPGame = pvPGameRepository.save(newPvPGameEntity)</span>
+<span class="fc" id="L84">        pvPGameLogService.savePvPGameLog(pvPGame.matchId, gameResultPlayer1.log, gameResultPlayer2.log)</span>
+<span class="fc" id="L85">        return Triple(pvPGame, gameResultPlayer1.hasErrors, gameResultPlayer2.hasErrors)</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

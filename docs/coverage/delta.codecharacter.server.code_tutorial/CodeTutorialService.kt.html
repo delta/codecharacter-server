@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CodeTutorialService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.code_tutorial</a> &gt; <span class="el_source">CodeTutorialService.kt</span></div><h1>CodeTutorialService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.code_tutorial
+
+import delta.codecharacter.dtos.ChallengeTypeDto
+import delta.codecharacter.dtos.TutorialsGetRequestDto
+import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
+import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchVerdictEnum
+import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchVerdictEnum
+import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.game.GameEntity
+import delta.codecharacter.server.game.GameStatusEnum
+import delta.codecharacter.server.notifications.NotificationService
+import delta.codecharacter.server.user.public_user.PublicUserService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import java.util.UUID
+import kotlin.properties.Delegates
+
+<span class="fc" id="L20">@Service</span>
+<span class="fc" id="L21">class CodeTutorialService(</span>
+<span class="fc" id="L22">    @Autowired private val codeTutorialRepository: CodeTutorialRepository,</span>
+<span class="fc" id="L23">    @Autowired private val notificationService: NotificationService,</span>
+<span class="fc" id="L24">    @Autowired private val publicUserService: PublicUserService,</span>
+) {
+
+    @Value(&quot;\${environment.event-start-date}&quot;) private lateinit var startDate: String
+<span class="fc" id="L28">    @Value(&quot;\${environment.total-no-of-code-tutorial-levels}&quot;) private var totalCodeTutorials: Int = 4</span>
+    fun getTutorialByNumber(tutorialNumber: Int): CodeTutorialEntity {
+<span class="fc" id="L30">        val currentTutorial =</span>
+<span class="fc" id="L31">            codeTutorialRepository.findByNumber(tutorialNumber).orElseThrow {</span>
+<span class="nc" id="L32">                throw CustomException(HttpStatus.BAD_REQUEST, &quot;Invalid Request&quot;)</span>
+            }
+<span class="fc" id="L34">        return currentTutorial</span>
+    }
+
+    fun getTutorialByNumberForUser(userId: UUID, codeTutorialNumber: Int): TutorialsGetRequestDto {
+<span class="fc" id="L38">        val maxCodeTutorialNumber = publicUserService.getPublicUser(userId).codeTutorialLevel</span>
+<span class="fc" id="L39">        lateinit var currentTutorial: CodeTutorialEntity</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        if(codeTutorialNumber &lt;= maxCodeTutorialNumber)</span>
+        {
+<span class="fc" id="L42">            currentTutorial = getTutorialByNumber(codeTutorialNumber)</span>
+        }
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        else if(codeTutorialNumber &lt;= totalCodeTutorials)</span>
+        {
+<span class="fc" id="L46">            throw CustomException(HttpStatus.BAD_REQUEST, &quot;Complete the current tutorial first&quot;)</span>
+        }
+        else
+        {
+<span class="nc" id="L50">            throw CustomException(HttpStatus.SERVICE_UNAVAILABLE, &quot;No more tutorials!&quot;)</span>
+        }
+<span class="fc" id="L52">        return TutorialsGetRequestDto(</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">                tutorialName = currentTutorial.tutName,</span>
+<span class="fc" id="L54">                tutorialCodes = currentTutorial.tutorial,</span>
+<span class="fc" id="L55">                tutorialType = currentTutorial.tutType,</span>
+<span class="fc" id="L56">                description = currentTutorial.description,</span>
+<span class="fc" id="L57">                tutorialId = currentTutorial.number,</span>
+        )
+    }
+    fun completeCodeTutorial(gameEntity: GameEntity, userId: UUID, number: Int): CodeTutorialMatchVerdictEnum {
+<span class="fc" id="L61">        val destruction = gameEntity.destruction</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (gameEntity.status == GameStatusEnum.EXECUTE_ERROR)</span>
+<span class="fc" id="L63">            return CodeTutorialMatchVerdictEnum.FAILURE</span>
+<span class="fc" id="L64">        val currentCodeTutorial = getTutorialByNumber(number)</span>
+        if ((
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">                        currentCodeTutorial.tutType == ChallengeTypeDto.MAP &amp;&amp;</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">                                destruction &gt;= 75.0</span>
+                        ) ||
+                (
+<span class="nc bnc" id="L70" title="All 2 branches missed.">                        currentCodeTutorial.tutType == ChallengeTypeDto.CODE &amp;&amp;</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">                                destruction &lt; 75.0</span>
+                        )
+        ) {
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">            if(number == publicUserService.getPublicUser(userId).codeTutorialLevel)</span>
+            {
+<span class="nc" id="L76">                publicUserService.updateUserCodeTutorialLevel(userId, true)</span>
+            }
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">            if(number == totalCodeTutorials)</span>
+            {
+<span class="nc" id="L80">                notificationService.sendNotification(</span>
+<span class="nc" id="L81">                    userId,</span>
+<span class="nc" id="L82">                    title = &quot;Completed all tutorials!&quot;,</span>
+<span class="nc" id="L83">                    content = &quot;&quot;</span>
+                )
+            }
+<span class="fc" id="L86">            return CodeTutorialMatchVerdictEnum.SUCCESS</span>
+        }
+<span class="nc" id="L88">        return CodeTutorialMatchVerdictEnum.FAILURE</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

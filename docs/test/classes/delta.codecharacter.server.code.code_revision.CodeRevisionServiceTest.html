@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - CodeRevisionServiceTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>CodeRevisionServiceTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/delta.codecharacter.server.code.code_revision.html">delta.codecharacter.server.code.code_revision</a> &gt; CodeRevisionServiceTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">2</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">1.760s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">should create code revision()</td>
+<td class="success">1.432s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">should get all code revisions()</td>
+<td class="success">0.328s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2024-02-13T14:35:56.000Z  INFO 2540 --- [MessageBroker-3] d.c.server.schedulers.SchedulingService  : Practice phase ended!!
+2024-02-13T14:35:56.004Z  INFO 2540 --- [MessageBroker-3] d.c.s.u.public_user.PublicUserService    : Ratings reset after practice phase done
+2024-02-13T14:35:56.006Z  INFO 2540 --- [MessageBroker-3] d.c.s.u.public_user.PublicUserService    : PvP Ratings reset after practice phase done
+2024-02-13T14:35:56.017Z  INFO 2540 --- [MessageBroker-3] d.c.s.u.public_user.PublicUserService    : Leaderboard tier set during the start of game phase
+2024-02-13T14:35:56.018Z  INFO 2540 --- [MessageBroker-3] d.c.s.u.public_user.PublicUserService    : PvP Leaderboard tier set during the start of game phase
+2024-02-13T14:35:56.166Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.166+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22260,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Removing drop-pending idents with drop timestamps before timestamp&quot;,&quot;attr&quot;:{&quot;timestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.168Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.166+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-16-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.171Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.170+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-15-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.177Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.176+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-8-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.180Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.179+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-9-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.181Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.181+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-7-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.186Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.186+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-20-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.189Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.189+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-19-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.193Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.192+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-18-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.196Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.195+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-17-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.208Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.197+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-24-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.209Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.199+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-23-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.210Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.202+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-26-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.211Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.204+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-25-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.213Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.207+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-22-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.214Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.211+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-21-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.223Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.215+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-30-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.224Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.218+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-29-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.225Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.222+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-28-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.226Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.225+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-27-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.230Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.229+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-34-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.236Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.231+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-33-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.241Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.238+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-32-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:56.242Z  INFO 2540 --- [       Thread-6] d.f.e.m.s.autoconfigure.EmbeddedMongo    : {&quot;t&quot;:{&quot;$date&quot;:&quot;2024-02-13T14:35:56.240+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-31-3374258319243772850&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2024-02-13T14:35:57.000Z  INFO 2540 --- [MessageBroker-2] d.c.server.schedulers.SchedulingService  : Practice phase ended!!
+2024-02-13T14:35:57.007Z  INFO 2540 --- [MessageBroker-2] d.c.s.u.public_user.PublicUserService    : Ratings reset after practice phase done
+2024-02-13T14:35:57.016Z  INFO 2540 --- [MessageBroker-2] d.c.s.u.public_user.PublicUserService    : PvP Ratings reset after practice phase done
+2024-02-13T14:35:57.047Z  INFO 2540 --- [MessageBroker-2] d.c.s.u.public_user.PublicUserService    : Leaderboard tier set during the start of game phase
+2024-02-13T14:35:57.053Z  INFO 2540 --- [MessageBroker-2] d.c.s.u.public_user.PublicUserService    : PvP Leaderboard tier set during the start of game phase
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.5</a> at Feb 13, 2024, 2:36:14 PM</p>
+</div>
+</div>
+</body>
+</html>
