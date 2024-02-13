@@ -80,12 +80,13 @@ class GameService(
                 destruction = destructionPercentage, coinsUsed = coinsUsed, status = gameStatus
             )
         val game = gameRepository.save(newGameEntity)
-        if(!codeTutorialMatchRepository.findById(game.matchId).isPresent) {
-            gameLogService.saveGameLog(game.id, gameResult.log)
-        }
-        else{
+
+        if(codeTutorialMatchRepository.findById(game.matchId).isPresent) {
             gameRepository.deleteById(game.id)
+            return game
         }
+
+        gameLogService.saveGameLog(game.id, gameResult.log)
         return game
     }
 }

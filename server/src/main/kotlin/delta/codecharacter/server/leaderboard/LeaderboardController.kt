@@ -23,7 +23,8 @@ class LeaderboardController(@Autowired private val publicUserService: PublicUser
     override fun getPvPLeaderboard(
         page: Int?,
         size: Int?,
+        tier: TierTypeDto?,
     ): ResponseEntity<List<PvPLeaderBoardResponseDto>> {
-        return ResponseEntity.ok(publicUserService.getPvPLeaderboard(page, size))
+        return ResponseEntity.ok(publicUserService.getPvPLeaderboard(page, size, tier))
     }
 }

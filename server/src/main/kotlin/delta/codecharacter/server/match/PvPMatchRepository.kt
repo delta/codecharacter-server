@@ -10,4 +10,5 @@ import java.util.UUID
 interface PvPMatchRepository : MongoRepository<PvPMatchEntity, UUID> {
     fun findTop10ByOrderByTotalPointsDesc(): List<PvPMatchEntity>
     fun findByPlayer1OrderByCreatedAtDesc(player1: PublicUserEntity, pageRequest: PageRequest): List<PvPMatchEntity>
+    fun findByIdIn(matchIds: List<UUID>): List<PvPMatchEntity>
 }

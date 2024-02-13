@@ -51,7 +51,7 @@ class PvPGameService(
         rabbitTemplate.convertAndSend("gamePvpRequestQueue", mapper.writeValueAsString(pvPGameRequest))
     }
 
-    fun updateGameStatus(gameStatusUpdateJson: String): PvPGameEntity {
+    fun updateGameStatus(gameStatusUpdateJson: String): Triple<PvPGameEntity, Boolean, Boolean> {
         val gameStatusUpdateEntity =
             mapper.readValue(gameStatusUpdateJson, PvPGameStatusUpdateEntity::class.java)
         val oldPvPGameEntity =
@@ -60,7 +60,7 @@ class PvPGameService(
             }
         if(gameStatusUpdateEntity.gameResultPlayer1 == null || gameStatusUpdateEntity.gameResultPlayer2 == null) {
             val newPvPGameEntity = oldPvPGameEntity.copy(status = gameStatusUpdateEntity.gameStatus)
-            return pvPGameRepository.save(newPvPGameEntity)
+            return Triple(pvPGameRepository.save(newPvPGameEntity), false, false)
         }
 
         val gameResultPlayer1 = gameStatusUpdateEntity.gameResultPlayer1
@@ -82,6 +82,6 @@ class PvPGameService(
 
         val pvPGame = pvPGameRepository.save(newPvPGameEntity)
         pvPGameLogService.savePvPGameLog(pvPGame.matchId, gameResultPlayer1.log, gameResultPlayer2.log)
-        return pvPGame
+        return Triple(pvPGame, gameResultPlayer1.hasErrors, gameResultPlayer2.hasErrors)
     }
 }

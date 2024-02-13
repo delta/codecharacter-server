@@ -87,6 +87,7 @@ class TestAttributes {
                 pvPLosses = 7,
                 pvPTies = 3,
                 tier = TierTypeDto.TIER_PRACTICE,
+                pvPTier = TierTypeDto.TIER_PRACTICE,
                 score = 0.0,
                 dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
                 tutorialLevel = 1,
@@ -110,11 +111,12 @@ class TestAttributes {
                 pvPLosses = 7,
                 pvPTies = 3,
                 tier = TierTypeDto.TIER_PRACTICE,
+                pvPTier = TierTypeDto.TIER_PRACTICE,
                 score = 0.0,
                 dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
                 tutorialLevel = 1,
                 pvpRating = 1000.0,
-                codeTutorialLevel = 1
+                codeTutorialLevel = 1,
             )
     }
 }

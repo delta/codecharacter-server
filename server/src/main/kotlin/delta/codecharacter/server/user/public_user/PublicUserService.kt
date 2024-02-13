@@ -12,6 +12,7 @@ import delta.codecharacter.dtos.UserStatsDto
 import delta.codecharacter.dtos.PvPUserStatsDto
 import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.match.MatchModeEnum
 import delta.codecharacter.server.match.MatchVerdictEnum
 import delta.codecharacter.server.user.rating_history.RatingType
 import org.slf4j.Logger
@@ -59,8 +60,10 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 pvPTies = 0,
                 score = 0.0,
                 // tier = TierTypeDto.TIER_PRACTICE, //TODO: Automatically assign tier2 to players
+                // pvPTier = TierTypeDto.TIER_PRACTICE,
                 // registering after practice phase
                 tier = TierTypeDto.TIER2,
+                pvPTier = TierTypeDto.TIER2,
                 tutorialLevel = 1,
                 dailyChallengeHistory = HashMap(),
                 pvpRating = 1500.0,
@@ -81,12 +84,32 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         logger.info("Leaderboard tier set during the start of game phase")
     }
 
+    fun updatePvPLeaderboardAfterPracticePhase() {
+        val publicUsers = publicUserRepository.findAll()
+        publicUsers.forEachIndexed { index, user ->
+            if (index < tier1Players.toInt()) {
+                publicUserRepository.save(user.copy(pvPTier = TierTypeDto.TIER1))
+            } else {
+                publicUserRepository.save(user.copy(pvPTier = TierTypeDto.TIER2))
+            }
+        }
+        logger.info("PvP Leaderboard tier set during the start of game phase")
+    }
+
     fun resetRatingsAfterPracticePhase() {
         val users = publicUserRepository.findAll()
         users.forEach { user ->
             publicUserRepository.save(user.copy(rating = 1500.0, wins = 0, ties = 0, losses = 0))
         }
         logger.info("Ratings reset after practice phase done")
+    }
+
+    fun resetPvPRatingsAfterPracticePhase() {
+        val users = publicUserRepository.findAll()
+        users.forEach { user ->
+            publicUserRepository.save(user.copy(pvpRating = 1500.0, pvPWins = 0, pvPTies = 0, pvPLosses = 0))
+        }
+        logger.info("PvP Ratings reset after practice phase done")
     }
 
     fun promoteTiers() {
@@ -117,6 +140,39 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
             } else {
                 logger.error(
                     "Error occurred while updating ${updateToTier2User.username} (UserName) to TIER2"
+                )
+            }
+        }
+    }
+
+    fun promotePvPTiers() {
+        val topPlayersInTier2 =
+                publicUserRepository.findAllByPvPTier(
+                        TierTypeDto.TIER2,
+                        PageRequest.of(0, topPlayer.toInt(), Sort.by(Sort.Order.desc("pvpRating")))
+                )
+        val bottomPlayersInTier1 =
+                publicUserRepository.findAllByPvPTier(
+                        TierTypeDto.TIER1,
+                        PageRequest.of(0, topPlayer.toInt(), Sort.by(Sort.Order.asc("pvpRating")))
+                )
+        topPlayersInTier2.forEach { users ->
+            val updatedToTier1User = publicUserRepository.save(users.copy(pvPTier = TierTypeDto.TIER1))
+            if (updatedToTier1User.pvPTier == TierTypeDto.TIER1) {
+                logger.info("UserName ${updatedToTier1User.username} got promoted to PvP TIER1")
+            } else {
+                logger.error(
+                        "Error occurred while updating ${updatedToTier1User.username} (UserName) to PvP TIER1"
+                )
+            }
+        }
+        bottomPlayersInTier1.forEach { users ->
+            val updateToTier2User = publicUserRepository.save(users.copy(pvPTier = TierTypeDto.TIER2))
+            if (updateToTier2User.pvPTier == TierTypeDto.TIER2) {
+                logger.info("UserName ${updateToTier2User.username} got demoted to PvP TIER2")
+            } else {
+                logger.error(
+                        "Error occurred while updating ${updateToTier2User.username} (UserName) to PvP TIER2"
                 )
             }
         }
@@ -171,32 +227,39 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
 
     fun getPvPLeaderboard(
         page: Int?,
-        size: Int?
+        size: Int?,
+        tier: TierTypeDto?,
     ): List<PvPLeaderBoardResponseDto> {
         val pageRequest =
-            PageRequest.of(
-                    page ?: 0,
-                    size ?: 10,
-                    Sort.by(Sort.Order.desc("pvpRating"), Sort.Order.desc("wins"), Sort.Order.asc("username"))
-            )
-        return publicUserRepository.findAll(pageRequest).content.map {
+                PageRequest.of(
+                        page ?: 0,
+                        size ?: 10,
+                        Sort.by(Sort.Order.desc("pvpRating"), Sort.Order.desc("pvPWins"), Sort.Order.asc("username"))
+                )
+        val publicUsers =
+                if (tier == null) {
+                    publicUserRepository.findAll(pageRequest).content
+                } else {
+                    publicUserRepository.findAllByPvPTier(tier, pageRequest)
+                }
+        return publicUsers.map {
             PvPLeaderBoardResponseDto(
-                user =
-                PublicUserDto(
-                    username = it.username,
-                    name = it.name,
-                    tier = TierTypeDto.valueOf(it.tier.name),
-                    country = it.country,
-                    college = it.college,
-                    avatarId = it.avatarId,
-                ),
-                stats =
-                PvPUserStatsDto(
-                    rating = BigDecimal(it.pvpRating),
-                    wins = it.pvPWins,
-                    losses = it.pvPLosses,
-                    ties = it.pvPTies,
-                ),
+                    user =
+                    PublicUserDto(
+                            username = it.username,
+                            name = it.name,
+                            tier = TierTypeDto.valueOf(it.pvPTier.name),
+                            country = it.country,
+                            college = it.college,
+                            avatarId = it.avatarId,
+                    ),
+                    stats =
+                    PvPUserStatsDto(
+                            rating = BigDecimal(it.pvpRating),
+                            wins = it.pvPWins,
+                            losses = it.pvPLosses,
+                            ties = it.pvPTies
+                    ),
             )
         }
     }
@@ -352,24 +415,50 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         publicUserRepository.save(updatedUser)
         logger.info("Ratings updated for ${user.username}")
     }
+
+    fun updateAutoMatchPvPRating(userId: UUID, newRating: Double) {
+        val user = publicUserRepository.findById(userId).get()
+        val updatedUser = user.copy(pvpRating = newRating)
+        publicUserRepository.save(updatedUser)
+        logger.info("PvP Ratings updated for ${user.username}")
+    }
+
     fun updateAutoMatchWinsLosses(
         userIds: List<UUID>,
         userIdWinsMap: Map<UUID, Int>,
         userIdLoss: Map<UUID, Int>,
-        userIdTies: Map<UUID, Int>
+        userIdTies: Map<UUID, Int>,
+        autoMatchType: MatchModeEnum
     ) {
-        logger.info("Updating wins and losses for $userIds")
+        logger.info("Updating normal wins and losses for $userIds")
         userIds.forEach {
             val user = publicUserRepository.findById(it).get()
-            val updatedUser =
-                user.copy(
-                    wins = user.wins + userIdWinsMap[it]!!,
-                    losses = user.losses + userIdLoss[it]!!,
-                    ties = user.ties + userIdTies[it]!!
-                )
+            val updatedUser: PublicUserEntity
+            when (autoMatchType) {
+                MatchModeEnum.AUTO -> {
+                    updatedUser =
+                        user.copy(
+                            wins = user.wins + userIdWinsMap[it]!!,
+                            losses = user.losses + userIdLoss[it]!!,
+                            ties = user.ties + userIdTies[it]!!
+                        )
+                }
+                MatchModeEnum.AUTOPVP -> {
+                    updatedUser =
+                        user.copy(
+                            pvPWins = user.pvPWins + userIdWinsMap[it]!!,
+                            pvPLosses = user.pvPLosses + userIdLoss[it]!!,
+                            pvPTies = user.pvPTies + userIdTies[it]!!
+                        )
+                }
+                else -> {
+                    updatedUser = user
+                }
+            }
             publicUserRepository.save(updatedUser)
         }
     }
+
     fun getPublicUser(userId: UUID): PublicUserEntity {
         return publicUserRepository.findById(userId).get()
     }
@@ -408,5 +497,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
 
     fun getTopNUsers(): List<PublicUserEntity> {
         return publicUserRepository.findAllByTier(TierTypeDto.TIER1).sortedByDescending { it.rating }
+    }
+
+    fun getPvPTopNUsers(): List<PublicUserEntity> {
+        return publicUserRepository.findAllByPvPTier(TierTypeDto.TIER1).sortedByDescending { it.pvpRating }
     }
 }

@@ -5,5 +5,6 @@ enum class MatchModeEnum {
     SELFPVP,
     MANUAL,
     AUTO,
+    AUTOPVP,
     PVP
 }

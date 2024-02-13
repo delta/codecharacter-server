@@ -31,6 +31,7 @@ class SchedulingService(
     fun updateTempLeaderboard() {
         logger.info("Practice phase ended!!")
         publicUserService.resetRatingsAfterPracticePhase()
+        publicUserService.resetPvPRatingsAfterPracticePhase()
         codeRevisionService.resetCodeRevisionAfterPracticePhase()
         latestCodeService.resetLatestCodeAfterPracticePhase()
         lockedCodeService.resetLockedCodeAfterPracticePhase()
@@ -38,11 +39,13 @@ class SchedulingService(
         lockedMapService.resetLockedMapAfterPracticePhase()
         mapRevisionService.resetMapRevisionAfterPracticePhase()
         publicUserService.updateLeaderboardAfterPracticePhase()
+        publicUserService.updatePvPLeaderboardAfterPracticePhase()
     }
 
 
     @Scheduled(cron = "\${environment.promote-demote-time}", zone = "GMT+5:30")
     fun createAutoMatch() {
         matchService.createAutoMatch()
+        matchService.createPvPAutoMatch()
     }
 }
