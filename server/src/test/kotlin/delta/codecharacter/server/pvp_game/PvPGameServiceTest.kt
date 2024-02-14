@@ -80,12 +80,16 @@ internal class PvPGameServiceTest {
         val pvPGame = mockk<PvPGameEntity>()
         val matchId = UUID.randomUUID()
 
+        val pvPGameParameters = gameParameters.copy(
+            numberOfCoins = 10,
+        )
+
         val expectedPvPGameRequest =
             PvPGameRequestEntity(
                 gameId = matchId,
                 player1 = GameCode("player1 code", LanguageEnum.CPP),
                 player2 = GameCode("player2 code", LanguageEnum.JAVA),
-                parameters = gameParameters,
+                parameters = pvPGameParameters,
             )
 
         every {pvPGame.matchId} returns matchId

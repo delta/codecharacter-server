@@ -41,10 +41,13 @@ class PvPGameService(
     }
 
     fun sendPvPGameRequest(pvPGame: PvPGameEntity, player1Code: GameCode, player2Code: GameCode) {
+        val pvPGameParameters = parameters.copy(
+            numberOfCoins = 10,
+        )
         val pvPGameRequest =
             PvPGameRequestEntity(
                 gameId = pvPGame.matchId,
-                parameters = parameters,
+                parameters = pvPGameParameters,
                 player1 = player1Code,
                 player2 = player2Code
             )
