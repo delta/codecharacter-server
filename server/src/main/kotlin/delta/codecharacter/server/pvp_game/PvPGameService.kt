@@ -89,7 +89,14 @@ class PvPGameService(
         println("saved normal match")
         println(gameResultPlayer1.log.length)
         println(gameResultPlayer2.log.length)
-        pvPGameLogService.savePvPGameLog(pvPGame.matchId, gameResultPlayer1.log, gameResultPlayer2.log)
+        try {
+            pvPGameLogService.savePvPGameLog(pvPGame.matchId, gameResultPlayer1.log, gameResultPlayer2.log)
+        }
+        catch (e : Exception){
+            println("log size too much")
+            val logSizeHighError = "ERRORS, ERROR TYPE: LOGS TOO BIG\nERRORS, ERROR LOG:\n THE GAME RAN PERFECTLY BUT THE LOGS ARE TOO BIG TO RENDER\n"
+            pvPGameLogService.savePvPGameLog(pvPGame.matchId,logSizeHighError,logSizeHighError)
+        }
         println("saved normal match log")
         return Triple(pvPGame, gameResultPlayer1.hasErrors, gameResultPlayer2.hasErrors)
     }
