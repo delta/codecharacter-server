@@ -565,6 +565,7 @@ class MatchService(
         println("Passed the game repository query")
 
         if (matchRepository.findById(matchId).isPresent) {
+            println("normal game thing")
             val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
             println("Saved the logs for normal game")
             val match = matchRepository.findById(updatedGame.matchId).get()
@@ -710,6 +711,7 @@ class MatchService(
                 }
             }
         } else if (dailyChallengeMatchRepository.findById(matchId).isPresent) {
+            println("daily challenge game")
             val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
             val match = dailyChallengeMatchRepository.findById(matchId).get()
             simpMessagingTemplate.convertAndSend(
@@ -751,6 +753,7 @@ class MatchService(
                 dailyChallengeMatchRepository.save(updatedMatch)
             }
         } else if(pvPMatchRepository.findById(matchId).isPresent) {
+            println("pvp game")
             val (updatedGame, player1HasErrors, player2HasErrors) = pvPGameService.updateGameStatus(gameStatusUpdateJson)
             val match = pvPMatchRepository.findById(updatedGame.matchId).get()
             if (match.mode != MatchModeEnum.AUTOPVP && match.game.matchId == updatedGame.matchId) {
