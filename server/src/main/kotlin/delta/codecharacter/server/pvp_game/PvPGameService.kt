@@ -62,7 +62,9 @@ class PvPGameService(
                 throw CustomException(HttpStatus.NOT_FOUND, "PvPGame not found")
             }
         if(gameStatusUpdateEntity.gameResultPlayer1 == null || gameStatusUpdateEntity.gameResultPlayer2 == null) {
+            println("came inside self match")
             val newPvPGameEntity = oldPvPGameEntity.copy(status = gameStatusUpdateEntity.gameStatus)
+            println("saved self match")
             return Triple(pvPGameRepository.save(newPvPGameEntity), false, false)
         }
 
@@ -82,9 +84,11 @@ class PvPGameService(
                 scorePlayer2 = gameResultPlayer2.score,
                 status = gameStatus
             )
-
+        println("normal match only")
         val pvPGame = pvPGameRepository.save(newPvPGameEntity)
+        println("saved normal match")
         pvPGameLogService.savePvPGameLog(pvPGame.matchId, gameResultPlayer1.log, gameResultPlayer2.log)
+        println("saved normal match log")
         return Triple(pvPGame, gameResultPlayer1.hasErrors, gameResultPlayer2.hasErrors)
     }
 }
