@@ -447,7 +447,7 @@ internal class MatchServiceTest {
         every { dailyChallengeService.getDailyChallengeByDate() } returns mockk()
         every {
             gameService.sendGameRequest(
-                any(), dailyChallengeForUser.chall.cpp.toString(), LanguageEnum.CPP, matchRequest.value
+                any(), dailyChallengeForUser.chall.python.toString(), LanguageEnum.PYTHON, matchRequest.value
             )
         } returns Unit
 
@@ -457,7 +457,7 @@ internal class MatchServiceTest {
             dailyChallengeMatchRepository.save(any())
             gameService.createGame(any())
             gameService.sendGameRequest(
-                any(), dailyChallengeForUser.chall.cpp.toString(), LanguageEnum.CPP, matchRequest.value
+                any(), dailyChallengeForUser.chall.python.toString(), LanguageEnum.PYTHON, matchRequest.value
             )
         }
         confirmVerified(dailyChallengeMatchRepository, gameService)
