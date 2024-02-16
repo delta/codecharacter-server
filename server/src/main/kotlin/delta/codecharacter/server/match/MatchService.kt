@@ -562,8 +562,11 @@ class MatchService(
             throw CustomException(HttpStatus.NOT_FOUND, "Game not found")
         }
 
+        println("Passed the game repository query")
+
         if (matchRepository.findById(matchId).isPresent) {
             val updatedGame = gameService.updateGameStatus(gameStatusUpdateEntity)
+            println("Saved the logs for normal game")
             val match = matchRepository.findById(updatedGame.matchId).get()
             if (match.mode != MatchModeEnum.AUTO && match.games.first().id == updatedGame.id) {
                 simpMessagingTemplate.convertAndSend(
