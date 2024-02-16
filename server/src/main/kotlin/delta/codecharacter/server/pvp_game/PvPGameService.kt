@@ -83,8 +83,6 @@ class PvPGameService(
                 status = gameStatus
             )
         val pvPGame = pvPGameRepository.save(newPvPGameEntity)
-        println(gameResultPlayer1.log.length)
-        println(gameResultPlayer2.log.length)
         try {
             pvPGameLogService.savePvPGameLog(pvPGame.matchId, gameResultPlayer1.log, gameResultPlayer2.log)
         }
