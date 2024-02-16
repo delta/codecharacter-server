@@ -62,9 +62,7 @@ class PvPGameService(
                 throw CustomException(HttpStatus.NOT_FOUND, "PvPGame not found")
             }
         if(gameStatusUpdateEntity.gameResultPlayer1 == null || gameStatusUpdateEntity.gameResultPlayer2 == null) {
-            println("came inside self match")
             val newPvPGameEntity = oldPvPGameEntity.copy(status = gameStatusUpdateEntity.gameStatus)
-            println("saved self match")
             return Triple(pvPGameRepository.save(newPvPGameEntity), false, false)
         }
 
@@ -84,9 +82,7 @@ class PvPGameService(
                 scorePlayer2 = gameResultPlayer2.score,
                 status = gameStatus
             )
-        println("normal match only")
         val pvPGame = pvPGameRepository.save(newPvPGameEntity)
-        println("saved normal match")
         println(gameResultPlayer1.log.length)
         println(gameResultPlayer2.log.length)
         try {
@@ -97,7 +93,6 @@ class PvPGameService(
             val logSizeHighError = "ERRORS, ERROR TYPE: LOGS TOO BIG\nERRORS, ERROR LOG:\n THE GAME RAN PERFECTLY BUT THE LOGS ARE TOO BIG TO RENDER\n"
             pvPGameLogService.savePvPGameLog(pvPGame.matchId,logSizeHighError,logSizeHighError)
         }
-        println("saved normal match log")
         return Triple(pvPGame, gameResultPlayer1.hasErrors, gameResultPlayer2.hasErrors)
     }
 }
