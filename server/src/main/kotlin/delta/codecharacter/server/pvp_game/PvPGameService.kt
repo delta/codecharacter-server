@@ -87,6 +87,8 @@ class PvPGameService(
         println("normal match only")
         val pvPGame = pvPGameRepository.save(newPvPGameEntity)
         println("saved normal match")
+        println(gameResultPlayer1.log.length)
+        println(gameResultPlayer2.log.length)
         pvPGameLogService.savePvPGameLog(pvPGame.matchId, gameResultPlayer1.log, gameResultPlayer2.log)
         println("saved normal match log")
         return Triple(pvPGame, gameResultPlayer1.hasErrors, gameResultPlayer2.hasErrors)
