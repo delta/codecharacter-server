@@ -54,7 +54,7 @@ class TestAttributes {
                 day = 0,
                 challName = "challengeName",
                 challType = ChallengeTypeDto.CODE,
-                chall = DailyChallengeObjectDto(cpp = "example cpp code"),
+                chall = DailyChallengeObjectDto(cpp = "example cpp code", python = "example python code"),
                 perfectScore = 500,
                 numberOfCompletions = 2,
                 toleratedDestruction = 60,

@@ -8,6 +8,7 @@ import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
 import delta.codecharacter.server.code_tutorial.CodeTutorialService
 import delta.codecharacter.server.code_tutorial.match.CodeTutorialMatchRepository
+import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.daily_challenge.DailyChallengeService
 import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchRepository
 import delta.codecharacter.server.exception.CustomException
@@ -441,10 +442,10 @@ internal class MatchServiceTest {
         val matchRequest = DailyChallengeMatchRequestDto(value = "[[0,0,0]]")
         every { dailyChallengeService.getDailyChallengeByDateForUser(any()) } returns
             dailyChallengeForUser
+        every { dailyChallengeService.getDailyChallengeByDate() } returns TestAttributes.dailyChallengeCode
         every { dailyChallengeMatchRepository.save(any()) } returns mockk()
         every { publicUserService.getPublicUser(any()) } returns TestAttributes.publicUser
         every { gameService.createGame(any()) } returns mockk()
-        every { dailyChallengeService.getDailyChallengeByDate() } returns mockk()
         every {
             gameService.sendGameRequest(
                 any(), dailyChallengeForUser.chall.python.toString(), LanguageEnum.PYTHON, matchRequest.value

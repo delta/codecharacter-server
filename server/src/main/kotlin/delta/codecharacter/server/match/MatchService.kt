@@ -271,7 +271,7 @@ class MatchService(
         when (challType) {
             ChallengeTypeDto.CODE -> { // code as question and map as answer
                 mapValidator.validateMap(value)
-                code = chall.python.toString()
+                code = dc.chall.python.toString()
                 language = LanguageEnum.PYTHON
                 map = value
             }
