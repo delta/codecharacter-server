@@ -21,7 +21,12 @@ class LockedCodeService(
         codeType: CodeTypeDto
     ): Pair<LanguageEnum, String> {
         val lockedCode = HashMap<CodeTypeDto, Code>()
-        lockedCode[codeType] = defaultCodeMapConfiguration.defaultLockedCode
+        if(codeType == CodeTypeDto.NORMAL) {
+            lockedCode[codeType] = defaultCodeMapConfiguration.defaultLockedCode
+        }
+        else if(codeType == CodeTypeDto.PVP) {
+            lockedCode[codeType] = defaultCodeMapConfiguration.defaultPvPLockedCode
+        }
         return lockedCodeRepository
             .findById(userId)
             .orElse(
@@ -33,7 +38,7 @@ class LockedCodeService(
             .let { code ->
                 Pair(
                     code.lockedCode[codeType]?.language ?: defaultCodeMapConfiguration.defaultLanguage,
-                    code.lockedCode[codeType]?.code ?: defaultCodeMapConfiguration.defaultCode
+                    code.lockedCode[codeType]?.code ?: if (codeType == CodeTypeDto.NORMAL) defaultCodeMapConfiguration.defaultCode else defaultCodeMapConfiguration.defaultPvPCode,
                 )
             }
     }
