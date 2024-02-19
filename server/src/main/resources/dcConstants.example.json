@@ -39,5 +39,20 @@
     "numberOfCompletions" : 0,
     "toleratedDestruction" : 50,
     "map": ""
+  },
+  {
+    "day": 5,
+    "challName": "Code ",
+    "challType": "CODE",
+    "chall": {
+      "cpp" : "This is cpp code",
+      "java" : "This is Java Code",
+      "python" : "from player_code import (\n    Position,\n    Attacker,\n    Defender,\n    AttackerType,\n    DefenderType,\n    Constants,\n    Map,\n    State,\n    Game,\n    is_valid_spawn_position,\n    get_all_valid_spawn_positions,\n)\n\nlast_spawned = 0\n\ndef run(state: State) -> Game:\n    global last_spawned\n    game = Game()\n\n    remaining_coins = state.no_of_coins_left\n\n    attackers = state.attackers\n    defenders = state.defenders\n    type_1=1\n    type_2=2\n    type_3=3\n\n    all_valid_spawn_positions = get_all_valid_spawn_positions()\n\n    if len(defenders) != 0:\n        for i in range(6):\n            position1=Position(25+i,0)\n            position2=Position(25+i,63)\n            position3=Position(i,0)      \n\n            if is_valid_spawn_position(position1) and\\n                    not game.is_already_spawned_at_position(position1) and\\n                is_valid_spawn_position(position2) and\\n                    not game.is_already_spawned_at_position(position2) and\\n                is_valid_spawn_position(position3) and\\n                    not game.is_already_spawned_at_position(position3):\n                           \n                game.spawn_attacker(type_1,position3)\n                game.spawn_attacker(type_2,position2)\n                game.spawn_attacker(type_3,position1)\n                    \n    if len(attackers)!=0 and len(defenders)!=0:\n        game.set_target(attackers[0].id,defenders[0].id)\n        game.activate_ability(attackers[0].id)\n    \n    return game"
+    },
+    "description": "Labore adipisicing culpa eiusmod labore mollit nisi ex fugiat nulla et voluptate laborum.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 70,
+    "map": ""
   }
 ]
