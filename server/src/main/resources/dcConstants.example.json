@@ -39,5 +39,20 @@
     "numberOfCompletions" : 0,
     "toleratedDestruction" : 50,
     "map": ""
+  },
+  {
+    "day": 5,
+    "challName": "Aerial Wrath Increasing",
+    "challType": "CODE",
+    "chall": {
+      "cpp" : "This is cpp code",
+      "java" : "This is Java Code",
+      "python" : "from player_code import (\n    Position,\n    Attacker,\n    Defender,\n    AttackerType,\n    DefenderType,\n    Constants,\n    Map,\n    State,\n    Game,\n    is_valid_spawn_position,\n    get_all_valid_spawn_positions,\n)\n\n# This initial code is well commented and serves as a small tutorial for game\n# APIs, for more information you can refer to the documentation\n\n# This is the function player has to fill\n# You can define any new functions here that you want\n\n\nlast_spawned = 0\n\ndef run(state: State) -> Game:\n    game = Game()\n\n    remaining_coins = state.no_of_coins_left\n    defenders = state.defenders\n    attackers = state.attackers\n\n    aerial_towers = 0\n    aerial_towers_arr = []\n    for x in defenders:\n        if(x.type == 3):\n            aerial_towers+=1\n            aerial_towers_arr.append(x)\n\n    aerial_attackers = 0\n    aerial_attackers_arr = []\n    for x in attackers:\n        if(x.type == 3):\n            aerial_attackers+=1\n    spawn = 0\n    if(aerial_towers > 0 and aerial_attackers<100):\n        while(aerial_attackers<100):\n            game.spawn_attacker(3,Position(0,spawn))\n            spawn+=1\n            aerial_attackers+=1\n            if(spawn > 60):\n                break\n        if(len(aerial_towers_arr) > 0):\n            for x in aerial_attackers_arr:\n                game.set_target(x.id,aerial_towers_arr[0].id)\n    else:\n        if(len(aerial_towers_arr) > 0 or len(aerial_attackers_arr) < 20):\n            while(aerial_attackers<100):\n                game.spawn_attacker(3,Position(0,spawn))\n                spawn+=1\n                aerial_attackers+=1\n                if(spawn > 60):\n                    break\n    \n    return game\n\n"
+    },
+    "description": "The attackers are getting angrier and have returned with a vengeance. Can you protect your base from their wrath?",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": ""
   }
 ]
