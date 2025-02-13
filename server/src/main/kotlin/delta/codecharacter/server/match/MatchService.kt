@@ -129,7 +129,11 @@ class MatchService(
 
     private fun createPvPSelfMatch(userId: UUID, codeRevisionId1: UUID?, codeRevisionId2: UUID?) {
         if (codeRevisionId1==codeRevisionId2) {
-            throw CustomException(HttpStatus.BAD_REQUEST, "Codes must be different")
+            notificationService.sendNotification(
+                userId,
+                "PvP Self Match: Warning",
+                "You are matching against same code"
+            )
         }
         val (code1, language1) = getCodeFromRevision(userId, codeRevisionId1, CodeTypeDto.PVP)
         val (code2, language2) = getCodeFromRevision(userId, codeRevisionId2, CodeTypeDto.PVP)
@@ -267,8 +271,8 @@ class MatchService(
         when (challType) {
             ChallengeTypeDto.CODE -> { // code as question and map as answer
                 mapValidator.validateMap(value)
-                code = chall.cpp.toString()
-                language = LanguageEnum.CPP
+                code = dc.chall.python.toString()
+                language = LanguageEnum.PYTHON
                 map = value
             }
             ChallengeTypeDto.MAP -> {
@@ -857,7 +861,7 @@ class MatchService(
                     }
                     notificationService.sendNotification(
                         match.player1.userId,
-                        "Auto Match Result",
+                        "PvP Auto Match Result",
                         "${
                             when (verdict) {
                                 MatchVerdictEnum.PLAYER1 -> "Won"
